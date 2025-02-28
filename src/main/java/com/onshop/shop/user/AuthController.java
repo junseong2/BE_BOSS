@@ -1,18 +1,20 @@
 package com.onshop.shop.user;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;  // ✅ 추가!
-import org.springframework.transaction.annotation.Transactional;
-
+import com.onshop.shop.user.LoginRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders; // 이 줄을 추가하세요.
 import org.springframework.http.HttpMethod;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -169,13 +171,20 @@ public class AuthController {
 	
 	@GetMapping("/user-info")
 	public ResponseEntity<Map<String, String>> getUserInfo(HttpSession session) {
-	    String userId = (String) session.getAttribute("userId");
-	    String userName = (String) session.getAttribute("userName");
-        System.out.println("user-info UserName: " + userName);
-        System.out.println("user-info UserId: " + userId);
-	    if (userId == null || userName == null) {
+	    Object userIdObj = session.getAttribute("userId");
+	    Object userNameObj = session.getAttribute("userName");
+
+	    System.out.println("user-info UserId: " + userIdObj);
+	    System.out.println("user-info UserName: " + userNameObj);
+
+	    // ✅ 값이 null인지 확인
+	    if (userIdObj == null || userNameObj == null) {
 	        return ResponseEntity.status(401).body(Map.of("error", "로그인이 필요합니다."));
 	    }
+
+	    // ✅ Integer → String 변환 방지
+	    String userId = userIdObj instanceof Integer ? String.valueOf(userIdObj) : userIdObj.toString();
+	    String userName = userNameObj instanceof Integer ? String.valueOf(userNameObj) : userNameObj.toString();
 
 	    return ResponseEntity.ok(Map.of("userId", userId, "userName", userName));
 	}
@@ -270,43 +279,113 @@ public class AuthController {
 
         return ResponseEntity.ok("Kakao login successful");
     }
-    @Transactional
-    public synchronized User saveOrUpdateUser(String socialId, String userName, String userEmail) {
-        Optional<User> existingUserOpt = userRepository.findBySocialId(socialId);
-        
-        if (existingUserOpt.isPresent()) {
-            User existingUser = existingUserOpt.get();
-            existingUser.setUsername(userName);
-            existingUser.setEmail(userEmail);
-            System.out.println("Updating existing user: " + existingUser);
+    
+    
+    @Autowired
+    private UserService userService;
+    @PostMapping("/signup")
+    public ResponseEntity<?> signUp(@RequestBody UserEntity user, HttpSession session) {
+        try {
+            if (user.getAddresses() == null) {
+                user.setAddresses(new ArrayList<>()); // ✅ addresses가 null이면 초기화
+            }
 
-            return userRepository.save(existingUser); // 기존 사용자 업데이트
-        } else {
-            User newUser = new User(socialId, userName, userEmail);
-            System.out.println("Saving new user: " + newUser);
+            userService.registerUser(user);
+            // ✅ userId 확인
+            System.out.println("로컬 UserName: " +  user.getUsername());
+            System.out.println("로컬 UserId: " +  user.getUserId());
+            // ✅ 가입한 사용자의 username을 세션에 저장
+       
+            // ✅ 가입한 사용자의 username을 세션에 저장
+        //    session.setAttribute("username", user.getUsername());
 
-            return userRepository.save(newUser); // 새 사용자 저장
+            return ResponseEntity.ok("회원가입 성공!");
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("회원가입 실패: " + e.getMessage());
         }
     }
+    @PostMapping("/signin")
+    public ResponseEntity<?> signIn(@RequestBody LoginRequest loginRequest, HttpSession session) {
+        try {
+            // ✅ 유저 정보 조회
+            UserEntity user = userService.findByEmailAndPassword(loginRequest.getEmail(), loginRequest.getPassword());
+
+            if (user == null) {
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("이메일 또는 비밀번호가 올바르지 않습니다.");
+            }
+
+            // ✅ 로그인 성공 시 세션 저장
+            session.setAttribute("userId", user.getUserId());
+            session.setAttribute("username", user.getUsername());
+
+            return ResponseEntity.ok(Map.of("message", "로그인 성공!", "username", user.getUsername()));
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("로그인 실패: " + e.getMessage());
+        }
+    }
+    
+    @PostMapping("/locallogin")
+    public ResponseEntity<?> login(@RequestBody UserEntity loginRequest, HttpSession session) {
+        UserEntity user = userService.findByEmailAndPassword(loginRequest.getEmail(), loginRequest.getPassword());
+
+        if (user == null) {
+            return ResponseEntity.status(401).body("로그인 실패: 이메일 또는 비밀번호가 올바르지 않습니다.");
+        }
+
+        // ✅ 로그인 성공 로그 추가
+        System.out.println("로그인 성공: " + user.getUsername());
+
+        // ✅ 세션에 저장
+        session.setAttribute("userId", user.getUserId());
+        session.setAttribute("userName", user.getUsername());  // ✅ 여기에서 저장
+
+        return ResponseEntity.ok(Map.of("message", "로그인 성공!", "userName", user.getUsername()));
+    }
+
+
     @Transactional
-    public synchronized User saveOrUpdateSocialUser(String socialId, String userName, String userEmail,String social_provider) {
-        Optional<User> existingUserOpt = userRepository.findBySocialId(socialId);
-        
+    public UserEntity saveOrUpdateUser(String socialId, String userName, String userEmail) {
+        Optional<UserEntity> existingUserOpt = userRepository.findBySocialId(socialId);
+
         if (existingUserOpt.isPresent()) {
-            User existingUser = existingUserOpt.get();
+            UserEntity existingUser = existingUserOpt.get();
             existingUser.setUsername(userName);
             existingUser.setEmail(userEmail);
-            existingUser.setSocialProvider(social_provider);
-          
-          
             System.out.println("Updating existing user: " + existingUser);
 
-            return userRepository.save(existingUser); // 기존 사용자 업데이트
+            return userRepository.save(existingUser); // ✅ 기존 사용자 업데이트
         } else {
-            User newUser = new User(socialId, userName, userEmail,social_provider);
+            UserEntity newUser = new UserEntity();
+            newUser.setSocialId(socialId);
+            newUser.setUsername(userName);
+            newUser.setEmail(userEmail);
             System.out.println("Saving new user: " + newUser);
 
-            return userRepository.save(newUser); // 새 사용자 저장
+            return userRepository.save(newUser); // ✅ 새 사용자 저장
+        }
+    }
+
+    @Transactional
+    public UserEntity saveOrUpdateSocialUser(String socialId, String userName, String userEmail, String socialProvider) {
+        Optional<UserEntity> existingUserOpt = userRepository.findBySocialId(socialId);
+
+        if (existingUserOpt.isPresent()) {
+            UserEntity existingUser = existingUserOpt.get();
+            existingUser.setUsername(userName);
+            existingUser.setEmail(userEmail);
+            existingUser.setSocialProvider(socialProvider);
+            System.out.println("Updating existing user: " + existingUser);
+
+            return userRepository.save(existingUser); // ✅ 기존 사용자 업데이트
+        } else {
+            UserEntity newUser = new UserEntity();
+            newUser.setSocialId(socialId);
+            newUser.setUsername(userName);
+            newUser.setEmail(userEmail);
+            newUser.setSocialProvider(socialProvider);
+            System.out.println("Saving new user: " + newUser);
+
+            return userRepository.save(newUser); // ✅ 새 사용자 저장
         }
     }
 	private String generateState() {
