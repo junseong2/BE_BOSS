@@ -130,9 +130,10 @@ public class AuthController {
 	    String userName = userInfo.get("name").asText();
 	    String userEmail = userInfo.has("email") ? userInfo.get("email").asText() : "";
 	    String social_provider = "naver";
+	    String role = "costomer";
 
 	    // 🔹 사용자 정보 저장 또는 업데이트
-	    saveOrUpdateUser(naverId, userName, userEmail); // naverId를 String으로 사용
+	    saveOrUpdateSocialUser(naverId, userName, userEmail,social_provider,role); // naverId를 String으로 사용
 
 	    // 🔹 UserEntity 찾기
 	    UserEntity user = userService.findBySocialId(naverId); // naverId를 사용하여 찾기
@@ -241,6 +242,8 @@ public class AuthController {
 	              address.setIsDefault(addrReq.getIsDefault());
 	              System.out.println("📌 요청으로 받은 주소 리스트: " + request.getAddresses());
 
+	              
+	              
 	              // 🔥 디버깅 로그 추가
 	           // ✅ 필드 값 확인 (디버깅 로그 추가)
 	              System.out.println("✅ 새 주소 객체 생성 - address1: " + address.getAddress1() 
@@ -345,8 +348,11 @@ public class AuthController {
 	    String userName = userInfo.path("kakao_account").path("profile").path("nickname").asText();
 	    String userEmail = userInfo.path("kakao_account").path("email").asText();
 
+	    String social_provider = "kakao";
+	    String role = "costomer";
+	    
 	    // 사용자 정보를 저장하거나 업데이트
-	    saveOrUpdateUser(kakaoId, userName, userEmail);
+	    saveOrUpdateSocialUser(kakaoId, userName, userEmail,social_provider,role);
 
 	    // ✅ userId로 UserEntity 찾기
 	    UserEntity user = userService.findBySocialId(kakaoId); // Optional이 아니라 직접 반환
@@ -471,7 +477,7 @@ public class AuthController {
     }
 
     @Transactional
-    public UserEntity saveOrUpdateSocialUser(String socialId, String userName, String userEmail, String socialProvider) {
+    public UserEntity saveOrUpdateSocialUser(String socialId, String userName, String userEmail, String socialProvider,String Role) {
         Optional<UserEntity> existingUserOpt = userRepository.findBySocialId(socialId);
 
         if (existingUserOpt.isPresent()) {
@@ -479,6 +485,7 @@ public class AuthController {
             existingUser.setUsername(userName);
             existingUser.setEmail(userEmail);
             existingUser.setSocialProvider(socialProvider);
+            existingUser.setRole(Role);
             System.out.println("Updating existing user: " + existingUser);
 
             return userRepository.save(existingUser); // ✅ 기존 사용자 업데이트
@@ -488,6 +495,7 @@ public class AuthController {
             newUser.setUsername(userName);
             newUser.setEmail(userEmail);
             newUser.setSocialProvider(socialProvider);
+            newUser.setRole(Role);
             System.out.println("Saving new user: " + newUser);
 
             return userRepository.save(newUser); // ✅ 새 사용자 저장
