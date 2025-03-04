@@ -1,31 +1,17 @@
 package com.onshop.shop.cart;
-//장바구니 엔터티로, 사용자와 연결되어 있으며 다수의 CartItem을 가집니다.
 
-
-
-
-import java.util.ArrayList;
-import java.util.List;
-
-import jakarta.persistence.CascadeType;
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.OneToMany;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 
 @Entity
-@Table(name = "carts")
+@Table(name = "cart")
 public class CartEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long cartId;
 
     private Long userId;
-
-    @OneToMany(mappedBy = "cart", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<CartItemEntity> items = new ArrayList<>();
+    private Long productId;
+    private int quantity;
 
     // Getters and Setters
     public Long getCartId() {
@@ -40,10 +26,26 @@ public class CartEntity {
     public void setUserId(Long userId) {
         this.userId = userId;
     }
-    public List<CartItemEntity> getItems() {
-        return items;
+    public Long getProductId() {
+        return productId;
     }
-    public void setItems(List<CartItemEntity> items) {
-        this.items = items;
+    public void setProductId(Long productId) {
+        this.productId = productId;
+    }
+    public int getQuantity() {
+        return quantity;
+    }
+    public void setQuantity(int quantity) {
+        this.quantity = quantity;
+    }
+
+    @Override
+    public String toString() {
+        return "CartEntity { " +
+                "cartId=" + cartId +
+                ", userId=" + userId +
+                ", productId=" + productId +
+                ", quantity=" + quantity +
+                " }";
     }
 }

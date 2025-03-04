@@ -1,7 +1,6 @@
 package com.onshop.shop.cart;
 
 import jakarta.persistence.*;
-
 @Entity
 @Table(name = "cart_items")
 public class CartItemEntity {
@@ -10,11 +9,15 @@ public class CartItemEntity {
     private Long cartItemId;
 
     @ManyToOne
-    @JoinColumn(name = "cart_id")
+    @JoinColumn(name = "cart_id", nullable = false) // nullable = false 추가
     private CartEntity cart;
 
     private Long productId;
     private Integer quantity;
+
+    // 기본 생성자
+    public CartItemEntity() {
+    }
 
     // Getters and Setters
     public Long getCartItemId() {
@@ -40,5 +43,12 @@ public class CartItemEntity {
     }
     public void setQuantity(Integer quantity) {
         this.quantity = quantity;
+    }
+
+    @Override
+    public String toString() {
+        return "CartItemEntity {cartItemId=" + cartItemId +
+               ", productId=" + productId +
+               ", quantity=" + quantity + "}";
     }
 }
