@@ -1,11 +1,8 @@
 package com.onshop.shop.cart;
 
-import com.onshop.shop.cart.CartItemRequest;
-import com.onshop.shop.cart.CartEntity;
-import com.onshop.shop.cart.CartItemEntity;
-import com.onshop.shop.cart.CartRepository;
+import java.util.List;
+
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 @Service
 public class CartService {
@@ -16,26 +13,32 @@ public class CartService {
         this.cartRepository = cartRepository;
     }
 
-    // 사용자 ID로 장바구니 조회
-    public CartEntity getCartByUserId(Long userId) {
-        CartEntity cart = cartRepository.findByUserId(userId);
-        if (cart == null) {
-            cart = new CartEntity();
-            cart.setUserId(userId);
-        }
-        return cart;
+    // 사용자 ID로 장바구니 아이템 조회
+    public List<CartEntity> getCartByUserId(Long userId) {
+        return cartRepository.findByUserId(userId);
     }
 
-    // 장바구니에 아이템 추가 (간단한 예시)
-    @Transactional
+    // 장바구니에 상품 추가
     public CartEntity addItemToCart(Long userId, CartItemRequest request) {
-        CartEntity cart = getCartByUserId(userId);
-        // 신규 아이템 생성 및 장바구니에 추가
-        CartItemEntity item = new CartItemEntity();
-        item.setProductId(request.getProductId());
-        item.setQuantity(request.getQuantity());
-        item.setCart(cart);
-        cart.getItems().add(item);
+        CartEntity cart = new CartEntity();
+        cart.setUserId(userId);
+        cart.setProductId(request.getProductId());
+        cart.setQuantity(request.getQuantity());
         return cartRepository.save(cart);
+    }
+
+    // cartId로 아이템 제거
+    public boolean removeItemFromCart(Long cartId) { // cartId로 수정
+        if (cartRepository.existsById(cartId)) {
+            cartRepository.deleteById(cartId);
+            return true;
+        }
+        return false;
+    }
+
+    // 장바구니 비우기
+    public void clearCart(Long userId) {
+        List<CartEntity> carts = cartRepository.findByUserId(userId);
+        cartRepository.deleteAll(carts);
     }
 }
