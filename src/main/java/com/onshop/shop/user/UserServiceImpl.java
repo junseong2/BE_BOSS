@@ -7,8 +7,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.onshop.shop.user.repository.AddressRepository;
-import com.onshop.shop.user.repository.UserRepository;
+import com.onshop.shop.user.AddressRepository;
+import com.onshop.shop.user.UserRepository;
 
 @Service
 public class UserServiceImpl implements UserService {

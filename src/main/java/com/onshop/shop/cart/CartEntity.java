@@ -1,4 +1,4 @@
-package com.onshop.shop.cart.model;
+package com.onshop.shop.cart;
 //장바구니 엔터티로, 사용자와 연결되어 있으며 다수의 CartItem을 가집니다.
 
 

@@ -1,4 +1,4 @@
-package com.onshop.shop.user.repository;
+package com.onshop.shop.user;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
