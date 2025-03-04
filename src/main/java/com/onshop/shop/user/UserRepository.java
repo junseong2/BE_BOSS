@@ -1,4 +1,4 @@
-package com.onshop.shop.user.repository;
+package com.onshop.shop.user;
 
 import java.util.Optional;
 
