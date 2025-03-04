@@ -1,8 +1,8 @@
 package com.onshop.shop.cart;
 
-import com.onshop.shop.cart.dto.CartItemRequest;
-import com.onshop.shop.cart.model.CartEntity;
-import com.onshop.shop.cart.model.CartItemEntity;
+import com.onshop.shop.cart.CartItemRequest;
+import com.onshop.shop.cart.CartEntity;
+import com.onshop.shop.cart.CartItemEntity;
 import com.onshop.shop.cart.CartRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;

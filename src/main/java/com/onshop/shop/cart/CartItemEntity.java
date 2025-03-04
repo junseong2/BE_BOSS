@@ -1,4 +1,4 @@
-package com.onshop.shop.cart.model;
+package com.onshop.shop.cart;
 
 import jakarta.persistence.*;
 

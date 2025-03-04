@@ -28,9 +28,9 @@ import org.springframework.web.client.RestTemplate;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.onshop.shop.user.dto.UserUpdateRequest;
-import com.onshop.shop.user.repository.AddressRepository;
-import com.onshop.shop.user.repository.UserRepository;
+import com.onshop.shop.user.UserUpdateRequest;
+import com.onshop.shop.user.AddressRepository;
+import com.onshop.shop.user.UserRepository;
 
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession; // javax -> jakarta로 변경

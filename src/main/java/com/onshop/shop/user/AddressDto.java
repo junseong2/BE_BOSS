@@ -1,4 +1,4 @@
-package com.onshop.shop.user.dto;
+package com.onshop.shop.user;
 
 import lombok.Getter;
 import lombok.Setter;

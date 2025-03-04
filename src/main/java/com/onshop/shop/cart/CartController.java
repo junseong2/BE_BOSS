@@ -1,8 +1,8 @@
 package com.onshop.shop.cart;
 
-import com.onshop.shop.cart.model.CartEntity;
+import com.onshop.shop.cart.CartEntity;
 import com.onshop.shop.cart.CartService;
-import com.onshop.shop.cart.dto.CartItemRequest;
+import com.onshop.shop.cart.CartItemRequest;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
