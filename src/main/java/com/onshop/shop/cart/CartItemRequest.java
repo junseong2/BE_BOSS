@@ -1,4 +1,4 @@
-package com.onshop.shop.cart.dto;
+package com.onshop.shop.cart;
 
 public class CartItemRequest {
     private Long productId;
