@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.onshop.shop.products.*;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
 import com.onshop.shop.category.*;
 
@@ -23,6 +24,7 @@ import org.springframework.web.bind.annotation.CrossOrigin;
 @RestController
 @RequestMapping("/products")
 @RequiredArgsConstructor
+@Slf4j
 public class ProductsController {
 
     private final ProductsService productsService;
@@ -36,6 +38,7 @@ public class ProductsController {
     // 단일 상품 조회
     @GetMapping("/{productId}")
     public ProductsDTO getProductById(@PathVariable Long productId) {
+    	log.info("products id:{}", productId);
         return productsService.getProductById(productId);
     }
     
