@@ -1,3 +1,4 @@
+
 package com.onshop.shop.user;
 
 import java.util.List;
@@ -19,3 +20,4 @@ public class UserDTO {
     // 주소 정보 리스트
     private List<AddressDto> addresses;
 }
+
