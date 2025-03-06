@@ -64,7 +64,6 @@ public class AuthController {
 		private final UserRepository userRepository;
 
 		// ✅ 생성자에서 UserRepository 주입
-		@Autowired
 		public AuthController(RestTemplate restTemplate, UserRepository userRepository) {
 		    this.restTemplate = restTemplate;
 		    this.userRepository = userRepository;
@@ -396,7 +395,7 @@ public class AuthController {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("회원가입 실패: " + e.getMessage());
         }
     }
-    /*
+    
     @PostMapping("/signin")
     public ResponseEntity<?> signIn(@RequestBody LoginRequest loginRequest, HttpSession session) {
         try {
@@ -415,7 +414,7 @@ public class AuthController {
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("로그인 실패: " + e.getMessage());
         }
-    }*/
+    }
     
     /*
     
