@@ -1,3 +1,4 @@
+
 package com.onshop.shop.user;
 
 import java.util.Optional;
@@ -17,3 +18,4 @@ public interface UserRepository extends JpaRepository<UserEntity, Integer> { // 
     //Optional<Integer> findByUserId();//1 2 3 4와 같은 userId로 검색
     Optional<UserEntity> findByEmailAndPassword(String email, String password);
 }
+

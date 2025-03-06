@@ -1,6 +1,7 @@
 package com.onshop.shop.cart;
 
 public class CartItemRequest {
+	private Long userId;
     private Long productId;
     private Integer quantity;
 
