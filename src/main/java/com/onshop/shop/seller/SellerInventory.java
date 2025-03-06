@@ -1,25 +1,28 @@
-package com.onshop.shop.seller.inventoryManagement;
+package com.onshop.shop.seller;
 
 import java.time.LocalDateTime;
 
-import org.hibernate.annotations.Check;
 import org.hibernate.annotations.UpdateTimestamp;
 
-import jakarta.persistence.Column;
+import com.onshop.shop.products.Product;
+
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
+import lombok.Builder;
 import lombok.Data;
 
-@Entity
-@Table(name="inventory")
+@Entity(name="Inventory")
+@Table(name="Inventory")
 @Data
-public class InventoryEntity {
+@Builder
+public class SellerInventory {
 	
 	@Id
-	@GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long inventoryId;
 	
 	private Long productId;
@@ -27,6 +30,6 @@ public class InventoryEntity {
 	private Long stock;
 	
 	@UpdateTimestamp
-	private LocalDateTime updatedDate;
+	private LocalDateTime updated_date;
 
 }
