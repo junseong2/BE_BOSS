@@ -1,3 +1,4 @@
+
 package com.onshop.shop.config;  // 패키지명 추가
 
 import org.springframework.context.annotation.Bean;
@@ -11,3 +12,4 @@ public class AppConfig {
         return new RestTemplate();
     }
 }
+

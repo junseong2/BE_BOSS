@@ -1,3 +1,4 @@
+
 package com.onshop.shop.user;
 
 import jakarta.persistence.*;
@@ -23,3 +24,4 @@ public class AddressEntity {
     private String post;
     private Boolean isDefault;
 }
+

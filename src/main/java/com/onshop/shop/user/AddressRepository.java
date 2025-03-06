@@ -1,3 +1,4 @@
+
 package com.onshop.shop.user;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
@@ -26,3 +27,4 @@ public interface AddressRepository extends JpaRepository<AddressEntity, Integer>
     void deleteAllByUserId(@Param("userId") Integer userId);
 
 }
+
