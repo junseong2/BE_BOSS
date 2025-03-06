@@ -1,3 +1,4 @@
+
 package com.onshop.shop.user;
 
 import lombok.Getter;
@@ -11,3 +12,4 @@ public class AddressDto {
     private String post;
     private Boolean isDefault;
 }
+
