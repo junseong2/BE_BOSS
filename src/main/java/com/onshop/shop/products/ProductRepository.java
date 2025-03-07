@@ -1,6 +1,7 @@
 package com.onshop.shop.products;
 
 import org.apache.ibatis.annotations.Param;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -20,9 +21,11 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
     
     
     // 판매자(점주)의 상품 조회
-    @Query(nativeQuery = true, value =  ""
-    		+ "SELECT p.product_id as productId, p.name as name, p.price as price, c.category_name as category, i.stock as stock "
-    		+ "FROM product p INNER JOIN inventory i ON p.product_id = i.inventory_id "
-    		+ "INNER JOIN category c ON p.product_id = c.category_id")
-    public List<SellerProductsDTO> findBySellerId(@Param("sellerId") Long sellerId, Pageable pageable);
+    @Query(value = "SELECT p.product_id AS productId, p.name AS name, p.price AS price, c.category_name AS categoryName, i.stock AS stock " +
+            "FROM product p " +
+            "JOIN category c ON c.category_id = p.category_id " + 
+            "JOIN inventory i ON i.product_id = p.product_id " + 
+            "WHERE p.seller_id = :sellerId", 
+    nativeQuery = true)
+    Page<SellerProductsDTO> findBySellerId(@Param("sellerId") Long sellerId, Pageable pageable);
 }
