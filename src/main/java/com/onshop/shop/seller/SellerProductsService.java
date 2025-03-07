@@ -7,4 +7,6 @@ public interface SellerProductsService {
 	
 	List<SellerProductsDTO> getAllProducts(int page, int size);
 	
+	void registerProducts(List<SellerProductsRequestDTO> products);
+	
 }
