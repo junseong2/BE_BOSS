@@ -18,7 +18,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping("/cart")
-@CrossOrigin(origins = "http://localhost:5173") // 프론트엔드 URL에 맞게 수정
+@CrossOrigin(origins = "http://localhost:5173", allowCredentials = "true") // 프론트엔드 URL에 맞게 수정
 public class CartController {
 
     private final CartService cartService;
@@ -27,32 +27,18 @@ public class CartController {
         this.cartService = cartService;
     }
 
-    // 장바구니 조회
     @GetMapping
     public ResponseEntity<Map<String, Object>> getCart(@RequestParam("userId") Long userId) {
-        List<CartEntity> carts = cartService.getCartByUserId(userId);
+        // ✅ CartDTO 리스트를 가져옴
+        List<CartDTO> cartItems = cartService.getCartByUserId(userId);
 
         Map<String, Object> response = new HashMap<>();
-        response.put("cartItems", carts);
-
-        // 장바구니 아이템 출력
-        Set<Long> printedCartIds = new HashSet<>();
-
-        for (CartEntity cart : carts) {
-            Long cartId = cart.getCartId();
-            Long cartUserId = cart.getUserId();
-
-            if (!printedCartIds.contains(cartId)) {
-                System.out.println("장바구니 ID: " + cartId + ", 사용자의 ID: " + cartUserId);
-                printedCartIds.add(cartId);
-            }
-
-            System.out.println("상품 ID: " + cart.getProductId() + ", 수량: " + cart.getQuantity() + "개");
-        }
-
+        response.put("cartItems", cartItems);
         response.put("message", "장바구니 조회 성공");
+
         return ResponseEntity.ok(response);
     }
+
 
     // 장바구니에 상품 추가
     @PostMapping("/add")

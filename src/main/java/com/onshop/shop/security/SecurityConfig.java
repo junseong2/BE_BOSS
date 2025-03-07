@@ -26,7 +26,7 @@ public class SecurityConfig {
             .cors(cors -> cors.configurationSource(corsConfigurationSource()))
             .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
             .authorizeHttpRequests(auth -> auth
-                .requestMatchers("/auth/**","/category","/products","/category/**","/products/**").permitAll()//API추가할때마다 수정필요
+                .requestMatchers("/auth/**","/category","/products","/category/**","/products/**","/cart/**").permitAll()//API추가할때마다 수정필요
                 .anyRequest().authenticated()
             )
             .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class); // 필터 추가
