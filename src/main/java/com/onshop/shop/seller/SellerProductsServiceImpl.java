@@ -23,7 +23,7 @@ public class SellerProductsServiceImpl implements SellerProductsService {
 		Long sellerId = 1L; // 임시
 		Pageable pageable = PageRequest.of(page, size);
 		
-		List<SellerProductsDTO> products =  productRepository.findBySellerId(sellerId, pageable);
+		List<SellerProductsDTO> products =  productRepository.findBySellerId(sellerId, pageable).toList();
 		
 		if(products == null) {
 			throw new ResourceNotFoundException("조회할 상품 목록을 찾을 수 없습니다.") ;
