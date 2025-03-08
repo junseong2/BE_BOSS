@@ -1,4 +1,4 @@
-package com.onshop.shop.seller;
+package com.onshop.shop.seller.products;
 
 import java.util.List;
 import java.util.Map;
@@ -91,25 +91,41 @@ public class SellerProductsServiceImpl implements SellerProductsService {
 
 	}
 	
-	// 상품 삭제(단일)
+	
+	// 상품 수정
 	@Override
 	@Transactional
-	public void removeProduct(Long productId) {
+	public void updateProducts(Long productId, SellerProductsRequestDTO productDTO) {
 		// TODO: 권한이 seller 인 경우만 접근이 가능하며, 상품의 sellerId 와 권한 있는 유저의 id 가 일치해야 처리되도록 해야함
 		Long sellerId = 1L;
 		
+		Product	oldProduct = productRepository.findBySellerIdAndProductId(sellerId, productId);
 		
-		// TODO: 현재는 이렇게 해두었지만, 향후 deleteByIdAndSellerId 형식으로 단일 쿼리로 처리 검토
-		int hasProduct = productRepository.existsBySellerId(sellerId);
-		if(hasProduct<1) {
-			throw new ResourceNotFoundException(productId+"번으로 등록된 상품을 찾을 수 없습니다.");
+		if(oldProduct == null) {
+			throw new ResourceNotFoundException("상품ID:"+productId+" 로 등록된 상품을 찾을 수 없습니다.");
 		}
 		
-		productRepository.deleteById(productId);
-	}
+		Category category = categoryRepository.findByCategoryName(productDTO.getCategory());
+		
+		if(category == null) {
+			throw new ResourceNotFoundException(productDTO.getCategory()+"로 등록된 카테고리를 찾을 수 없습니다.");
+		}
+		
 
+		productRepository.save(
+				Product.builder()
+				.productId(oldProduct.getProductId())
+				.name(productDTO.getProductName())
+				.category(category)
+				.description(productDTO.getDescription())
+				.sellerId(sellerId)
+				.price(productDTO.getPrice())
+				.build());
+		
+	}
 	
-	// 상품 삭제(다중)
+	
+	// 상품 삭제
 	@Override
 	@Transactional
 	public void removeProducts(SellerProductIdsDTO productsIdsDTO) {
