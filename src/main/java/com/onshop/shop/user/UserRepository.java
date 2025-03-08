@@ -7,15 +7,19 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
-import com.onshop.shop.user.UserEntity;
+import com.onshop.shop.user.User;
 
 @Repository
-public interface UserRepository extends JpaRepository<UserEntity, Integer> { // ✅ User → UserEntity 변경
-    Optional<UserEntity> findBySocialId(String socialId); 
+public interface UserRepository extends JpaRepository<User, Integer> {
+	
+	Optional<User> findByUserId(Integer userId); 
+	Optional<User> findBySocialId(String socialId); 
 
-    @Query("SELECT MAX(u.userId) FROM UserEntity u") // ✅ User → UserEntity 변경
+    @Query("SELECT MAX(u.userId) FROM User u") 
     Optional<Integer> findMaxUserId();
-    //Optional<Integer> findByUserId();//1 2 3 4와 같은 userId로 검색
-    Optional<UserEntity> findByEmailAndPassword(String email, String password);
+    
+
+   
+    Optional<User> findByEmailAndPassword(String email, String password);//미래에 아이디비번찾기용도
 }
 
