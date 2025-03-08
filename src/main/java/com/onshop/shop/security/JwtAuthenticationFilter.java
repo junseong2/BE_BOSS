@@ -59,18 +59,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         try {
         	
         	
-        	try {
-        	    if (jwtUtil.validateToken(token)) {
-        	        Integer userId = jwtUtil.extractUserId(token);
-        	        System.out.println("✅ JWT 인증 성공 - userId: " + userId);
-        	    } else {
-        	        System.out.println("❌ JWT 검증 실패 - 유효하지 않은 토큰");
-        	    }
-        	} catch (Exception e) {
-        	    System.out.println("❌ JWT 인증 과정에서 오류 발생: " + e.getMessage());
-        	}
-
-        	
+        
             if (jwtUtil.validateToken(token)) {
                 Integer userId = jwtUtil.extractUserId(token);
                 UserDetails userDetails = userDetailsService.loadUserByUsername(userId.toString());

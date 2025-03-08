@@ -1,6 +1,7 @@
 package com.onshop.shop.user;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -17,9 +18,9 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.CookieValue;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -31,6 +32,7 @@ import com.onshop.shop.security.JwtUtil;
 
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpSession;
 
 @RestController
 @RequestMapping("/auth")
@@ -66,7 +68,7 @@ public class AuthController {
     }
 
   
-    //Authorization 헤더로 보내는 대신 쿠키를 사용
+    //쿠키를 사용
     @GetMapping("/user-info")
     public ResponseEntity<Map<String, String>> getUserInfo(@CookieValue(value = "jwt", required = false) String token) {
         if (token == null) {
@@ -174,7 +176,52 @@ public class AuthController {
         return ResponseEntity.ok("회원 정보가 수정되었습니다!");
     }
 
-    
+    @Autowired
+    private UserService userService;
+    @PostMapping("/signup")//로컬유저 회원가입
+    public ResponseEntity<?> signUp(@RequestBody User user, HttpSession session) {
+        try {
+            if (user.getAddresses() == null) {
+                user.setAddresses(new ArrayList<>()); // ✅ addresses가 null이면 초기화
+            }
+
+            userService.registerUser(user);
+            // ✅ userId 확인
+            System.out.println("로컬 UserName: " +  user.getUsername());
+            System.out.println("로컬 UserId: " +  user.getUserId());
+      
+
+            return ResponseEntity.ok("회원가입 성공!");
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("회원가입 실패: " + e.getMessage());
+        }
+    }
+    @PostMapping("/locallogin") // 로컬 로그인
+    public ResponseEntity<?> login(@RequestBody User loginRequest, HttpServletResponse response) {
+        User user = userService.findByEmailAndPassword(loginRequest.getEmail(), loginRequest.getPassword());
+
+        if (user == null) {
+            return ResponseEntity.status(401)
+                    .body(Map.of("error", "로그인 실패: 이메일 또는 비밀번호가 올바르지 않습니다."));
+        }
+
+        // JWT 생성
+        String token = jwtUtil.generateToken(user.getUserId());
+        
+        
+        
+        // 쿠키에 JWT 설정
+        Cookie cookie = new Cookie("jwt", token);
+        System.out.println("jwtUtil.generateToken(user.getUserId());:"+token);
+        cookie.setHttpOnly(true); // 클라이언트에서 접근 불가
+        cookie.setPath("/"); // 쿠키의 유효 경로 설정
+        response.addCookie(cookie); // 쿠키 추가
+        System.out.println(   "message"+ "로그인 성공~!"+ "userId"+ user.getUserId()+ "userName"+ user.getUsername());
+        return ResponseEntity.ok(Map.of("message", "로그인 성공~!", "userId", user.getUserId(), "userName", user.getUsername()));
+}
+
+
+
     @GetMapping("/naver")
     public ResponseEntity<String> naverLoginRedirect() {
         String state = generateState();

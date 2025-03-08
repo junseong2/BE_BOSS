@@ -11,7 +11,7 @@ public class Cart {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long cartId;
 
-    private Integer userId;
+    private Integer userId;//int형이 성능 절약된다고 함! 
     private Long productId;
     private int quantity;
 }
