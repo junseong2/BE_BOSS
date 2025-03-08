@@ -6,6 +6,7 @@ import org.hibernate.annotations.UpdateTimestamp;
 
 import com.onshop.shop.products.Product;
 
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
@@ -28,7 +29,7 @@ public class Inventory {
 
     private int stock;
 
-    @OneToOne(fetch = FetchType.LAZY)
+    @OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     @JoinColumn(name = "product_id")  // productId 컬럼을 직접 쓰지 않고 객체로 참조해야 함
     private Product product;
     

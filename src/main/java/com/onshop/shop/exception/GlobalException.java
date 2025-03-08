@@ -14,12 +14,27 @@ public class GlobalException {
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<ErrorMessageResponse> handleMethodArgumentNotValidException(MethodArgumentNotValidException ex) {
         ErrorMessageResponse response = new ErrorMessageResponse(HttpStatus.BAD_REQUEST, "유효성 검사 실패 : " + ex.getBindingResult().getAllErrors().get(0).getDefaultMessage());
-        return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
+        return new ResponseEntity<ErrorMessageResponse>(response, HttpStatus.BAD_REQUEST);
     }
+    
+    // 400 Null 포인터 예외
+    @ExceptionHandler(NullPointerException.class)
+    public ResponseEntity<ErrorMessageResponse> handleNullPointerException(NullPointerException ex){
+    	ErrorMessageResponse response = new ErrorMessageResponse(HttpStatus.BAD_REQUEST, ex.getMessage());
+    	return new ResponseEntity<ErrorMessageResponse>(response, HttpStatus.BAD_REQUEST);
+    }
+    
     // 404 NOT_FOUND
     @ExceptionHandler(ResourceNotFoundException.class)
     public ResponseEntity<ErrorMessageResponse> handleResourceNotFound(ResourceNotFoundException ex) {
         ErrorMessageResponse response = new ErrorMessageResponse(HttpStatus.NOT_FOUND, ex.getMessage());
-        return new ResponseEntity<>(response, HttpStatus.NOT_FOUND);
+        return new ResponseEntity<ErrorMessageResponse>(response, HttpStatus.NOT_FOUND);
+    }
+    
+    // 500 INTERNAL_SERVER_ERROR
+    @ExceptionHandler(Exception.class)
+    public ResponseEntity<ErrorMessageResponse> handleAllExceptions(Exception ex) {
+    	ErrorMessageResponse response = new ErrorMessageResponse(HttpStatus.INTERNAL_SERVER_ERROR, "예상치 못한 오류가 발생했습니다");
+    	return new ResponseEntity<ErrorMessageResponse>(response, HttpStatus.INTERNAL_SERVER_ERROR);
     }
 }

@@ -28,4 +28,12 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
             "WHERE p.seller_id = :sellerId", 
     nativeQuery = true)
     Page<SellerProductsDTO> findBySellerId(@Param("sellerId") Long sellerId, Pageable pageable);
+    
+    // 상품 삭제(다중)
+    @Query("SELECT p FROM Product p WHERE p.productId IN (:ids)")
+    int deleteProductsByIds(List<Long> productIds);
+    
+    // 판매자가 등록한 상품 존재 유무 확인
+    @Query("SELECT COUNT(p) FROM Product p WHERE p.sellerId =:sellerId")
+    int existsBySellerId(Long sellerId);
 }

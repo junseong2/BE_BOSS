@@ -16,6 +16,7 @@ import com.onshop.shop.inventory.InventoryRepository;
 import com.onshop.shop.products.Product;
 import com.onshop.shop.products.ProductRepository;
 
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 
 @Service
@@ -89,5 +90,35 @@ public class SellerProductsServiceImpl implements SellerProductsService {
 		inventoryRepository.saveAll(unsavedInventories);
 
 	}
+	
+	// 상품 삭제(단일)
+	@Override
+	@Transactional
+	public void removeProduct(Long productId) {
+		// TODO: 권한이 seller 인 경우만 접근이 가능하며, 상품의 sellerId 와 권한 있는 유저의 id 가 일치해야 처리되도록 해야함
+		Long sellerId = 1L;
+		
+		
+		// TODO: 현재는 이렇게 해두었지만, 향후 deleteByIdAndSellerId 형식으로 단일 쿼리로 처리 검토
+		int hasProduct = productRepository.existsBySellerId(sellerId);
+		if(hasProduct<1) {
+			throw new ResourceNotFoundException(productId+"번으로 등록된 상품을 찾을 수 없습니다.");
+		}
+		
+		productRepository.deleteById(productId);
+	}
+
+	
+	// 상품 삭제(다중)
+	@Override
+	@Transactional
+	public void removeProducts(SellerProductIdsDTO productsIdsDTO) {
+		// TODO: 권한이 seller 인 경우만 접근이 가능하며, 상품의 sellerId 와 권한 있는 유저의 id 가 일치해야 처리되도록 해야함
+		
+		List<Long> productIds = productsIdsDTO.getIds();
+		
+		productRepository.deleteAllByIdInBatch(productIds);
+	}
+
 
 }
