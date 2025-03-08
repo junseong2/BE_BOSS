@@ -14,7 +14,7 @@ import lombok.Setter;
 @Setter
 @Entity
 @Table(name = "users")
-public class UserEntity {
+public class User {
 
 	@Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -40,7 +40,7 @@ public class UserEntity {
 
     // ✅ AddressEntity를 사용하도록 수정
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<AddressEntity> addresses = new ArrayList<>();
+    private List<Address> addresses = new ArrayList<>();
     
     
  // ✅ 전화번호를 리스트로 변환하는 메서드 추가
