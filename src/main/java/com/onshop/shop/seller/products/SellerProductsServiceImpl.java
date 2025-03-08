@@ -82,8 +82,8 @@ public class SellerProductsServiceImpl implements SellerProductsService {
 		// 재고 추가
 		List<Inventory> unsavedInventories = savedProducts.stream().map((product) -> {
 		    return Inventory.builder()
-		            .product(product)
-		            .stock(0)
+		            .productId(product)
+		            .stock(0L)
 		            .build();
 		}).collect(Collectors.toList());
 
