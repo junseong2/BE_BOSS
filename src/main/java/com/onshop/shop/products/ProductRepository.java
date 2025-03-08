@@ -7,7 +7,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
-import com.onshop.shop.seller.SellerProductsDTO;
+import com.onshop.shop.seller.products.SellerProductsDTO;
 
 import java.util.List;
 
@@ -28,6 +28,10 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
             "WHERE p.seller_id = :sellerId", 
     nativeQuery = true)
     Page<SellerProductsDTO> findBySellerId(@Param("sellerId") Long sellerId, Pageable pageable);
+    
+    // 점주 전용 상품 조회(단일)
+    @Query("SELECT p FROM Product p WHERE p.sellerId = :sellerId AND p.productId = :productId")
+    Product findBySellerIdAndProductId(@Param("sellerId") Long sellerId, @Param("productId") Long productId);
     
     // 상품 삭제(다중)
     @Query("SELECT p FROM Product p WHERE p.productId IN (:ids)")
