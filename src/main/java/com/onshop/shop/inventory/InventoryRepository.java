@@ -1,5 +1,7 @@
 package com.onshop.shop.inventory;
 
+import java.util.List;
+
 import org.apache.ibatis.annotations.Param;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -22,5 +24,8 @@ public interface InventoryRepository extends JpaRepository<Inventory, Long> {
     // 상품ID 별 재고 조회
 //    @Query("SELECT i FROM Inventory i WHERE i.product.id = :productId ")
     
-
+    
+    @Query("SELECT i FROM Inventory i WHERE i.product.id IN :productIds")
+    List<Inventory> findAllByProductIds(@Param("productIds") List<Long> productIds);
+    
 }
