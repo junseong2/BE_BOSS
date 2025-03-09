@@ -24,6 +24,13 @@ public class GlobalException {
     	return new ResponseEntity<ErrorMessageResponse>(response, HttpStatus.BAD_REQUEST);
     }
     
+    // 400 과잉 요청
+    @ExceptionHandler(OverStockException.class)
+    public ResponseEntity<ErrorMessageResponse> handleOverStockException(OverStockException ex){
+    	ErrorMessageResponse response = new ErrorMessageResponse(HttpStatus.BAD_REQUEST, ex.getMessage());
+    	return new ResponseEntity<ErrorMessageResponse>(response, HttpStatus.BAD_REQUEST);
+    }
+    
     // 404 NOT_FOUND
     @ExceptionHandler(ResourceNotFoundException.class)
     public ResponseEntity<ErrorMessageResponse> handleResourceNotFound(ResourceNotFoundException ex) {
