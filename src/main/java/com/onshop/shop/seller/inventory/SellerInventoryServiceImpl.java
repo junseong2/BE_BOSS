@@ -29,7 +29,7 @@ public class SellerInventoryServiceImpl implements SellerInventoryService {
 		//TODO: 실제 인증된 판매자 ID 를 기반으로 인증되어야 함
 		Long sellerId = 1L;
 		
-		List<SellerInventoryResponseDTO> inventories = inventoryRepository.findBySellerId(sellerId, pageable).toList();
+		List<SellerInventoryResponseDTO> inventories = inventoryRepository.findAllBySellerId(sellerId, pageable).toList();
 		
 		if(inventories.isEmpty() || inventories == null) {
 			throw new ResourceNotFoundException("해당 재고 목록은 존재하지 않습니다.");
@@ -95,5 +95,23 @@ public class SellerInventoryServiceImpl implements SellerInventoryService {
 		
 		inventoryRepository.saveAll(updatedInventories);
 		
+	}
+
+
+	// 재고 상품 검색
+	@Override
+	public List<SellerInventoryResponseDTO> searchInventories(String search, int page, int size) {
+		Pageable pageable = PageRequest.of(page, size);
+		
+		//TODO: 실제 인증된 판매자 ID 를 기반으로 인증되어야 함
+		Long sellerId = 1L;
+		
+		List<SellerInventoryResponseDTO> inventories = inventoryRepository.findAllByNameAndSellerId(search, sellerId, pageable).toList();
+		
+		if(inventories.isEmpty() || inventories == null) {
+			throw new ResourceNotFoundException("해당 재고 목록은 존재하지 않습니다.");
+		}
+		
+		return inventories;
 	}
 }

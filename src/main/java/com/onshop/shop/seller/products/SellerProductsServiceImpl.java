@@ -18,9 +18,11 @@ import com.onshop.shop.products.ProductRepository;
 
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class SellerProductsServiceImpl implements SellerProductsService {
 	
 	private final ProductRepository productRepository;
@@ -121,7 +123,6 @@ public class SellerProductsServiceImpl implements SellerProductsService {
 				.sellerId(sellerId)
 				.price(productDTO.getPrice())
 				.build());
-		
 	}
 	
 	
@@ -134,6 +135,22 @@ public class SellerProductsServiceImpl implements SellerProductsService {
 		List<Long> productIds = productsIdsDTO.getIds();
 		
 		productRepository.deleteAllByIdInBatch(productIds);
+	}
+
+	// 상품 검색
+	@Override
+	public List<SellerProductsDTO> searchProducts(String search, int page, int size) {
+		
+		Long sellerId = 1L; // 임시
+		Pageable pageable = PageRequest.of(page, size);
+		
+		List<SellerProductsDTO> products = productRepository.findByNameAndSellerId(search,sellerId, pageable).toList();
+		log.info("products:{}", products);
+		if(products == null) {
+			throw new ResourceNotFoundException("조회할 상품 목록을 찾을 수 없습니다.") ;
+		}
+		
+		return products;
 	}
 
 

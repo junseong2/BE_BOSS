@@ -33,6 +33,15 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
     @Query("SELECT p FROM Product p WHERE p.sellerId = :sellerId AND p.productId = :productId")
     Product findBySellerIdAndProductId(@Param("sellerId") Long sellerId, @Param("productId") Long productId);
     
+    // 점주 전용 상품 검색
+    @Query(value = "SELECT p.product_id AS productId, p.name AS name, p.price AS price, c.category_name AS categoryName, i.stock AS stock " +
+            "FROM product p " +
+            "JOIN category c ON c.category_id = p.category_id " + 
+            "LEFT JOIN inventory i ON i.product_id = p.product_id " + 
+            "WHERE p.seller_id = :sellerId AND p.name LIKE CONCAT('%', :name, '%')", 
+    nativeQuery = true)
+    Page<SellerProductsDTO> findByNameAndSellerId(@Param("name") String name, @Param("sellerId") Long sellerId, Pageable pageable);
+    
     // 상품 삭제(다중)
     @Query("SELECT p FROM Product p WHERE p.productId IN (:ids)")
     int deleteProductsByIds(List<Long> productIds);
