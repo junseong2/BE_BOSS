@@ -21,7 +21,7 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
     
     
     // 판매자(점주)의 상품 조회
-    @Query(value = "SELECT p.product_id AS productId, p.name AS name, p.price AS price, c.category_name AS categoryName, i.stock AS stock " +
+    @Query(value = "SELECT p.product_id AS productId, p.name AS name, p.price AS price, c.category_name AS categoryName, p.description AS description, i.stock AS stock " +
             "FROM product p " +
             "JOIN category c ON c.category_id = p.category_id " + 
             "JOIN inventory i ON i.product_id = p.product_id " + 
