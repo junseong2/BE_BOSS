@@ -18,6 +18,6 @@ public class UserDTO {
     private String role;
     
     // 주소 정보 리스트
-    private List<AddressDto> addresses;
+    private List<AddressDTO> addresses;
 }
 

@@ -1,12 +1,16 @@
 package com.onshop.shop.user;
 
+import java.util.List;
+
 import org.springframework.transaction.annotation.Transactional;
 
 public interface UserService {
     @Transactional
-    void registerUser(UserEntity user);
+    void registerUser(User user);
 
-    UserEntity findByEmailAndPassword(String email, String password);
-    UserEntity findBySocialId(String socialId);
-    void updateUser(UserEntity updatedUser);
+    User findByEmailAndPassword(String email, String password);
+    User findBySocialId(String socialId);
+    void updateUser(User updatedUser);
+    User getUserById(Integer userId); // ✅ 인터페이스에는 선언만!
+    List<AddressDTO> getAddressesByUserId(Integer userId);
 }

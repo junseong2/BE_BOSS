@@ -1,17 +1,15 @@
 package com.onshop.shop.security;
-//JWT
-import java.io.IOException;
 
+import java.io.IOException;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
+import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
-import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
 import org.springframework.web.filter.OncePerRequestFilter;
 
@@ -24,33 +22,62 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         this.jwtUtil = jwtUtil;
         this.userDetailsService = userDetailsService;
     }
-
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain chain)
             throws ServletException, IOException {
 
-        String header = request.getHeader("Authorization");
+        String token = null;
 
-        if (header == null || !header.startsWith("Bearer ")) {
+        // ✅ 1. 먼저 쿠키에서 JWT를 찾음
+        if (request.getCookies() != null) {
+            for (Cookie cookie : request.getCookies()) {
+                if ("jwt".equals(cookie.getName())) {
+                    token = cookie.getValue();
+                    System.out.println("🔍 JWT 쿠키 발견: " + token);
+                    break;
+                }
+            }
+        }
+
+        // ✅ 2. Authorization 헤더에서 JWT를 찾음 (쿠키가 없을 경우)
+        else if (token == null) {
+            String header = request.getHeader("Authorization");
+            if (header != null && header.startsWith("Bearer ")) {
+                token = header.replace("Bearer ", "");
+                System.out.println("🔍 Authorization 헤더에서 JWT 발견: " + token);
+            }
+        }
+
+        // ✅ 3. 토큰이 없는 경우
+        if (token == null) {
+            System.out.println("❌ JWT 토큰 없음");
             chain.doFilter(request, response);
             return;
         }
 
-        String token = header.replace("Bearer ", "");
-
+        // ✅ 4. JWT 검증 수행
         try {
-            Long userId = jwtUtil.validateToken(token);
-            UserDetails userDetails = userDetailsService.loadUserByUsername(userId.toString());
+        	
+        	
+        
+            if (jwtUtil.validateToken(token)) {
+                Integer userId = jwtUtil.extractUserId(token);
+                UserDetails userDetails = userDetailsService.loadUserByUsername(userId.toString());
 
-            UsernamePasswordAuthenticationToken authentication =
-                    new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
-            authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
+                UsernamePasswordAuthenticationToken authentication =
+                        new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
+                authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
 
-            SecurityContextHolder.getContext().setAuthentication(authentication);
+                SecurityContextHolder.getContext().setAuthentication(authentication);
+                System.out.println("✅ JWT 인증 성공 - userId: " + userId);
+            } else {
+                System.out.println("❌ JWT 검증 실패 - 유효하지 않은 토큰");
+            }
         } catch (Exception e) {
-            System.out.println("JWT 검증 실패: " + e.getMessage());
+            System.out.println("❌ JWT 검증 중 오류 발생: " + e.getMessage());
         }
 
         chain.doFilter(request, response);
     }
+
 }
