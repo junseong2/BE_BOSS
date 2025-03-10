@@ -51,6 +51,21 @@ public class SellerProductsController {
 		return ResponseEntity.created(null).body(null);
 	}
 	
+	// 상품 검색
+	@GetMapping("/search")
+	public ResponseEntity<?> searchProduct(
+			@RequestParam String search,
+			@RequestParam int page,
+			@RequestParam int size
+			){
+		
+		log.info("search:{}, page:{}, size:{}", search, page,size);
+		List<SellerProductsDTO> products = sellerProductsService.searchProducts(search, page, size);
+		return ResponseEntity.ok(products);
+		
+	}
+	
+	
 	
 	// 상품 수정
 	@PatchMapping("/{productId}")
