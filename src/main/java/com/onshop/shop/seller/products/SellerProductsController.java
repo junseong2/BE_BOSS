@@ -45,6 +45,8 @@ public class SellerProductsController {
 	public ResponseEntity<?> registerProduct(
 			@Valid @RequestBody List<SellerProductsRequestDTO> productsDTO
 			){
+		
+		log.info("productsDTO:{}", productsDTO);
 		sellerProductsService.registerProducts(productsDTO);
 		
 		
@@ -84,9 +86,8 @@ public class SellerProductsController {
 				HttpStatus.OK, 
 				"선택 상품의 정보가 수정되었습니다.", 		
 				SellerProductsResponseDTO.builder()
-					.category(productDTO.getCategory())
-					.productName(productDTO.getProductName())
-					.description(productDTO.getDescription())
+					.category(productDTO.getCategoryName())
+					.productName(productDTO.getName())
 					.price(productDTO.getPrice())
 					.build());
 		return ResponseEntity.ok(response);

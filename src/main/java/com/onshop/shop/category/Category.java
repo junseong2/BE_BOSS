@@ -27,8 +27,6 @@ import java.util.List;
 @Builder
 public class Category {
 	
-	
-
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "category_id")
