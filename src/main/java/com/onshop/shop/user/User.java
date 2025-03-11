@@ -14,12 +14,12 @@ import lombok.Setter;
 @Setter
 @Entity
 @Table(name = "users")
-public class UserEntity {
+public class User {
 
 	@Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "user_id") // DB 컬럼명과 명시적 매핑
-    private Integer userId;
+    private Integer userId;//int형이 성능 절약된다고 함! 
 
     private String username;
     private String email;
@@ -38,12 +38,12 @@ public class UserEntity {
     @CreationTimestamp
     private Timestamp createdSignup;
 
-    // ✅ AddressEntity를 사용하도록 수정
+  
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<AddressEntity> addresses = new ArrayList<>();
+    private List<Address> addresses = new ArrayList<>();
     
     
- // ✅ 전화번호를 리스트로 변환하는 메서드 추가
+
     public List<String> getPhones() {
         List<String> phones = new ArrayList<>();
         if (phone1 != null) phones.add(phone1);
@@ -52,11 +52,16 @@ public class UserEntity {
         return phones;
     }
 
-    // ✅ 전화번호 리스트를 개별 컬럼에 매핑하는 메서드 추가
+  
     public void setPhones(List<String> phones) {
-        this.phone1 = phones.size() > 0 ? phones.get(0) : null;
-        this.phone2 = phones.size() > 1 ? phones.get(1) : null;
-        this.phone3 = phones.size() > 2 ? phones.get(2) : null;
+        if (phones.size() > 0) this.phone1 = phones.get(0);
+        else this.phone1 = null;
+
+        if (phones.size() > 1) this.phone2 = phones.get(1);
+        else this.phone2 = null;
+
+        if (phones.size() > 2) this.phone3 = phones.get(2);
+        else this.phone3 = null;
     }
     
 }
