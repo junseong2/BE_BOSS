@@ -4,7 +4,8 @@ package com.onshop.shop.products;
 import java.math.BigDecimal;
 
 import java.time.LocalDateTime;
-
+import java.util.Arrays;
+import java.util.List;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -57,10 +58,22 @@ public class Product {
 
     @Column(name="price")
     private Integer price;
+    
+    @Column(name="gImage")
+    private String gImage;
 
     @Column(name="expiry_date")
     private LocalDateTime expiryDate;
 
     @Column(name="created_register")
     private LocalDateTime createdRegister;
+    
+    // ✅ 쉼표(,)로 구분된 gImages를 리스트로 변환하여 반환
+    public List<String> getImageList() {
+        return (this.gImage != null && !this.gImage.isEmpty())
+                ? Arrays.asList(this.gImage.split(","))
+                : List.of();
+    }
+    
+    
 }
