@@ -38,13 +38,13 @@ public class SellerInventoryController {
 		return ResponseEntity.ok(inventories);
 	}
 	
-	// 상품 재고 발주(간이 즉시 요청)
+	// 상품 재고 추가
 	@PatchMapping()
 	public ResponseEntity<?> addInventory(
 			@Valid @RequestBody List<InventoryOrderRequestDTO> orderRequest
 			){
 		
-
+		
 		log.info("order:{}", orderRequest);
 		sellerInventoryService.updateInventory(orderRequest);
 		
@@ -55,7 +55,7 @@ public class SellerInventoryController {
 	@GetMapping("/search")
 	@Validated
 	public ResponseEntity<?> searchInventories(
-			@RequestParam("search") @NotBlank(message="검색어는 필수입니다.") String search,
+			@RequestParam("search") String search,
 			@RequestParam("page") @Min(value = 0, message="page는 최소 0 이상이어야 합니다.") int page,
 			@RequestParam("size") @Min(value = 5, message="size는 최소 5 이상이어야 합니다.") int size
 			){
@@ -63,4 +63,6 @@ public class SellerInventoryController {
 		List<SellerInventoryResponseDTO> inventories = sellerInventoryService.searchInventories(search, page, size);
 		return ResponseEntity.ok(inventories);
 	}
+	
+	
 }
