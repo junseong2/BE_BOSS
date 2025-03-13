@@ -37,4 +37,5 @@ public interface InventoryRepository extends JpaRepository<Inventory, Long> {
     @Query("SELECT i FROM Inventory i WHERE i.product.id IN :productIds")
     List<Inventory> findAllByProductIds(@Param("productIds") List<Long> productIds);
     
+    
 }
