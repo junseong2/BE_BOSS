@@ -65,17 +65,10 @@ public class SellerInventoryServiceImpl implements SellerInventoryService {
 		// orderRequestDTOs의 각 아이템에 대해 재고 업데이트
 		List<Inventory> updatedInventories = orderRequestDTOs.stream().map(orderRequestDTO -> {
 		    Long productId = orderRequestDTO.getProductId();  
-		    Long orderStock = orderRequestDTO.getOrderStock();  // 주문재고
-		    Long currentStock = orderRequestDTO.getCurrentStock();  // 현재재고
+		    Long currentStock = orderRequestDTO.getStock();  // 현재재고
 		    Long minStock = orderRequestDTO.getMinStock();  // 최소재고
 		    
 		    
-		    // TODO: 이 부분은 계절성 이벤트와 같은 특이사항에서 유연하게 조절할 수 있도록 하면 좋을 듯?
-		    // 불필요한 재고 발주 취소
-		    if(currentStock > minStock* 2) {
-		    	throw new OverStockException("최소재고 보다 2배 많은 재고를 가진 상품이 존재하여 발주요청을 취소합니다.");
-		    }
-
 		    // 해당 상품에 대한 Inventory 조회
 		    Inventory inventory = prevInventories.stream()
 		            .filter(inven -> inven.getProduct().getProductId().equals(productId))
@@ -84,7 +77,8 @@ public class SellerInventoryServiceImpl implements SellerInventoryService {
 
 
 		    // 재고 업데이트
-		    inventory.increaseStock(orderStock);
+		    inventory.setStock(currentStock);
+		    inventory.setMinStock(minStock);
 
 		    return inventory;
 		    
