@@ -8,9 +8,10 @@ import lombok.Data;
 @AllArgsConstructor
 @Builder
 public class InventoryOrderRequestDTO {
-	
 	private Long productId;
-	private Long orderStock; // 발주 요청 재고
-	private Long currentStock; // 현재 재고
+	private Long inventoryId;
+	private String category;
+	private String name;
+	private Long stock; // 현재 재고
 	private Long minStock; // 최소 재고
 }
