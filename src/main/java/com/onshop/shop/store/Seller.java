@@ -8,11 +8,14 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
+
 import lombok.Data;
+
 @Data
 @Entity
 @Table(name = "seller")
 public class Seller {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "seller_id")
@@ -27,20 +30,32 @@ public class Seller {
     @Column(name = "description")
     private String description;  // 상점 설명
 
-    @Column(name = "created_at", columnDefinition = "DATETIME")
+    @Column(name = "header_id", nullable = false)
+    private Integer headerId;  // 상단바 ID (디자인 변경 가능)
+
+    @Column(name = "menu_bar_id", nullable = false)
+    private Integer menuBarId;  // 메뉴바 ID (메뉴 스타일 변경 가능)
+
+    @Column(name = "navigation_id", nullable = false)
+    private Integer navigationId;  // 네비게이션 ID (페이지 이동 방식)
+
+    @Column(name = "created_at", columnDefinition = "DATETIME DEFAULT CURRENT_TIMESTAMP")
     private LocalDateTime createdAt;  // 생성일
 
-    @Column(name = "updated_at", columnDefinition = "DATETIME")
+    @Column(name = "updated_at", columnDefinition = "DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP")
     private LocalDateTime updatedAt;  // 수정일
 
     public Seller() {}
 
-    public Seller(Long userId, String storename, String description, LocalDateTime createdAt, LocalDateTime updatedAt) {
-        this.userId = userId;
+    public Seller(Long sellerId, Long userId, String storename, String description, Integer headerId, Integer menuBarId, Integer navigationId, LocalDateTime createdAt, LocalDateTime updatedAt) {
+        this.sellerId = sellerId;
+    	this.userId = userId;
         this.storename = storename;
         this.description = description;
+        this.headerId = headerId;
+        this.menuBarId = menuBarId;
+        this.navigationId = navigationId;
         this.createdAt = createdAt;
         this.updatedAt = updatedAt;
     }
-
 }

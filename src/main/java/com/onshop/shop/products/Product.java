@@ -43,16 +43,20 @@ public class Product {
     private Long productId;
 
     // 카테고리와 다대일 관계
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "category_id")
     private Category category;
 
+    
+    
+    
     @Column(name="seller_id")
     private Long sellerId;
 
     @Column(name="name", nullable = false)
     private String name;
-
+    @Column(name="store_id", nullable = false)  // ✅ storeId 추가
+    private Long storeId;
     @Column(name="description")
     private String description;
 
@@ -74,6 +78,12 @@ public class Product {
                 ? Arrays.asList(this.gImage.split(","))
                 : List.of();
     }
-    
+    public Long getProductId() {
+        return productId;
+    }
+
+    public String getName() {
+        return name;
+    }
     
 }

@@ -60,4 +60,20 @@ public class ProductsServiceImpl implements ProductsService {
     }
     
 
+    @Override
+    public List<Product> getProductsBySellerId(Long sellerId) {
+        return productRepository.findBySellerId(sellerId);
+    }
+    @Override
+    public void getProductDetails(Long productId) {
+        // Fetch the product by its ID
+        Product product = productRepository.findById(productId)
+            .orElseThrow(() -> new RuntimeException("상품을 찾을 수 없습니다."));
+        
+        // Print product details
+        System.out.println("상품 ID: " + product.getProductId());
+        System.out.println("상품 이름: " + product.getName());
+    }
+    
+
 }

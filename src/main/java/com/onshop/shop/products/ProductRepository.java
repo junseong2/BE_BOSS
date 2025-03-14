@@ -15,6 +15,10 @@ import java.util.List;
 public interface ProductRepository extends JpaRepository<Product, Long> {
     List<Product> findByCategoryId(Long categoryId); // 기존 코드
     List<Product> findByCategoryIdIn(List<Long> categoryIds);
+    List<Product> findBySellerId(Long sellerId);
+
+    
+    
     
     @Query("SELECT p FROM Product p JOIN p.category c WHERE p.name LIKE %:query% OR c.name LIKE %:query%")
     public List<Product> searchByNameOrCategory(@Param("query") String query);
