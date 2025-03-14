@@ -38,7 +38,14 @@ public class ProductsController {
     // 단일 상품 조회
     @GetMapping("/{productId}")
     public ProductsDTO getProductById(@PathVariable Long productId) {
+    	
     	log.info("products id:{}", productId);
+    	
+    	log.info("products :{}",      productsService.getProductById(productId));
+
+   
+
+    	
         return productsService.getProductById(productId);
     }
     
