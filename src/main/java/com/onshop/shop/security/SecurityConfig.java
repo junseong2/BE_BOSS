@@ -29,9 +29,11 @@ public class SecurityConfig {
             .cors(cors -> cors.configurationSource(corsConfigurationSource()))
             .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
             .authorizeHttpRequests(auth -> auth
-                .requestMatchers("/api/**","/auth/**", "/category","/articles", "/articles/**",
+                .requestMatchers("/api/**","/auth/**", "/category",
+                	      "/products/**",    "/products", "/category/**", "/products/**", "/cart/**", "/favicon.ico","/uploads/**"
+                        ,"/store/**","/seller/**","/seller","/seller/info/**"
+                		)
 
-                        "/products", "/category/**", "/products/**", "/cart/**", "/favicon.ico","/seller/**","/uploads/**")
                 .permitAll()
                 .anyRequest().authenticated()
             )
