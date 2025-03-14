@@ -59,16 +59,13 @@
 </dependency>
 
 
-		<!-- 3. mysql -->
-		<!-- <https://mvnrepository.com/artifact/mysql/mysql-connector-java> -->
-		<dependency>
-			<groupId>mysql</groupId>
-			<artifactId>mysql-connector-java</artifactId>
-			<version>8.0.33</version>
-		</dependency>
+	
 
-
-
+<dependency>
+    <groupId>mysql</groupId>
+    <artifactId>mysql-connector-java</artifactId>
+    <version>8.0.26</version>
+</dependency>
 
     <!-- Lombok (선택사항, 코드 간결화) -->
   <dependency>
