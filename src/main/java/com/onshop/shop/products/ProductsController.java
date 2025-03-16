@@ -43,9 +43,6 @@ public class ProductsController {
     	
     	log.info("products :{}",      productsService.getProductById(productId));
 
-   
-
-    	
         return productsService.getProductById(productId);
     }
     

@@ -46,17 +46,13 @@ public class Product {
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "category_id")
     private Category category;
-
-    
-    
     
     @Column(name="seller_id")
     private Long sellerId;
 
     @Column(name="name", nullable = false)
     private String name;
-    @Column(name="store_id", nullable = false)  // ✅ storeId 추가
-    private Long storeId;
+
     @Column(name="description")
     private String description;
 

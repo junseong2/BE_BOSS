@@ -38,6 +38,8 @@ public class GlobalException {
         return new ResponseEntity<ErrorMessageResponse>(response, HttpStatus.NOT_FOUND);
     }
     
+    // 
+    
     // 500 INTERNAL_SERVER_ERROR
     @ExceptionHandler(Exception.class)
     public ResponseEntity<ErrorMessageResponse> handleAllExceptions(Exception ex) {

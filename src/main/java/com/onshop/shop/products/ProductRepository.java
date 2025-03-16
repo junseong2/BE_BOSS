@@ -18,31 +18,39 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
     List<Product> findBySellerId(Long sellerId);
 
     
-    
-    
     @Query("SELECT p FROM Product p JOIN p.category c WHERE p.name LIKE %:query% OR c.name LIKE %:query%")
     public List<Product> searchByNameOrCategory(@Param("query") String query);
     
     
-    // 판매자(점주)의 상품 조회
-    @Query(value = "SELECT p.product_id AS productId, p.name AS name, p.price AS price, c.category_name AS categoryName, p.description AS description, i.stock AS stock " +
-            "FROM product p " +
-            "JOIN category c ON c.category_id = p.category_id " + 
-            "JOIN inventory i ON i.product_id = p.product_id " + 
-            "WHERE p.seller_id = :sellerId", 
-    nativeQuery = true)
-    Page<SellerProductsDTO> findBySellerId(@Param("sellerId") Long sellerId, Pageable pageable);
+    @Query("SELECT new com.onshop.shop.seller.products.SellerProductsDTO( " +
+    	       "p.productId, p.name, p.price, c.name, p.description, i.stock, GROUP_CONCAT(pi.imageUrl)) " +
+    	       "FROM Product p " +
+    	       "JOIN p.category c " +
+    	       "LEFT JOIN Inventory i ON i.product.productId = p.productId " +  // Inventory와 Product를 외래키로 연결
+    	       "LEFT JOIN ProductImage pi ON pi.product.productId = p.productId " +
+    	       "WHERE p.sellerId = :sellerId " + 
+    	       "GROUP BY p.productId")
+    	List<SellerProductsDTO> findBySellersId(@Param("sellerId") Long sellerId, Pageable pageable);
+
+
     
     // 점주 전용 상품 조회(단일)
     @Query("SELECT p FROM Product p WHERE p.sellerId = :sellerId AND p.productId = :productId")
     Product findBySellerIdAndProductId(@Param("sellerId") Long sellerId, @Param("productId") Long productId);
     
+    
+
     // 점주 전용 상품 검색
-    @Query(value = "SELECT p.product_id AS productId, p.name AS name, p.price AS price, c.category_name AS categoryName, p.description AS description, i.stock AS stock " +
+    @Query(value = ""+
+    		"SELECT p.product_id AS productId, p.name AS name, p.price AS price, " +
+            "c.category_name AS categoryName, p.description AS description, i.stock AS stock, " +
+            "GROUP_CONCAT(pi.image_url) AS imageUrls " + // 여러 이미지 URL을 하나의 문자열로 변환
             "FROM product p " +
             "JOIN category c ON c.category_id = p.category_id " + 
             "LEFT JOIN inventory i ON i.product_id = p.product_id " + 
-            "WHERE p.seller_id = :sellerId AND p.name LIKE CONCAT('%', :name, '%')", 
+            "LEFT JOIN product_image pi ON pi.product_id = p.product_id " + // 이미지가 없는 경우도 고려
+            "WHERE p.seller_id = :sellerId AND p.name LIKE CONCAT('%', :name, '%')" +
+            "GROUP BY p.product_id",  // 상품별로 그룹화
     nativeQuery = true)
     Page<SellerProductsDTO> findByNameAndSellerId(@Param("name") String name, @Param("sellerId") Long sellerId, Pageable pageable);
     

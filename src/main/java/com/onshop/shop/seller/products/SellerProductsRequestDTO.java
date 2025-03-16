@@ -1,13 +1,19 @@
 package com.onshop.shop.seller.products;
 
+import java.util.List;
+
+import org.springframework.web.multipart.MultipartFile;
+
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
+import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
 @Data
 @NoArgsConstructor
+@AllArgsConstructor
 public class SellerProductsRequestDTO {
 	
 	@NotEmpty(message = "상품이름은 필수입니다.")
@@ -26,11 +32,7 @@ public class SellerProductsRequestDTO {
 	
 	private Integer stock; // 재고
 	
-	public SellerProductsRequestDTO(String name, String productName,String description,	String categoryName, Integer price) {
-		this.name = name;
-		this.description = description;
-		this.categoryName = categoryName;
-		this.price = price;
-		this.stock = 0;
-	}
+	
+	
+	
 }
