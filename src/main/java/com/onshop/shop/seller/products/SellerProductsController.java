@@ -25,34 +25,34 @@ import lombok.extern.slf4j.Slf4j;
 @RequestMapping("/seller/products")
 @Slf4j
 public class SellerProductsController {
-	
+
 	private final SellerProductsService sellerProductsService;
-	
-	
+
+
 	// 모든 상품 조회
 	@GetMapping()
 	public ResponseEntity<?> getAllProducts(
 			@RequestParam int page,
 			@RequestParam int size
 			){
-		
+
 		List<SellerProductsDTO> products = sellerProductsService.getAllProducts(page, size);
 		return ResponseEntity.ok(products);
 	}
-	
+
 	// 상품 추가
 	@PostMapping()
 	public ResponseEntity<?> registerProduct(
 			@Valid @RequestBody List<SellerProductsRequestDTO> productsDTO
 			){
-		
+
 		log.info("productsDTO:{}", productsDTO);
 		sellerProductsService.registerProducts(productsDTO);
-		
-		
+
+
 		return ResponseEntity.created(null).body(null);
 	}
-	
+
 	// 상품 검색
 	@GetMapping("/search")
 	public ResponseEntity<?> searchProduct(
@@ -60,15 +60,15 @@ public class SellerProductsController {
 			@RequestParam int page,
 			@RequestParam int size
 			){
-		
+
 		log.info("search:{}, page:{}, size:{}", search, page,size);
 		List<SellerProductsDTO> products = sellerProductsService.searchProducts(search, page, size);
 		return ResponseEntity.ok(products);
-		
+
 	}
-	
-	
-	
+
+
+
 	// 상품 수정
 	@PatchMapping("/{productId}")
 	public ResponseEntity<?> updateProduct(
@@ -78,13 +78,13 @@ public class SellerProductsController {
 		if(productId == null) {
 			throw new NullPointerException("상품ID는 필수입니다.");
 		}
-		
+
 		sellerProductsService.updateProducts(productId, productDTO);
-		
+
 
 		SuccessMessageResponse response = new SuccessMessageResponse(
-				HttpStatus.OK, 
-				"선택 상품의 정보가 수정되었습니다.", 		
+				HttpStatus.OK,
+				"선택 상품의 정보가 수정되었습니다.",
 				SellerProductsResponseDTO.builder()
 					.category(productDTO.getCategoryName())
 					.productName(productDTO.getName())
@@ -92,7 +92,7 @@ public class SellerProductsController {
 					.build());
 		return ResponseEntity.ok(response);
 	}
-	
+
 	// 상품 삭제(단일, 다중 모두 처리)
 	@DeleteMapping()
 	public ResponseEntity<?> removeProducts(
@@ -100,9 +100,9 @@ public class SellerProductsController {
 			){
 		log.info("ids:{}", productIds);
 		sellerProductsService.removeProducts(productIds);
-		
+
 		return ResponseEntity.noContent().build();
-		
+
 	}
 
 }

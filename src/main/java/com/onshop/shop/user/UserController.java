@@ -9,7 +9,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 public class UserController {
-	
+
 	@GetMapping("/")
 	ResponseEntity<?> root(){
 		Map<String, String> map = new HashMap<>();

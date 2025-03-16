@@ -1,11 +1,12 @@
 package com.onshop.shop.reply;
 
+import java.time.LocalDateTime;
+
+import com.onshop.shop.article.ArticleEntity;
+import com.onshop.shop.user.User;
+
 import lombok.Getter;
 import lombok.Setter;
-import java.time.LocalDateTime;
-import com.onshop.shop.user.User;
-import com.onshop.shop.article.ArticleEntity;
-import com.onshop.shop.reply.ReplyEntity;
 
 @Getter
 @Setter

@@ -38,7 +38,7 @@ public class SellerController {
     public ResponseEntity<Map<String, Object>> getSellerInfoByStoreName(
             @PathVariable String storename,
             @CookieValue(value = "jwt", required = false) String token) {
-        
+
         logger.info("📌 [SellerController] /info/{} 요청 수신됨", storename);
 
         // ✅ 판매자 정보 조회
@@ -49,7 +49,7 @@ public class SellerController {
 
             // 🔥 ✅ `userId` 검증 제거 (누구나 판매자 정보 조회 가능)
             Map<String, Object> response = Map.of(
-                    
+
             		"storename", seller.getStorename(),
                     "sellerId",seller.getSellerId(),
                     "headerId", seller.getHeaderId(),
@@ -62,7 +62,7 @@ public class SellerController {
 
         return ResponseEntity.status(404).body(Map.of("error", "판매자를 찾을 수 없습니다."));
     }
-    
+
     @Autowired
     private ProductsService productsService; // ✅ 올바른 Service 주입
 
@@ -70,9 +70,9 @@ public class SellerController {
     // 특정 판매자의 제품 목록 조회
     @GetMapping("/product")
     public List<Product> getProductsBySeller(@RequestParam Long sellerId) {
-    	
-    	
-    	
+
+
+
         return productsService.getProductsBySellerId(sellerId);
     }
 

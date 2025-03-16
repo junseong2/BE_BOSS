@@ -11,14 +11,14 @@ import lombok.RequiredArgsConstructor;
 @Service
 @RequiredArgsConstructor
 public class SellerOrderServiceImpl implements SellerOrderService {
-	
-	
-	
+
+
+
 	@Override
 	public void createOrder(List<InventoryOrderRequestDTO> orderDTOs) {
-		
-		
-	
+
+
+
 	}
 
 }

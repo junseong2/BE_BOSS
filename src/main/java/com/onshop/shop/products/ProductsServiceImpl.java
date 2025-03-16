@@ -1,12 +1,14 @@
 package com.onshop.shop.products;
 
-import com.onshop.shop.category.Category;
-import com.onshop.shop.category.CategoryRepository;
-import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Service;
-
 import java.util.List;
 import java.util.stream.Collectors;
+
+import org.springframework.stereotype.Service;
+
+import com.onshop.shop.category.Category;
+import com.onshop.shop.category.CategoryRepository;
+
+import lombok.RequiredArgsConstructor;
 
 @Service
 @RequiredArgsConstructor
@@ -58,7 +60,7 @@ public class ProductsServiceImpl implements ProductsService {
                        .map(ProductsDTO::fromEntity)  // Product -> ProductsDTO로 변환
                        .collect(Collectors.toList());
     }
-    
+
 
     @Override
     public List<Product> getProductsBySellerId(Long sellerId) {
@@ -69,11 +71,11 @@ public class ProductsServiceImpl implements ProductsService {
         // Fetch the product by its ID
         Product product = productRepository.findById(productId)
             .orElseThrow(() -> new RuntimeException("상품을 찾을 수 없습니다."));
-        
+
         // Print product details
         System.out.println("상품 ID: " + product.getProductId());
         System.out.println("상품 이름: " + product.getName());
     }
-    
+
 
 }

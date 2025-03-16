@@ -15,7 +15,7 @@ public interface AddressRepository extends JpaRepository<Address, Integer> {
     void deleteByUserUserId(Integer userId);
 
     long countByUser(User user);
-    
+
     @Modifying
     @Transactional
     @Query("DELETE FROM Address a WHERE a.user.userId = :userId")

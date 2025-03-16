@@ -5,23 +5,14 @@ import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-import java.util.List;
-import java.util.Optional;
-import java.util.stream.Collectors;
-
-import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
-
-import com.onshop.shop.user.AddressRepository;
-import com.onshop.shop.user.UserRepository;
 
 @Service
 public class UserServiceImpl implements UserService {
     private final UserRepository userRepository;
     private final AddressRepository addressRepository;
-    
+
     @Autowired
     public UserServiceImpl(UserRepository userRepository, AddressRepository addressRepository) {
         this.userRepository = userRepository;
@@ -62,7 +53,8 @@ public class UserServiceImpl implements UserService {
         return userRepository.findBySocialId(socialId).orElse(null);
     }
 
-    @Transactional
+    @Override
+	@Transactional
     public void updateUser(User updatedUser) {
         User existingUser = userRepository.findByUserId(updatedUser.getUserId())
             .orElseThrow(() -> new IllegalArgumentException("User not found"));
@@ -89,7 +81,7 @@ public class UserServiceImpl implements UserService {
         existingUser.setPhones(updatedUser.getPhones());
         userRepository.save(existingUser);
     }
-    
+
     @Override
     public User getUserById(Integer userId) {
         return userRepository.findByUserId(userId).orElse(null);

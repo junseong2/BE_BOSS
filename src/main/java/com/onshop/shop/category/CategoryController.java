@@ -1,13 +1,14 @@
 package com.onshop.shop.category;
 
-import org.springframework.beans.factory.annotation.Autowired;
+import java.util.List;
+
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 import lombok.RequiredArgsConstructor;
-
-import java.util.List;
-import java.util.Map;
 
 @RestController
 @RequestMapping("/category")
@@ -15,7 +16,7 @@ import java.util.Map;
 public class CategoryController {
 
     private final CategoryService categoryService;
-    
+
  // ✅ 특정 카테고리 정보 조회 (카테고리 이름 포함)
     @GetMapping("/{categoryId}")
     public ResponseEntity<CategoryDTO> getCategoryById(@PathVariable Long categoryId) {

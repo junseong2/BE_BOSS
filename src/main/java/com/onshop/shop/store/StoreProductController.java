@@ -27,7 +27,7 @@ public class StoreProductController {
     @GetMapping("/store/{storeName}/products/info")
     public ResponseEntity<?> getSellerByStorename(@PathVariable String storeName) {
         System.out.println("✅ 요청된 storename: " + storeName); // 콘솔 출력 (디버깅용)
-        
+
         Optional<Seller> seller = sellerService.getSellerByStorename(storeName);
 
         if (seller.isEmpty()) {
@@ -43,7 +43,7 @@ public class StoreProductController {
     @GetMapping("/store/{storeName}/products")
     public ResponseEntity<?> getProductsByStore(@PathVariable String storeName) {
         System.out.println("✅ 상품 조회 요청 storename: " + storeName); // 콘솔 출력 (디버깅용)
-        
+
         Optional<Seller> seller = sellerService.getSellerByStorename(storeName);
 
         if (seller.isEmpty()) {

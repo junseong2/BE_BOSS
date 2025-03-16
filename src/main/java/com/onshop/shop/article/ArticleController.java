@@ -1,12 +1,18 @@
 package com.onshop.shop.article;
 
-import com.onshop.shop.article.ArticleService;
-
-import lombok.extern.slf4j.Slf4j;
+import java.util.List;
 
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
-import java.util.List;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+import lombok.extern.slf4j.Slf4j;
 
 
 @RestController
@@ -23,11 +29,11 @@ public class ArticleController {
     // ✅ 모든 게시물 조회
     @GetMapping
     public ResponseEntity<List<ArticleDTO>> getAllArticles() {
-    	
+
         List<ArticleDTO> articles = articleService.getAllArticles();
         log.info(articles.toString());
         return ResponseEntity.ok(articles);
-        
+
     }
 
     // ✅ 특정 게시물 조회

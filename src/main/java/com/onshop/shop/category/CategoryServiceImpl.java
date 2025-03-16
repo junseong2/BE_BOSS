@@ -1,12 +1,11 @@
 package com.onshop.shop.category;
 
-import org.springframework.beans.factory.annotation.Autowired;
+import java.util.List;
+import java.util.stream.Collectors;
+
 import org.springframework.stereotype.Service;
 
 import lombok.RequiredArgsConstructor;
-
-import java.util.List;
-import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -27,7 +26,7 @@ public class CategoryServiceImpl implements CategoryService {
                 .map(CategoryDTO::fromEntity)
                 .collect(Collectors.toList());
     }
-    
+
     @Override
     public CategoryDTO getCategoryById(Long categoryId) {
         Category category = categoryRepository.findById(categoryId)

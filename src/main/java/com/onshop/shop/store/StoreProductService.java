@@ -18,7 +18,7 @@ public class StoreProductService {
     }
 
     // 수정된 상품 조회 메소드
-    
+
 
     @Transactional
     public List<Product> getProductsBySellerId(Long sellerId) {

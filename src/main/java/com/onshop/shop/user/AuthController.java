@@ -58,8 +58,8 @@ public class AuthController {
 
     private final UserRepository userRepository;
     private final JwtUtil jwtUtil; // ✅ JWT 유틸 추가
-    
-    
+
+
 
     public AuthController(RestTemplate restTemplate, UserRepository userRepository, JwtUtil jwtUtil) {
         this.restTemplate = restTemplate;//외부 API에서 데이터를 가져오기위해 필요함
@@ -67,7 +67,7 @@ public class AuthController {
         this.jwtUtil = jwtUtil;
     }
 
-  
+
     //쿠키를 사용
     @GetMapping("/user-info")
     public ResponseEntity<Map<String, String>> getUserInfo(@CookieValue(value = "jwt", required = false) String token) {
@@ -90,22 +90,22 @@ public class AuthController {
     public ResponseEntity<Map<String, String>> logout(HttpServletResponse response) {
         Cookie cookie = new Cookie("jwt", null);
         cookie.setHttpOnly(true);//javascript에서 접근불가
-        cookie.setSecure(true);//https로만 들어오게 
+        cookie.setSecure(true);//https로만 들어오게
         cookie.setPath("/");
-        cookie.setMaxAge(0); // 쿠키 만료 
+        cookie.setMaxAge(0); // 쿠키 만료
         response.addCookie(cookie);
 
         return ResponseEntity.ok(Map.of("message", "로그아웃 성공"));
     }
 
-   
-    
-    
+
+
+
     @Autowired
     private AddressRepository addressRepository;
-    
-    
-    
+
+
+
     @PutMapping("/update-userinfo")
     public ResponseEntity<String> updateUserInfo(@RequestBody UserUpdateRequest request, @CookieValue(value = "jwt", required = false) String token) {
         System.out.println("📢 회원 정보 수정 요청 받음: " + request);
@@ -189,7 +189,7 @@ public class AuthController {
             // ✅ userId 확인
             System.out.println("로컬 UserName: " +  user.getUsername());
             System.out.println("로컬 UserId: " +  user.getUserId());
-      
+
 
             return ResponseEntity.ok("회원가입 성공!");
         } catch (Exception e) {
@@ -207,9 +207,9 @@ public class AuthController {
 
         // JWT 생성
         String token = jwtUtil.generateToken(user.getUserId());
-        
-        
-        
+
+
+
         // 쿠키에 JWT 설정
         Cookie cookie = new Cookie("jwt", token);
         System.out.println("jwtUtil.generateToken(user.getUserId());:"+token);
@@ -232,7 +232,7 @@ public class AuthController {
     @GetMapping("/naver/callback")
     public ResponseEntity<String> naverCallback(@RequestParam String code, @RequestParam String state,
                                                  HttpServletResponse response) throws IOException {
-       
+
         String accessTokenUrl = "https://nid.naver.com/oauth2.0/token";
         String tokenRequestBody = "grant_type=authorization_code"
                 + "&client_id=" + naverClientId
@@ -283,20 +283,20 @@ public class AuthController {
         cookie.setMaxAge(60 * 60);
         response.addCookie(cookie);
 
-        
-        
+
+
        // 302(리다이렉트합니다) 상태, 홈 페이지로 리다이렉트
-        return ResponseEntity.status(HttpStatus.FOUND) 
-                             .header(HttpHeaders.LOCATION, "http://localhost:5173/")  
+        return ResponseEntity.status(HttpStatus.FOUND)
+                             .header(HttpHeaders.LOCATION, "http://localhost:5173/")
                              .build();
     }
-    
-    
-    
-    
-    
-    
-    
+
+
+
+
+
+
+
 
     @GetMapping("/kakao")
     public ResponseEntity<String> kakaoLoginRedirect() {
@@ -377,14 +377,14 @@ public class AuthController {
     }
 
 
-    
-    
-    
-    
-    
-    
-    
-    
+
+
+
+
+
+
+
+
     @Transactional
     public User saveOrUpdateUser(String socialId, String userName, String userEmail) {
         Optional<User> existingUserOpt = userRepository.findBySocialId(socialId);

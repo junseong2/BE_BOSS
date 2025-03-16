@@ -65,7 +65,7 @@ public class FaceRecognitionService {
         return response.getBody();
     }
 
- 
+
     public String addFace(String imageData, String userId) {
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);

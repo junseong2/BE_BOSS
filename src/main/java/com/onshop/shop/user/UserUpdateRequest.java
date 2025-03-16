@@ -10,7 +10,7 @@ import lombok.Setter;
 @Getter
 @Setter
 public class UserUpdateRequest {
-	
+
     @JsonAlias("userId") // JSON에서 userId가 String일 경우 Integer로 변환
     private Integer userId;
     private String email;

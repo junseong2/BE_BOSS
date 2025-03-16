@@ -1,16 +1,11 @@
 package com.onshop.shop.category;
 
 
-import java.util.List;
-
 import lombok.AllArgsConstructor;
 import lombok.Builder;
-import lombok.Data;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
-
-import lombok.*;
-
-import lombok.*;
+import lombok.Setter;
 
 @Getter
 @Setter

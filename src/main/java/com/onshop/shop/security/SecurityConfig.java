@@ -31,7 +31,7 @@ public class SecurityConfig {
             .authorizeHttpRequests(auth -> auth
                 .requestMatchers("/api/**","/auth/**", "/category",
                 	      "/products/**",    "/products", "/category/**", "/products/**", "/cart/**", "/favicon.ico","/uploads/**"
-                        ,"/store/**","/seller/**","/seller","/seller/info/**"
+                        ,"/store/**","/seller/**","/seller","/seller/info/**", "/payment/toss","/orders/create"
                 		)
 
                 .permitAll()
@@ -41,11 +41,13 @@ public class SecurityConfig {
                 .accessDeniedHandler(customAccessDeniedHandler())  // ⭐ 추가
             )
             .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
+        
+        System.out.println("✅ SecurityConfig 설정 완료: 모든 요청 필터 설정됨");
 
         return http.build();
     }
 
-    
+
     @Bean//경고용
     public AccessDeniedHandler customAccessDeniedHandler() {
         return (request, response, accessDeniedException) -> {
@@ -54,8 +56,8 @@ public class SecurityConfig {
             response.sendError(HttpServletResponse.SC_FORBIDDEN, "접근이 거부되었습니다.");
         };
     }
-    
-    
+
+
     @Bean
     public JwtAuthenticationFilter jwtAuthenticationFilter(JwtUtil jwtUtil, UserDetailsService userDetailsService) {
         return new JwtAuthenticationFilter(jwtUtil, userDetailsService);

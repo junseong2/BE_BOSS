@@ -4,10 +4,7 @@ import java.time.LocalDateTime;
 
 import org.springframework.http.HttpStatus;
 
-import lombok.Builder;
 import lombok.Data;
-import lombok.Getter;
-import lombok.RequiredArgsConstructor;
 
 
 @Data
@@ -16,7 +13,7 @@ public class ErrorMessageResponse {
 	private final HttpStatus status;
 	private final String message;
 	private final LocalDateTime timestamp;
-	
+
     public ErrorMessageResponse(HttpStatus status, String message) {
         this.status = status;
         this.message = message;

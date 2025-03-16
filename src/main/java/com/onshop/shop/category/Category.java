@@ -31,7 +31,7 @@ import lombok.Setter;
 @AllArgsConstructor
 @Builder
 public class Category {
-	
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "category_id")
@@ -44,8 +44,8 @@ public class Category {
     @JoinColumn(name = "parent_category_id")
     @JsonBackReference  // 순환 참조 방지
     private Category parentCategory;
-    
-    
+
+
     @OneToMany(mappedBy = "parentCategory", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     @JsonManagedReference  // 자식 카테고리는 직렬화 가능
     private List<Category> subCategories = new ArrayList<>();

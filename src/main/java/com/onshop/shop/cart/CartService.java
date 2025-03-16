@@ -16,7 +16,7 @@ public class CartService {
 
 	 public CartService(CartRepository cartRepository, ProductRepository productRepository) {
 	        this.cartRepository = cartRepository;
-	        this.productRepository = productRepository; 
+	        this.productRepository = productRepository;
 	    }
 
 	// 사용자 ID로 장바구니 아이템 조회
@@ -57,10 +57,10 @@ public class CartService {
 	    return true;
 	}
 
-	
-	
-	
-	
+
+
+
+
 	// cartId로 아이템 제거
 	public boolean removeItemFromCart(Long cartId) {
 		if (cartRepository.existsById(cartId)) {
@@ -69,9 +69,9 @@ public class CartService {
 		}
 		return false;
 	}
-	
-	
-	
+
+
+
 	 public boolean removeItemFromCartbyProductId(Integer userId, Long productId) {
 	        List<Cart> carts = cartRepository.findByUserId(userId);
 	        Cart cartToRemove = null;
@@ -90,9 +90,9 @@ public class CartService {
 	        return false;
 	    }
 
-	 
-	 
-	 
+
+
+
 	// 장바구니 비우기
 	public void clearCart(Integer userId) {
 		List<Cart> carts = cartRepository.findByUserId(userId);
@@ -100,8 +100,8 @@ public class CartService {
 			cartRepository.deleteAll(carts);
 		}
 	}
-	
-	
-	
+
+
+
 
 }

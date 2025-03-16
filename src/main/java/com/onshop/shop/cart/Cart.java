@@ -1,6 +1,10 @@
 package com.onshop.shop.cart;
 
-import jakarta.persistence.*;
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.Table;
 import lombok.Data;
 
 @Data
@@ -11,7 +15,7 @@ public class Cart {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long cartId;
 
-    private Integer userId;//int형이 성능 절약된다고 함! 
+    private Integer userId;//int형이 성능 절약된다고 함!
     private Long productId;
     private int quantity;
 }

@@ -1,22 +1,30 @@
 package com.onshop.shop.security;
 
-import io.jsonwebtoken.*;
-import io.jsonwebtoken.security.Keys;
+import java.security.Key;
+import java.util.Date;
+import java.util.Map;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestTemplate;
 
-import java.security.Key;
-import java.util.Date;
-import java.util.Map;
+import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.ExpiredJwtException;
+import io.jsonwebtoken.JwtException;
+import io.jsonwebtoken.Jwts;
+import io.jsonwebtoken.MalformedJwtException;
+import io.jsonwebtoken.SignatureAlgorithm;
+import io.jsonwebtoken.SignatureException;
+import io.jsonwebtoken.UnsupportedJwtException;
+import io.jsonwebtoken.security.Keys;
 
 @Component
 public class JwtUtil {
 
     private static final Logger logger = LoggerFactory.getLogger(JwtUtil.class);
     private static final String SECRET_KEY = "bossbossbossbossbossbossbossboss"; // ✅ 최소 32바이트 이상
-    private static final long EXPIRATION_TIME = 3600000; // ✅ 1시간 (밀리초)
+    private static final long EXPIRATION_TIME = 1000 * 60 * 60 * 24;  // ✅ 1시간 (밀리초)
 
     // 🔹 SECRET_KEY를 HMAC-SHA 키로 변환
     private Key getSigningKey() {

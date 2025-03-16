@@ -38,21 +38,21 @@ public class Inventory {
     @OneToOne(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
     @JoinColumn(name = "product_id")  // productId 컬럼을 직접 쓰지 않고 객체로 참조해야 함
     private Product product;
-    
+
     @UpdateTimestamp
 	private LocalDateTime updated_date;
-    
-    
+
+
     // 최소 재고 보다 작은지 체크
     public boolean isBelowMinStock() {
     	return this.stock < this.minStock;
     }
-    
+
     // 재고 증가
     public void increaseStock(Long quantity) {
         this.stock += quantity;
     }
-    
+
     // 최소 재고 증가
     public void increaseMinStock(Long quantiy ) {
     	this.minStock += quantiy;
