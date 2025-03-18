@@ -10,13 +10,13 @@ import org.springframework.stereotype.Repository;
 import com.onshop.shop.user.User;
 
 @Repository
-public interface UserRepository extends JpaRepository<User, Integer> {
+public interface UserRepository extends JpaRepository<User, Long> {
 	
-	Optional<User> findByUserId(Integer userId); 
+	Optional<User> findByUserId(Long userId); 
 	Optional<User> findBySocialId(String socialId); 
 
     @Query("SELECT MAX(u.userId) FROM User u") 
-    Optional<Integer> findMaxUserId();
+    Optional<Long> findMaxUserId();
     
 
    

@@ -1,11 +1,15 @@
 // ProductsEntity.java
-package com.onshop.shop.products;
-
-import java.math.BigDecimal;
+package com.onshop.shop.product;
 
 import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.List;
+
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
+
+import com.onshop.shop.category.Category;
+import com.onshop.shop.store.Seller;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -16,17 +20,11 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
-import jakarta.validation.constraints.DecimalMin;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
-import lombok.Data;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-
-import org.springframework.data.annotation.CreatedDate;
-
-import com.onshop.shop.category.Category;
 
 @Entity
 @Table(name = "product")
@@ -45,18 +43,18 @@ public class Product {
     // 카테고리와 다대일 관계
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "category_id")
+    @OnDelete(action = OnDeleteAction.NO_ACTION) // Seller 삭제 시 관련 Inventory 삭제
     private Category category;
 
     
-    
-    
-    @Column(name="seller_id")
-    private Long sellerId;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "seller_id", nullable = false) 
+    @OnDelete(action = OnDeleteAction.CASCADE) // Seller 삭제 시 관련 Inventory 삭제
+    private Seller seller;
 
     @Column(name="name", nullable = false)
     private String name;
-    @Column(name="store_id", nullable = false)  // ✅ storeId 추가
-    private Long storeId;
+    
     @Column(name="description")
     private String description;
 

@@ -22,14 +22,15 @@ public class JwtUtil {
     private Key getSigningKey() {
         return Keys.hmacShaKeyFor(SECRET_KEY.getBytes()); // Base64 디코딩 없이 사용
     }
-
-    // ✅ JWT에서 userId 추출
-    public Integer extractUserId(String token) {
-        return Integer.parseInt(getClaims(token).getSubject());
+    
+    
+ // ✅ JWT에서 userId 추출
+    public Long extractUserId(String token) {
+        return Long.parseLong(getClaims(token).getSubject());
     }
 
     // ✅ JWT 생성 메서드
-    public String generateToken(Integer userId) {
+    public String generateToken(Long userId) {
         return Jwts.builder()
                 .setSubject(String.valueOf(userId)) // userId 저장
                 .setIssuedAt(new Date()) // 발급 시간
