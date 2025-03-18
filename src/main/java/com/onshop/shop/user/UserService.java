@@ -9,6 +9,6 @@ public interface UserService {
     User findByEmailAndPassword(String email, String password);
     User findBySocialId(String socialId);
     void updateUser(User updatedUser);
-    User getUserById(Integer userId); // ✅ 인터페이스에는 선언만!
+    User getUserById(Long userId); // ✅ 인터페이스에는 선언만!
 
 }

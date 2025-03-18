@@ -1,13 +1,22 @@
-package com.onshop.shop.products;
-
-import com.onshop.shop.category.Category;
-import com.onshop.shop.category.CategoryRepository;
-import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Service;
+package com.onshop.shop.product;
 
 import java.util.List;
 import java.util.stream.Collectors;
 
+import org.springframework.data.domain.PageRequest;
+import org.springframework.stereotype.Service;
+
+import com.onshop.shop.category.Category;
+import com.onshop.shop.category.CategoryRepository;
+
+import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.stereotype.Service;
+import lombok.RequiredArgsConstructor;
+import java.util.List;
+import java.util.stream.Collectors;
 @Service
 @RequiredArgsConstructor
 public class ProductsServiceImpl implements ProductsService {
@@ -30,6 +39,16 @@ public class ProductsServiceImpl implements ProductsService {
     }
 
     @Override
+    public Page<Product> getAllProductsPage(Long sellerId, int page, int size) {
+        Pageable pageable = PageRequest.of(page, size);
+        return productRepository.findBySellerId(sellerId, pageable); // ✅ 올바른 메서드 사용
+
+    
+    }
+
+    
+    
+    @Override
     public List<ProductsDTO> getProductsByCategory(Long categoryId) {
         // ✅ 1. 해당 카테고리의 하위 카테고리 ID 가져오기
         List<Category> subcategories = categoryRepository.findByParentCategoryId(categoryId);
@@ -46,7 +65,16 @@ public class ProductsServiceImpl implements ProductsService {
                 .map(ProductsDTO::fromEntity)
                 .collect(Collectors.toList());
     }
+    
+    
+    @Override
+    public Page<Product> getProductsBySeller(Long sellerId, Pageable pageable) {
+        return productRepository.findBySellerId(sellerId, pageable); // ✅ `Page<Product>` 그대로 반환
+    }
 
+    
+    
+    
  // 상품 검색
     @Override
     public List<ProductsDTO> searchProducts(String query) {
@@ -76,4 +104,6 @@ public class ProductsServiceImpl implements ProductsService {
     }
     
 
+    
+    
 }

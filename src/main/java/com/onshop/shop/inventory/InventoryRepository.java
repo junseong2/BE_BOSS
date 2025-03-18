@@ -1,6 +1,7 @@
 package com.onshop.shop.inventory;
 
 import java.util.List;
+import java.util.Optional;
 
 import org.apache.ibatis.annotations.Param;
 import org.springframework.data.domain.Page;
@@ -36,6 +37,7 @@ public interface InventoryRepository extends JpaRepository<Inventory, Long> {
     
     @Query("SELECT i FROM Inventory i WHERE i.product.id IN :productIds")
     List<Inventory> findAllByProductIds(@Param("productIds") List<Long> productIds);
-    
-    
+    @Query(value = "SELECT stock FROM inventory WHERE product_id = :productId", nativeQuery = true)
+    Optional<Long> findStockByProductId(@Param("productId") Long productId);
+  
 }

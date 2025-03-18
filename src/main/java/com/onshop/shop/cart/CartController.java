@@ -39,7 +39,7 @@ public class CartController {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(Map.of("error", "JWT 토큰이 없습니다."));
         }
 
-        Integer userId = jwtUtil.extractUserId(jwtToken);
+        Long userId = jwtUtil.extractUserId(jwtToken);
         List<CartDTO> cartItems = cartService.getCartByUserId(userId);
 
         Map<String, Object> response = new HashMap<>();
@@ -55,12 +55,15 @@ public class CartController {
             @CookieValue(name = "jwt", required = false) String jwtToken,
             @RequestBody CartItemRequest request) {
 
+      System.out.println("카트에 추가 "+request);
+    	
+    	
         if (jwtToken == null) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(Map.of("error", "JWT 토큰이 없습니다."));
         }
 
         // ✅ JWT에서 userId를 추출 (클라이언트에서 userId를 직접 받지 않음)
-        Integer userId = jwtUtil.extractUserId(jwtToken);
+        Long userId = jwtUtil.extractUserId(jwtToken);
 
         if (request.getProductId() == null) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(Map.of("error", "productId가 누락되었습니다."));
@@ -93,7 +96,7 @@ System.out.println("업데이트양");
         }
 
         // JWT에서 userId 추출
-        Integer userId = jwtUtil.extractUserId(jwtToken);
+        Long userId = jwtUtil.extractUserId(jwtToken);
 
         if (request.getProductId() == null || request.getQuantity() == null || request.getQuantity() <= 0) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(Map.of("error", "잘못된 요청입니다. productId와 quantity를 확인해주세요."));
@@ -130,7 +133,7 @@ System.out.println("업데이트양");
         }
 
         // JWT에서 userId 추출
-        Integer userId = jwtUtil.extractUserId(jwtToken);
+        Long userId = jwtUtil.extractUserId(jwtToken);
         System.out.println("🔍 삭제 요청: userId=" + userId + ", productId=" + productId); // ✅ 디버깅 추가
 
         // 장바구니에서 아이템 삭제
@@ -158,7 +161,7 @@ System.out.println("업데이트양");
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(Map.of("error", "JWT 토큰이 없습니다."));
         }
 
-        Integer userId = jwtUtil.extractUserId(jwtToken);
+        Long userId = jwtUtil.extractUserId(jwtToken);
         cartService.clearCart(userId);
 
         Map<String, Object> response = new HashMap<>();

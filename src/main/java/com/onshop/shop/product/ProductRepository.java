@@ -1,4 +1,4 @@
-package com.onshop.shop.products;
+package com.onshop.shop.product;
 
 import org.apache.ibatis.annotations.Param;
 import org.springframework.data.domain.Page;
@@ -18,7 +18,8 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
     List<Product> findBySellerId(Long sellerId);
 
     
-    
+    Page<Product> findBySellerId(Long sellerId, Pageable pageable); // ✅ 올바른 JPA 규칙 적용
+
     
     @Query("SELECT p FROM Product p JOIN p.category c WHERE p.name LIKE %:query% OR c.name LIKE %:query%")
     public List<Product> searchByNameOrCategory(@Param("query") String query);
@@ -31,8 +32,8 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
             "JOIN inventory i ON i.product_id = p.product_id " + 
             "WHERE p.seller_id = :sellerId", 
     nativeQuery = true)
-    Page<SellerProductsDTO> findBySellerId(@Param("sellerId") Long sellerId, Pageable pageable);
-    
+    Page<SellerProductsDTO> findSellerProductsBySellerId(@Param("sellerId") Long sellerId, Pageable pageable); // ✅ 메서드 이름 변경하여 중복 방지
+
     // 점주 전용 상품 조회(단일)
     @Query("SELECT p FROM Product p WHERE p.sellerId = :sellerId AND p.productId = :productId")
     Product findBySellerIdAndProductId(@Param("sellerId") Long sellerId, @Param("productId") Long productId);

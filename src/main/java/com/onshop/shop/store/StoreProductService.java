@@ -4,7 +4,7 @@ import java.util.List;
 
 import org.springframework.stereotype.Service;
 
-import com.onshop.shop.products.Product;
+import com.onshop.shop.product.Product;
 
 import jakarta.transaction.Transactional;
 

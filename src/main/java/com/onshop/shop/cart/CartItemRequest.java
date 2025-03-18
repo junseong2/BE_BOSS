@@ -1,4 +1,6 @@
 package com.onshop.shop.cart;
+import com.onshop.shop.product.Product;
+
 import lombok.Data;
 
 @Data
