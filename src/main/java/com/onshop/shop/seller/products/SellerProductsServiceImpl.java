@@ -42,7 +42,7 @@ public class SellerProductsServiceImpl implements SellerProductsService {
         Long sellerId = 1L; // 임시
         Pageable pageable = PageRequest.of(page, size);
         
-        Page<Product> productPage = productRepository.findBySellerId(sellerId, pageable);
+        Page<Product> productPage = productRepository.findBySellerSellerId(sellerId, pageable);
         Page<SellerProductsDTO> dtoPage = productPage.map(product -> {
       
         	

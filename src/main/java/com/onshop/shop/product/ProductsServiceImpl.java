@@ -41,8 +41,7 @@ public class ProductsServiceImpl implements ProductsService {
     @Override
     public Page<Product> getAllProductsPage(Long sellerId, int page, int size) {
         Pageable pageable = PageRequest.of(page, size);
-        return productRepository.findBySellerId(sellerId, pageable); // ✅ 올바른 메서드 사용
-
+        return productRepository.findBySellerSellerId(sellerId, pageable);
     
     }
 
@@ -69,11 +68,9 @@ public class ProductsServiceImpl implements ProductsService {
     
     @Override
     public Page<Product> getProductsBySeller(Long sellerId, Pageable pageable) {
-        return productRepository.findBySellerId(sellerId, pageable); // ✅ `Page<Product>` 그대로 반환
+        return productRepository.findBySellerSellerId(sellerId, pageable);
     }
 
-    
-    
     
  // 상품 검색
     @Override
@@ -90,7 +87,7 @@ public class ProductsServiceImpl implements ProductsService {
 
     @Override
     public List<Product> getProductsBySellerId(Long sellerId) {
-        return productRepository.findBySellerId(sellerId);
+        return productRepository.findBySellerSellerId(sellerId);
     }
     @Override
     public void getProductDetails(Long productId) {
