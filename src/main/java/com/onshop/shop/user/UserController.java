@@ -33,13 +33,17 @@ import com.onshop.shop.address.Address;
 import com.onshop.shop.address.AddressRepository;
 import com.onshop.shop.security.JwtUtil;
 
+import jakarta.mail.MessagingException;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
+import jakarta.validation.Valid;
+import lombok.extern.slf4j.Slf4j;
 
 @RestController
 @RequestMapping("/auth")
 @CrossOrigin(origins = "http://localhost:5173", allowCredentials = "true") // ✅ 프론트엔드에서 쿠키 사용 허용
+@Slf4j
 public class UserController {
 
     @Value("${naver.client.id}")
@@ -455,5 +459,38 @@ public class UserController {
             newUser.setRole(role);
             return userRepository.save(newUser);
         }
+    }
+    
+    
+    
+    
+    /** 이매일 인증 */
+    
+    // 인증번호 발송
+    @PostMapping("/email/send-code")
+    public ResponseEntity<?> sendVerificationCode(@Valid @RequestBody EmailAuthRequestDTO emailRequestDTO) {
+
+        log.info("email:{}",emailRequestDTO);
+     
+        try {
+            userService.sendVerificationCode(emailRequestDTO.getEmail());
+        } catch (MessagingException ex) {
+            return null;
+        }
+
+        return ResponseEntity.ok(null);
+    }
+    
+    // 인증번호 검증
+    @PostMapping("/send-verification")
+    public ResponseEntity<?> emailVerification(@Valid @RequestBody EmailVerificationRequestDTO verificationRequestDTO) {
+
+        boolean isVer = userService.emailVerification(verificationRequestDTO);
+        if(isVer){
+            return ResponseEntity.noContent().build();
+        }
+
+        return (ResponseEntity<?>) ResponseEntity.badRequest();
+
     }
 }

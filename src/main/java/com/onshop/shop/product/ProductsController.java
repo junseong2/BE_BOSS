@@ -26,21 +26,22 @@ import java.util.List;
 import org.springframework.web.bind.annotation.DeleteMapping;
 
 @RestController
-@RequestMapping("/products")
+@RequestMapping("")
 @RequiredArgsConstructor
 @Slf4j
 public class ProductsController {
 
     private final ProductsService productsService;
 
+    /** 구매자*/
     // 모든 상품 조회
-    @GetMapping
+    @GetMapping("/products")
     public List<ProductsDTO> getAllProducts() {
         return productsService.getAllProducts();
     }
 
     // 단일 상품 조회
-    @GetMapping("/{productId}")
+    @GetMapping("/products/{productId}")
     public ProductsDTO getProductById(@PathVariable Long productId) {
     	
     	log.info("products id:{}", productId);
@@ -49,21 +50,20 @@ public class ProductsController {
     }
     
     // ✅ 특정 카테고리의 상품 조회 API 추가
-    @GetMapping("/category/{categoryId}")
+    @GetMapping("/products/category/{categoryId}")
     public List<ProductsDTO> getProductsByCategory(@PathVariable Long categoryId) {
         return productsService.getProductsByCategory(categoryId);
     }
     
-    @GetMapping("/search")
+    @GetMapping("/products/search")
     public List<ProductsDTO> searchProducts(@RequestParam String query) {
         return productsService.searchProducts(query);
     }
     
-    /* 판매자 */
-
-	
+    
+    /** 판매자 */
 	// 모든 상품 조회
-	@GetMapping()
+	@GetMapping("/seller/products")
 	public ResponseEntity<?> getAllProducts(
 			@RequestParam int page,
 			@RequestParam int size
@@ -74,7 +74,7 @@ public class ProductsController {
 	}
 	
 	// 상품 추가(다중)
-	@PostMapping("/multiple")
+	@PostMapping("/seller/products/multiple")
 	public ResponseEntity<?> registerProducts(
 			@Valid @RequestParam List<SellerProductsRequestDTO> productsDTO
 			){
@@ -87,7 +87,7 @@ public class ProductsController {
 	}
 	
 	// 상품 추가(
-	@PostMapping()
+	@PostMapping("/seller/products")
 	public ResponseEntity<?> registerProduct(
 			@Valid @RequestParam("product") String productJSON,
 			@RequestParam("images") List<MultipartFile> images
@@ -106,7 +106,7 @@ public class ProductsController {
 	}
 	
 	// 상품 검색
-	@GetMapping("/search")
+	@GetMapping("/seller/products/search")
 	public ResponseEntity<?> searchProduct(
 			@RequestParam String search,
 			@RequestParam int page,
@@ -122,7 +122,7 @@ public class ProductsController {
 	
 	
 	// 상품 수정
-	@PatchMapping("/{productId}")
+	@PatchMapping("/seller/products/{productId}")
 	public ResponseEntity<?> updateProduct(
 			@PathVariable Long productId,
 			@Valid @RequestBody SellerProductsRequestDTO productDTO
@@ -147,7 +147,7 @@ public class ProductsController {
 	}
 	
 	// 상품 삭제(단일, 다중 모두 처리)
-	@DeleteMapping()
+	@DeleteMapping("/seller/products")
 	public ResponseEntity<?> removeProducts(
 			@Valid @RequestBody SellerProductIdsDTO productIds
 			){
