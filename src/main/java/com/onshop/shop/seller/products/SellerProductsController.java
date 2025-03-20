@@ -114,6 +114,7 @@ public class SellerProductsController {
 					.category(productDTO.getCategoryName())
 					.productName(productDTO.getName())
 					.price(productDTO.getPrice())
+					.stock(productDTO.getStock())
 					.build());
 		return ResponseEntity.ok(response);
 	}

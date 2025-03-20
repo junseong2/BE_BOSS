@@ -145,14 +145,22 @@ public class SellerProductsServiceImpl implements SellerProductsService {
   		if(category == null) {
    			throw new ResourceNotFoundException(productDTO.getCategoryName() + "로 등록된 카테고리를 찾을 수 없습니다.");	
    		}
+  		
+  		Inventory inventory= inventoryRepository.findByProductId(productId);
+  		if(inventory == null) {
+  			throw new ResourceNotFoundException(productDTO.getName() + "의 재고 정보를 찾을 수 없습니다.");	
+  		}
                 
-        
+  		Long newStock = productDTO.getStock().longValue();
+        inventory.setStock(newStock);
         oldProduct.setName(productDTO.getName());
         oldProduct.setCategory(category);
         oldProduct.setDescription(productDTO.getDescription());
         oldProduct.setPrice(productDTO.getPrice());
         
         productRepository.save(oldProduct);
+        inventoryRepository.save(inventory);
+        
     }
     
     // 상품 삭제
@@ -160,13 +168,19 @@ public class SellerProductsServiceImpl implements SellerProductsService {
     @Transactional
     public void removeProducts(SellerProductIdsDTO productsIdsDTO) {
         List<Long> productIds = productsIdsDTO.getIds();
-        
+
         if (productIds == null || productIds.isEmpty()) {
             throw new IllegalArgumentException("삭제할 상품 ID 목록이 비어 있습니다.");
         }
-        
-        productRepository.deleteAllByIdInBatch(productIds);
+
+        try {
+            productRepository.deleteAllByIdInBatch(productIds);
+        } catch (Exception e) {
+            // 예외 처리: 트랜잭션이 실패하면 롤백
+            throw new RuntimeException("상품 삭제 중 오류가 발생했습니다.", e);
+        }
     }
+
     
     // 상품 검색
     @Override

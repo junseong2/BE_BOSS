@@ -1,9 +1,7 @@
 package com.onshop.shop.seller.products;
 
-import java.util.List;
-
-import org.springframework.web.multipart.MultipartFile;
-
+import jakarta.validation.constraints.Max;
+import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
@@ -30,6 +28,8 @@ public class SellerProductsRequestDTO {
 	@Positive(message = "가격은 0보다 커야 합니다.")
 	private Integer price; 
 	
+	@Min(value = 0, message = "재고는 최소 0 이상이어야 합니다.")
+	@Max(value= 1000, message ="재고는 최대 1000이하이어야 합니다.")
 	private Integer stock; // 재고
 	
 	

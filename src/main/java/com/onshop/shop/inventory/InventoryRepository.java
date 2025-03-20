@@ -30,12 +30,16 @@ public interface InventoryRepository extends JpaRepository<Inventory, Long> {
     nativeQuery = true)
     Page<SellerInventoryResponseDTO> findAllByNameAndSellerId(@Param("name") String name, @Param("sellerId") Long sellerId, Pageable pageable);
     
-    // 상품ID 별 재고 조회
+    // 상품ID 별 재고 목록 조회
 //    @Query("SELECT i FROM Inventory i WHERE i.product.id = :productId ")
     
     
     @Query("SELECT i FROM Inventory i WHERE i.product.id IN :productIds")
     List<Inventory> findAllByProductIds(@Param("productIds") List<Long> productIds);
     
+    
+    // 상품ID 별 재고 조회
+    @Query("SELECT i FROM Inventory i WHERE i.product.id = :productId")
+    Inventory findByProductId(@Param("productId") Long productId);
     
 }

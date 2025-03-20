@@ -1,5 +1,8 @@
 package com.onshop.shop.products;
 
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
+
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -23,6 +26,7 @@ public class ProductImage {
 	
     @ManyToOne
     @JoinColumn(name = "product_id")
+    @OnDelete(action = OnDeleteAction.CASCADE)  // 외래 키가 참조하는 product가 삭제될 때 해당 product_image도 삭제
     private Product product;
 
 }
