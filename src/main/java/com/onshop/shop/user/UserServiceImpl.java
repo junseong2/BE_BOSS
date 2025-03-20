@@ -5,17 +5,11 @@ import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-import java.util.List;
-import java.util.Optional;
-import java.util.stream.Collectors;
-
-import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.onshop.shop.user.AddressRepository;
-import com.onshop.shop.user.UserRepository;
+import com.onshop.shop.address.Address;
+import com.onshop.shop.address.AddressRepository;
 
 @Service
 public class UserServiceImpl implements UserService {
@@ -91,7 +85,7 @@ public class UserServiceImpl implements UserService {
     }
     
     @Override
-    public User getUserById(Integer userId) {
+    public User getUserById(Long userId) {
         return userRepository.findByUserId(userId).orElse(null);
     }
 

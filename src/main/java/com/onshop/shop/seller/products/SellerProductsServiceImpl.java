@@ -1,9 +1,11 @@
 package com.onshop.shop.seller.products;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -13,8 +15,10 @@ import com.onshop.shop.category.CategoryRepository;
 import com.onshop.shop.exception.ResourceNotFoundException;
 import com.onshop.shop.inventory.Inventory;
 import com.onshop.shop.inventory.InventoryRepository;
-import com.onshop.shop.products.Product;
-import com.onshop.shop.products.ProductRepository;
+import com.onshop.shop.product.Product;
+import com.onshop.shop.product.ProductRepository;
+import com.onshop.shop.store.Seller;
+import com.onshop.shop.store.SellerRepository;
 
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
@@ -28,6 +32,9 @@ public class SellerProductsServiceImpl implements SellerProductsService {
     private final ProductRepository productRepository;
     private final InventoryRepository inventoryRepository;
     private final CategoryRepository categoryRepository;
+    private final SellerRepository sellerRepository;
+    
+    
     
     // 점주 상품 조회
     @Override
@@ -35,42 +42,77 @@ public class SellerProductsServiceImpl implements SellerProductsService {
         Long sellerId = 1L; // 임시
         Pageable pageable = PageRequest.of(page, size);
         
-        List<SellerProductsDTO> products = productRepository.findBySellerId(sellerId, pageable).toList();
-        
+        Page<Product> productPage = productRepository.findBySellerSellerId(sellerId, pageable);
+        Page<SellerProductsDTO> dtoPage = productPage.map(product -> {
+      
+        	
+            Long stock = inventoryRepository.
+            		findStockByProductId(product.getProductId()).orElse(0L);
+
+
+            return new SellerProductsDTO(
+                product.getProductId(),
+                product.getName(),
+                product.getPrice(),
+                product.getCategory().getName(),
+                product.getDescription(),
+                stock // ✅ Inventory에서 가져온 stock 값 사용
+            );
+        });
+
+        List<SellerProductsDTO> products = dtoPage.getContent(); // ✅ Page -> List 변환
+
         if (products.isEmpty()) {
             throw new ResourceNotFoundException("조회할 상품 목록을 찾을 수 없습니다.");
         }
-        
         return products;
+
     }
 
-    // 점주 상품 추가
+ // 점주 상품 추가
     @Transactional
     @Override
     public void registerProducts(List<SellerProductsRequestDTO> productsDTO) {
         Long sellerId = 1L; // 임시
+        Seller seller = sellerRepository.findById(sellerId)
+                .orElseThrow(() -> new ResourceNotFoundException("Seller not found: " + sellerId));
 
         List<String> categoryNames = productsDTO.stream()
                                                 .map(SellerProductsRequestDTO::getCategoryName)
                                                 .distinct()
                                                 .collect(Collectors.toList());
+
         Map<String, Category> categoryMap = categoryRepository.findByNameIn(categoryNames)
                                                               .stream()
                                                               .collect(Collectors.toMap(Category::getName, category -> category));
         
-        List<Product> unsavedProducts = productsDTO.stream().map(product -> {
-            Category category = categoryMap.get(product.getCategoryName());
-            if (category == null) {
-                throw new IllegalArgumentException("Category not found: " + product.getCategoryName());
-            }
-            return Product.builder()
-                    .category(category)
-                    .name(product.getName())
-                    .description(product.getDescription())
-                    .price(product.getPrice())
-                    .sellerId(sellerId)
-                    .build();
-        }).collect(Collectors.toList());
+        List<Product> unsavedProducts = productsDTO.stream()
+            .map(productDTO -> {
+                Category category = categoryMap.get(productDTO.getCategoryName());
+                if (category == null) {
+                    throw new IllegalArgumentException("Category not found: " + productDTO.getCategoryName());
+                }
+
+                return Product.builder()
+                        .category(category)
+                        .seller(seller) // ✅ Seller 객체 참조
+                        .name(productDTO.getName())
+                        .description(productDTO.getDescription())
+                        .price(productDTO.getPrice())
+                        .build();
+            })
+            .collect(Collectors.toList());
+
+        
+//	    private Long productId;
+//	    private Long categoryId;
+//	    private Long sellerId;
+//	    private String name;
+//	    private String description;
+//	    private Integer price;
+//	    private List<String> gImage;
+//	    private LocalDateTime expiryDate;
+//	    private LocalDateTime createdRegister;
 
         List<Product> savedProducts = productRepository.saveAll(unsavedProducts);
 

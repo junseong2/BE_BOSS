@@ -1,4 +1,4 @@
-package com.onshop.shop.user;
+package com.onshop.shop.address;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Getter;

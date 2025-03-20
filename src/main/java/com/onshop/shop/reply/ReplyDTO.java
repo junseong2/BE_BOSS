@@ -4,20 +4,20 @@ import lombok.Getter;
 import lombok.Setter;
 import java.time.LocalDateTime;
 import com.onshop.shop.user.User;
-import com.onshop.shop.article.ArticleEntity;
-import com.onshop.shop.reply.ReplyEntity;
+import com.onshop.shop.article.Article;
+import com.onshop.shop.reply.Reply;
 
 @Getter
 @Setter
 public class ReplyDTO {
-    private int replyId;
-    private int articleId;
-    private int userId; // `UserEntity` 대신 `userId`만 저장
+    private Long replyId;
+    private Long articleId;
+    private Long userId; // `UserEntity` 대신 `userId`만 저장
     private String replyArticle;
     private LocalDateTime writtenDate;
 
     // 생성자
-    public ReplyDTO(int replyId, int articleId, int userId, String replyArticle, LocalDateTime writtenDate) {
+    public ReplyDTO(Long replyId, Long articleId, Long userId, String replyArticle, LocalDateTime writtenDate) {
         this.replyId = replyId;
         this.articleId = articleId;
         this.userId = userId;
@@ -26,21 +26,21 @@ public class ReplyDTO {
     }
 
     // ✅ Entity → DTO 변환 메서드
-    public static ReplyDTO fromEntity(ReplyEntity replyEntity) {
+    public static ReplyDTO fromEntity(Reply replyEntity) {
         return new ReplyDTO(
                 replyEntity.getReplyId(),
                 replyEntity.getArticle().getArticleId(),
-                replyEntity.getUserEntity() != null ? replyEntity.getUserEntity().getUserId() : 0, // `UserEntity`가 NULL일 수도 있음
+                replyEntity.getUser() != null ? replyEntity.getUser().getUserId() : 0, // `UserEntity`가 NULL일 수도 있음
                 replyEntity.getReplyArticle(),
                 replyEntity.getWrittenDate()
         );
     }
 
     // ✅ DTO → Entity 변환 메서드 (댓글 생성 시 사용)
-    public ReplyEntity toEntity(ArticleEntity articleEntity, User userEntity) {
-        ReplyEntity replyEntity = new ReplyEntity();
+    public Reply toEntity(Article articleEntity, User userEntity) {
+        Reply replyEntity = new Reply();
         replyEntity.setArticle(articleEntity);
-        replyEntity.setUserEntity(userEntity);
+        replyEntity.setUser(userEntity);
         replyEntity.setReplyArticle(this.replyArticle);
         replyEntity.setWrittenDate(LocalDateTime.now()); // 현재 시간 저장
         return replyEntity;

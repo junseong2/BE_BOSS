@@ -2,9 +2,12 @@ package com.onshop.shop.inventory;
 
 import java.time.LocalDateTime;
 
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
 import org.hibernate.annotations.UpdateTimestamp;
 
-import com.onshop.shop.products.Product;
+import com.onshop.shop.product.Product;
+import com.onshop.shop.store.Seller;
 
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Entity;
@@ -13,6 +16,7 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 import jakarta.persistence.UniqueConstraint;
@@ -35,9 +39,15 @@ public class Inventory {
     private Long stock;
     private Long minStock;
 
-    @OneToOne(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
-    @JoinColumn(name = "product_id")  // productId 컬럼을 직접 쓰지 않고 객체로 참조해야 함
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "product_id", nullable = false) 
+    @OnDelete(action = OnDeleteAction.CASCADE) // Product 삭제 시 관련 Inventory 삭제
     private Product product;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "seller_id", nullable = false) 
+    @OnDelete(action = OnDeleteAction.CASCADE) // Seller 삭제 시 관련 Inventory 삭제
+    private Seller seller;
     
     @UpdateTimestamp
 	private LocalDateTime updated_date;

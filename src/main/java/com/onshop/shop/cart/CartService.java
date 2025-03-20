@@ -5,8 +5,9 @@ import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Service;
 
-import com.onshop.shop.products.Product;
-import com.onshop.shop.products.ProductRepository;
+import com.onshop.shop.product.Product;
+import com.onshop.shop.product.ProductRepository;
+import com.onshop.shop.user.User;
 
 @Service
 public class CartService {
@@ -16,18 +17,16 @@ public class CartService {
 
 	 public CartService(CartRepository cartRepository, ProductRepository productRepository) {
 	        this.cartRepository = cartRepository;
-	        this.productRepository = productRepository; 
+	        this.productRepository = productRepository;
 	    }
 
 	// 사용자 ID로 장바구니 아이템 조회
-	public List<CartDTO> getCartByUserId(Integer userId) {
+	public List<CartDTO> getCartByUserId(Long userId) {
 		List<Cart> carts = cartRepository.findByUserId(userId);
 
 		return carts.stream().map(cart -> {
-			Product product = productRepository.
-
-					findById(cart.getProductId()).orElse(null);
-			return new CartDTO(cart.getCartId(), cart.getProductId(), cart.getQuantity(), cart.getUserId(),
+			Product product = cart.getProduct();
+			return new CartDTO(cart.getCartId(),cart.getQuantity(),cart.getUserId(), cart.getProduct().getProductId(),  
 					product.getName(), // ✅ productName 추가
 					product.getPrice() // ✅ productPrice 추가
 			);
@@ -35,17 +34,19 @@ public class CartService {
 	}
 
 	// 장바구니에 상품 추가
-	public Cart addItemToCart(Integer userId, CartItemRequest request) {
+	public Cart addItemToCart(Long userId, CartItemRequest request) {
+		Long productId =request.getProductId();
+		Product product =  productRepository.findById(productId).orElse(null);
 		Cart cart = new Cart();
 		cart.setUserId(userId);
-		cart.setProductId(request.getProductId());
+		cart.setProduct(product);
 		cart.setQuantity(request.getQuantity());
 		return cartRepository.save(cart);
 	}
 
 	// CartService에서 상품 수량 갱신 처리
-	public boolean updateItemQuantity(Integer userId, Long productId, Integer quantity) {
-	    Cart cart = cartRepository.findByUserIdAndProductId(userId, productId);
+	public boolean updateItemQuantity(Long userId, Long productId, Integer quantity) {
+	    Cart cart = cartRepository.findByUserIdAndProduct(userId,productRepository.findById(productId).orElse(null) );
 
 	    if (cart == null) {
 	        return false;  // 해당 상품이 장바구니에 없으면 실패
@@ -72,12 +73,12 @@ public class CartService {
 	
 	
 	
-	 public boolean removeItemFromCartbyProductId(Integer userId, Long productId) {
+	 public boolean removeItemFromCartbyProductId(Long userId, Long productId) {
 	        List<Cart> carts = cartRepository.findByUserId(userId);
 	        Cart cartToRemove = null;
 
 	        for (Cart cart : carts) {
-	            if (cart.getProductId().equals(productId)) {
+	            if (cart.getProduct().getProductId().equals(productId)) {
 	                cartToRemove = cart;
 	                break;
 	            }
@@ -94,7 +95,7 @@ public class CartService {
 	 
 	 
 	// 장바구니 비우기
-	public void clearCart(Integer userId) {
+	public void clearCart(Long userId) {
 		List<Cart> carts = cartRepository.findByUserId(userId);
 		if (!carts.isEmpty()) {
 			cartRepository.deleteAll(carts);

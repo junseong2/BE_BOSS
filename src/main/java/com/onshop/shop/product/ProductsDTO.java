@@ -1,4 +1,4 @@
-	package com.onshop.shop.products;
+	package com.onshop.shop.product;
 	
 	import lombok.*;
 	
@@ -36,7 +36,6 @@ import com.onshop.shop.category.Category;
 	        return ProductsDTO.builder()
 	                .productId(product.getProductId())
 	                .categoryId(product.getCategory() != null ? product.getCategory().getId() : null) // 수정된 부분
-	                .sellerId(product.getSellerId())
 	                .name(product.getName())
 	                .description(product.getDescription())
 	                .price(product.getPrice())

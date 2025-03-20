@@ -1,33 +1,37 @@
 package com.onshop.shop.reply;
 
 import com.onshop.shop.user.User;
-import com.onshop.shop.article.ArticleEntity;
+import com.onshop.shop.article.Article;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import java.time.LocalDateTime;
 
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
+
 @Entity
 @Getter
 @Setter
 @NoArgsConstructor
 @Table(name = "reply")
-public class ReplyEntity {
+public class Reply {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private int replyId;
+    private Long replyId;
 
-    // ✅ 게시물과의 관계 (Many-to-One)
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "article_id", nullable = false, foreignKey = @ForeignKey(name = "fk_reply_article"))
-    private ArticleEntity article;
+    @OnDelete(action = OnDeleteAction.CASCADE) // 게시글 삭제 시 Reply 삭제
+    private Article article;
 
-    // ✅ 사용자와의 관계 (Many-to-One, NULL 허용)
-    @ManyToOne
-    @JoinColumn(name = "writer_id", foreignKey = @ForeignKey(name = "fk_reply_user"))
-    private User userEntity;
+    // ✅ 사용자와의 관계 (Many-to-One) → 사용자 삭제 시 Reply는 남아있고 user_id는 NULL 처리됨
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_id", foreignKey = @ForeignKey(name = "fk_reply_user"))
+    @OnDelete(action = OnDeleteAction.SET_NULL) // 사용자 삭제 시 user_id를 NULL로 변경
+    private User user;
 
     // ✅ 댓글 본문
     @Column(nullable = false, columnDefinition = "TEXT")
