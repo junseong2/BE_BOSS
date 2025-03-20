@@ -1,6 +1,5 @@
 package com.onshop.shop.product;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -19,18 +18,11 @@ import lombok.extern.slf4j.Slf4j;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.onshop.shop.category.*;
-
-
-import com.onshop.shop.category.Category;
-import com.onshop.shop.category.CategoryService;
 import com.onshop.shop.exception.SuccessMessageResponse;
-import com.onshop.shop.product.*;
 
 import jakarta.validation.Valid;
 
 import java.util.List;
-import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
 
 @RestController
@@ -53,8 +45,6 @@ public class ProductsController {
     	
     	log.info("products id:{}", productId);
     	
-    	log.info("products :{}",      productsService.getProductById(productId));
-
         return productsService.getProductById(productId);
     }
     
@@ -108,7 +98,7 @@ public class ProductsController {
         ObjectMapper objectMapper = new ObjectMapper();
         SellerProductsRequestDTO productDTO = objectMapper.readValue(productJSON, SellerProductsRequestDTO.class);
         
-        Product savedProduct = productsService.registerProducts(productDTO);
+        Product savedProduct = productsService.registerProduct(productDTO);
         
         productsService.reigsterProductImages(images, savedProduct);
 		
@@ -124,7 +114,7 @@ public class ProductsController {
 			){
 		
 		log.info("search:{}, page:{}, size:{}", search, page,size);
-		List<SellerProductsDTO> products = sellerProductsService.searchProducts(search, page, size);
+		List<SellerProductsDTO> products = productsService.searchProducts(search, page, size);
 		return ResponseEntity.ok(products);
 		
 	}
@@ -141,7 +131,7 @@ public class ProductsController {
 			throw new NullPointerException("상품ID는 필수입니다.");
 		}
 		
-		sellerProductsService.updateProducts(productId, productDTO);
+		productsService.updateProducts(productId, productDTO);
 		
 
 		SuccessMessageResponse response = new SuccessMessageResponse(
@@ -162,7 +152,7 @@ public class ProductsController {
 			@Valid @RequestBody SellerProductIdsDTO productIds
 			){
 		log.info("ids:{}", productIds);
-		sellerProductsService.removeProducts(productIds);
+		productsService.removeProducts(productIds);
 		
 		return ResponseEntity.noContent().build();
 		
