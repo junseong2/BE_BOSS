@@ -1,4 +1,4 @@
-package com.onshop.shop.seller.products;
+package com.onshop.shop.product;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;

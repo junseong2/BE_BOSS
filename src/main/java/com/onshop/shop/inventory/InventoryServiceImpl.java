@@ -1,4 +1,4 @@
-package com.onshop.shop.seller.inventory;
+package com.onshop.shop.inventory;
 
 import java.util.List;
 import org.springframework.data.domain.PageRequest;
@@ -6,8 +6,6 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import com.onshop.shop.exception.OverStockException;
 import com.onshop.shop.exception.ResourceNotFoundException;
-import com.onshop.shop.inventory.Inventory;
-import com.onshop.shop.inventory.InventoryRepository;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -15,7 +13,7 @@ import lombok.extern.slf4j.Slf4j;
 @Service
 @RequiredArgsConstructor
 @Slf4j
-public class SellerInventoryServiceImpl implements SellerInventoryService {
+public class InventoryServiceImpl implements InventoryService {
 	
 	private final InventoryRepository inventoryRepository;
 
