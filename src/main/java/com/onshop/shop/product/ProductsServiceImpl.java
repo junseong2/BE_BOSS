@@ -24,7 +24,7 @@ import com.onshop.shop.exception.ResourceNotFoundException;
 import com.onshop.shop.exception.SuccessMessageResponse;
 import com.onshop.shop.inventory.Inventory;
 import com.onshop.shop.inventory.InventoryRepository;
-import com.onshop.shop.seller.products.Product;
+import com.onshop.shop.product.Product;
 import com.onshop.shop.store.Seller;
 import com.onshop.shop.store.SellerRepository;
 
