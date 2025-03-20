@@ -32,7 +32,7 @@ public class ArticleController {
 
     // ✅ 특정 게시물 조회
     @GetMapping("/{id}")
-    public ResponseEntity<ArticleDTO> getArticleById(@PathVariable int id) {
+    public ResponseEntity<ArticleDTO> getArticleById(@PathVariable Long id) {
         ArticleDTO article = articleService.getArticleById(id);
         return ResponseEntity.ok(article);
     }
@@ -47,14 +47,14 @@ public class ArticleController {
 
     // ✅ 게시물 수정 (부분 업데이트 지원)
     @PatchMapping("/{id}")
-    public ResponseEntity<ArticleDTO> updateArticle(@PathVariable int id, @RequestBody ArticleDTO articleDTO) {
+    public ResponseEntity<ArticleDTO> updateArticle(@PathVariable Long id, @RequestBody ArticleDTO articleDTO) {
         ArticleDTO updatedArticle = articleService.updateArticle(id, articleDTO);
         return ResponseEntity.ok(updatedArticle);
     }
 
     // ✅ 게시물 삭제
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteArticle(@PathVariable int id) {
+    public ResponseEntity<Void> deleteArticle(@PathVariable Long id) {
         articleService.deleteArticle(id);
         log.info("del id:{}",id);
         return ResponseEntity.noContent().build();

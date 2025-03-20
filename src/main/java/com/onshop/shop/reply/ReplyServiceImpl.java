@@ -1,6 +1,6 @@
 package com.onshop.shop.reply;
 
-import com.onshop.shop.article.ArticleEntity;
+import com.onshop.shop.article.Article;
 import com.onshop.shop.article.ArticleRepository;
 import com.onshop.shop.user.User;
 import com.onshop.shop.user.UserRepository;
@@ -23,7 +23,7 @@ public class ReplyServiceImpl implements ReplyService {
 
     // ✅ 특정 게시물의 댓글 조회
     @Override
-    public List<ReplyDTO> getRepliesByArticleId(int articleId) {
+    public List<ReplyDTO> getRepliesByArticleId(Long articleId) {
         return replyRepository.findByArticle_ArticleId(articleId).stream()
                 .map(ReplyDTO::fromEntity)
                 .collect(Collectors.toList());
@@ -33,7 +33,7 @@ public class ReplyServiceImpl implements ReplyService {
     @Override
     public ReplyDTO createReply(ReplyDTO replyDTO) {
         // 게시물 찾기
-        ArticleEntity articleEntity = articleRepository.findById(replyDTO.getArticleId())
+        Article articleEntity = articleRepository.findById(replyDTO.getArticleId())
                 .orElseThrow(() -> new RuntimeException("해당 게시물을 찾을 수 없습니다."));
 
         // 작성자 찾기 (익명 댓글 허용)
@@ -43,16 +43,16 @@ public class ReplyServiceImpl implements ReplyService {
         }
 
         // DTO → Entity 변환 후 저장
-        ReplyEntity replyEntity = replyDTO.toEntity(articleEntity, userEntity);
-        ReplyEntity savedReply = replyRepository.save(replyEntity);
+        Reply replyEntity = replyDTO.toEntity(articleEntity, userEntity);
+        Reply savedReply = replyRepository.save(replyEntity);
 
         return ReplyDTO.fromEntity(savedReply); // 저장 후 DTO 반환
     }
 
     // ✅ 댓글 삭제
     @Override
-    public void deleteReply(int replyId) {
-        Optional<ReplyEntity> reply = replyRepository.findById(replyId);
+    public void deleteReply(Long replyId) {
+        Optional<Reply> reply = replyRepository.findById(replyId);
         if (reply.isEmpty()) {
             throw new RuntimeException("삭제할 댓글을 찾을 수 없습니다.");
         }

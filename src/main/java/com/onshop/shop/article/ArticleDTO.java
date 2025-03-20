@@ -7,13 +7,13 @@ import java.time.LocalDateTime;
 @Getter
 @Setter
 public class ArticleDTO {
-    private int articleId;
+    private Long articleId;
     private String articleName;
     private String article;
-    private int userId; // UserEntity 대신 userId만 포함
+    private Long userId; // UserEntity 대신 userId만 포함
     private LocalDateTime writtenDate;
 
-    public ArticleDTO(int articleId, String articleName, String article, int userId, LocalDateTime writtenDate) {
+    public ArticleDTO(Long articleId, String articleName, String article, Long userId, LocalDateTime writtenDate) {
         this.articleId = articleId;
         this.articleName = articleName;
         this.article = article;
@@ -22,12 +22,12 @@ public class ArticleDTO {
     }
 
     // Entity → DTO 변환 메서드
-    public static ArticleDTO fromEntity(ArticleEntity articleEntity) {
+    public static ArticleDTO fromEntity(Article articleEntity) {
         return new ArticleDTO(
                 articleEntity.getArticleId(),
                 articleEntity.getArticleName(),
                 articleEntity.getArticle(),
-                articleEntity.getUserEntity() != null ? articleEntity.getUserEntity().getUserId() : 0, // UserEntity가 NULL일 수도 있음
+                articleEntity.getUser() != null ? articleEntity.getUser().getUserId() : 0, // UserEntity가 NULL일 수도 있음
                 articleEntity.getWrittenDate()
         );
     }

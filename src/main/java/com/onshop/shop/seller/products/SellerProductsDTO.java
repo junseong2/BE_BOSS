@@ -4,10 +4,10 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-
 @Data
 @Builder
 @NoArgsConstructor
+@AllArgsConstructor // ✅ 롬복으로 전체 생성자 추가 가능
 public class SellerProductsDTO {
     
     private Long productId;
@@ -16,15 +16,7 @@ public class SellerProductsDTO {
     private String description;
     private String categoryName;
     private Long stock;
-    
 
-    public SellerProductsDTO(Long productId, String name, Integer price, String categoryName, String description, Long stock) {
-        this.productId = productId;
-        this.name = name;
-        this.price = price;
-        this.description = description;
-        this.categoryName = categoryName;
-        this.stock = stock;
-    }
-    
+ 
+   
 }
