@@ -1,4 +1,4 @@
-package com.onshop.shop.products;
+package com.onshop.shop.product;
 
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;

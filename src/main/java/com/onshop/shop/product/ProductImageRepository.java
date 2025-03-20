@@ -1,4 +1,4 @@
-package com.onshop.shop.products;
+package com.onshop.shop.product;
 
 import java.util.List;
 

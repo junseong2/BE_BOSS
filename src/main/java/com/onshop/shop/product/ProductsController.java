@@ -1,4 +1,4 @@
-package com.onshop.shop.products;
+package com.onshop.shop.product;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -7,7 +7,6 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-import com.onshop.shop.products.*;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -17,6 +16,7 @@ import com.onshop.shop.category.*;
 
 import com.onshop.shop.category.Category;
 import com.onshop.shop.category.CategoryService;
+import com.onshop.shop.product.*;
 
 import java.util.List;
 import org.springframework.web.bind.annotation.CrossOrigin;

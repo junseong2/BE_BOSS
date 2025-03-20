@@ -6,7 +6,17 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.hibernate.annotations.CreationTimestamp;
-import jakarta.persistence.*;
+
+import com.onshop.shop.address.Address;
+
+import jakarta.persistence.CascadeType;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.OneToMany;
+import jakarta.persistence.Table;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -19,7 +29,7 @@ public class User {
 	@Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "user_id") // DB 컬럼명과 명시적 매핑
-    private Integer userId;//int형이 성능 절약된다고 함! 
+    private Long userId;//int형이 성능 절약된다고 함! 
 
     private String username;
     private String email;
