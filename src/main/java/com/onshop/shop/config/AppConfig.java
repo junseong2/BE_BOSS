@@ -1,5 +1,6 @@
 package com.onshop.shop.config;
 
+import org.springframework.ai.chat.client.ChatClient;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.client.RestTemplate;
@@ -23,5 +24,6 @@ public class AppConfig {
         objectMapper.disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
         return objectMapper; // 새 인스턴스가 아닌 설정된 객체를 반환
     }
+    
 }
  

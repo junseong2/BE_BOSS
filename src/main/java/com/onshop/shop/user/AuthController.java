@@ -82,7 +82,11 @@ public class AuthController {
             return ResponseEntity.status(404).body(Map.of("error", "유저 정보를 찾을 수 없습니다."));
         }
 
-        return ResponseEntity.ok(Map.of("userId", user.getUserId().toString(), "userName", user.getUsername()));
+        return ResponseEntity.ok(Map.of(
+        	    "userId", user.getUserId().toString(), 
+        	    "userName", user.getUsername(),
+        	    "email", user.getEmail() != null ? user.getEmail() : ""
+        	));
     }
 
     /* 로그아웃 시 쿠키 삭제 */

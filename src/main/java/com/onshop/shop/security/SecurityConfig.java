@@ -22,30 +22,31 @@ import jakarta.servlet.http.HttpServletResponse;
 @EnableMethodSecurity
 public class SecurityConfig {
 
-    @Bean
-    public SecurityFilterChain securityFilterChain(HttpSecurity http, JwtAuthenticationFilter jwtAuthenticationFilter) throws Exception {
-        http
-            .csrf(csrf -> csrf.disable())
-            .cors(cors -> cors.configurationSource(corsConfigurationSource()))
-            .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-            .authorizeHttpRequests(auth -> auth
-                .requestMatchers("/api/**","/auth/**", "/category",
-                	      "/products/**",    "/products", "/category/**", "/products/**", "/cart/**", "/favicon.ico","/uploads/**"
-                        ,"/store/**","/seller/**","/seller","/seller/info/**", "/payment/toss","/orders/create"
-                		)
+	@Bean
+	public SecurityFilterChain securityFilterChain(HttpSecurity http, JwtAuthenticationFilter jwtAuthenticationFilter) throws Exception {
+	    http
+	        .cors(cors -> cors.configurationSource(corsConfigurationSource())) // ✅ CORS 설정을 가장 먼저 적용
+	        .csrf(csrf -> csrf.disable())
+	        .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+	        .authorizeHttpRequests(auth -> auth
+	            .requestMatchers("/api/**","/auth/**", "/category",
+	                "/products/**", "/products", "/category/**", "/products/**", "/cart/**", "/favicon.ico","/uploads/**"
+	                ,"/store/**","/seller/**","/seller","/seller/info/**", "/payment/**","/orders/**"
+	            )
+	            .permitAll()
+	            .anyRequest().authenticated()
+	        )
+	        .exceptionHandling(exception -> exception
+	            .accessDeniedHandler(customAccessDeniedHandler())  // ⭐ 추가
+	        )
+	        .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
 
-                .permitAll()
-                .anyRequest().authenticated()
-            )
-            .exceptionHandling(exception -> exception
-                .accessDeniedHandler(customAccessDeniedHandler())  // ⭐ 추가
-            )
-            .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
-        
-        System.out.println("✅ SecurityConfig 설정 완료: 모든 요청 필터 설정됨");
+	    System.out.println("✅ SecurityConfig 설정 완료: 모든 요청 필터 설정됨");
 
-        return http.build();
-    }
+	    return http.build();
+	}
+
+    
 
 
     @Bean//경고용

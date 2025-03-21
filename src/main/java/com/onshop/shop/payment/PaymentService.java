@@ -1,7 +1,12 @@
 package com.onshop.shop.payment;
-import org.springframework.http.ResponseEntity;
+
+import java.util.Optional;
+import java.util.Map;
 
 public interface PaymentService {
-    ResponseEntity<?> processTossPayment(PaymentDTO paymentRequest);
-//    ResponseEntity<?> processKakaoPayment(PaymentDTO paymentRequest);
+    Payment createPayment(PaymentDTO paymentDTO);
+    Optional<Payment> getPaymentByImpUid(String impUid);
+    void updatePaymentStatus(String impUid, PaymentStatus status);
+    String getAccessToken();
+    Map<String, Object> getPaymentInfo(String impUid);
 }

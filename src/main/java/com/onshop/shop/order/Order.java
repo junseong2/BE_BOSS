@@ -6,22 +6,8 @@ import java.util.List;
 import com.onshop.shop.payment.Payment;
 import com.onshop.shop.user.User;
 
-import jakarta.persistence.CascadeType;
-import jakarta.persistence.Entity;
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
-import jakarta.persistence.OneToMany;
-import jakarta.persistence.Table;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import jakarta.persistence.*;
+import lombok.*;
 
 @Entity
 @Table(name = "orders")
@@ -38,7 +24,7 @@ public class Order {
 
     @ManyToOne
     @JoinColumn(name = "user_id", nullable = false)
-    private User user;  // 🔹 기존 Long → Integer 타입 변경 필요 없음 (User 자체를 참조하므로 문제 없음)
+    private User user;  
 
     private int totalPrice;
 
@@ -48,5 +34,5 @@ public class Order {
     private LocalDateTime createdDate;
 
     @OneToMany(mappedBy = "order", cascade = CascadeType.ALL)
-    private List<Payment> payments;
+    private List<Payment> payments; // 결제와 연관관계 설정
 }

@@ -1,32 +1,13 @@
 package com.onshop.shop.order;
 
-import java.time.LocalDateTime;
+import jakarta.validation.constraints.NotNull;
+import lombok.Data;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
-
-@Getter
-@Setter
-@NoArgsConstructor
-@AllArgsConstructor
-@Builder
+@Data
 public class OrderDTO {
-    private Long orderId;
-    private Integer userId; // 🔹 Long → Integer 변경
-    private int totalPrice;
-    private String status;
-    private LocalDateTime createdDate;
+    @NotNull(message = "사용자 ID는 필수입니다.")
+    private Long userId;
 
-    public static OrderDTO fromEntity(Order order) {
-        return OrderDTO.builder()
-                .orderId(order.getOrderId())
-                .userId(order.getUser().getUserId()) // 🔹 Integer 타입 유지
-                .totalPrice(order.getTotalPrice())
-                .status(order.getStatus().name())
-                .createdDate(order.getCreatedDate())
-                .build();
-    }
+    @NotNull(message = "총 금액은 필수입니다.")
+    private int totalPrice;
 }
