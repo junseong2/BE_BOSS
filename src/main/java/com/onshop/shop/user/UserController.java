@@ -224,6 +224,7 @@ public class UserController {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("회원가입 실패: " + e.getMessage());
         }
     }
+    
     @PostMapping("/locallogin") // 로컬 로그인
     public ResponseEntity<?> login(@RequestBody User loginRequest, HttpServletResponse response) {
         User user = userService.findByEmailAndPassword(loginRequest.getEmail(), loginRequest.getPassword());
@@ -482,7 +483,7 @@ public class UserController {
     }
     
     // 인증번호 검증
-    @PostMapping("/send-verification")
+    @PostMapping("/email/code-verify")
     public ResponseEntity<?> emailVerification(@Valid @RequestBody EmailVerificationRequestDTO verificationRequestDTO) {
 
         boolean isVer = userService.emailVerification(verificationRequestDTO);
@@ -490,7 +491,7 @@ public class UserController {
             return ResponseEntity.noContent().build();
         }
 
-        return (ResponseEntity<?>) ResponseEntity.badRequest();
+        return ResponseEntity.ok().body("success");
 
     }
 }

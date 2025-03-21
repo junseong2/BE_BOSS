@@ -119,39 +119,6 @@ public class UserServiceImpl implements UserService {
     }
     
     /** 이메일 인증*/
-
-    @Override
-    // 이메일 포맷 설정 
-    public MimeMessage createMail(String email, String authCode) throws MessagingException {
-        MimeMessage message = javaMailSender.createMimeMessage();
-
-        message.setFrom(senderEmail);
-        message.setRecipients(MimeMessage.RecipientType.TO, email);
-        message.setSubject("이메일 인증");
-        String body = "<html lang='ko'>" +
-                "<head>" +
-                "<meta charset='UTF-8'>" +
-                "<meta name='viewport' content='width=device-width, initial-scale=1.0'>" +
-                "<title>이메일 인증</title>" +
-                "</head>" +
-                "<body style='font-family: Arial, sans-serif; background-color: #f4f4f9; margin: 0; padding: 0; text-align: center;'>" +
-                "<div style='width: 100%; max-width: 600px; margin: 0 auto; background-color: #ffffff; border-radius: 10px; box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1); padding: 30px; text-align: center;'>" +
-                "<h3 style='font-size: 24px; color: #333333; margin-bottom: 20px; font-weight: bold;'>Mincho 사이트 인증 번호</h3>" +
-                "<p style='font-size: 18px; color: #555555;'>요청하신 인증 번호는 아래와 같습니다.</p>" +
-                "<div style='font-size: 48px; color: #4CAF50; font-weight: bold; background-color: #f1f8e9; padding: 20px; border-radius: 10px; display: inline-block; margin: 20px 0;'>" +
-                "<h1 style='margin: 0;'>" + authCode + "</h1>" +
-                "</div>" +
-                "<p style='font-size: 16px; color: #777777; margin-top: 30px;'>이메일 인증에 감사드립니다.</p>" +
-                "<p style='font-size: 18px; color: #666666; margin-top: 10px;'>감사합니다.</p>" +
-                "</div>" +
-                "</body>" +
-                "</html>";
-
-        message.setText(body, "UTF-8", "html");
-
-        return message;
-    }
-
     // 이메일 인증
     @Override
     public boolean emailVerification(EmailVerificationRequestDTO verificationRequestDTO) {
@@ -174,7 +141,7 @@ public class UserServiceImpl implements UserService {
 
          // TODO: 커스텀 예외 적용해야 함.
          if(isUser){
-             throw new BadRequestException("잘못된 요청임니다. 이전 단계를 완료 후 진행해주세요.");
+             throw new BadRequestException("이미 존재하는 이메일입니다.");
          }
 
         boolean isValidMx = this.validateMx(toMail.split("@")[1]);
@@ -213,6 +180,38 @@ public class UserServiceImpl implements UserService {
                 return false;
             }
     }
+    
+    @Override
+    // 이메일 포맷 설정 
+    public MimeMessage createMail(String email, String authCode) throws MessagingException {
+        MimeMessage message = javaMailSender.createMimeMessage();
+
+        message.setFrom(senderEmail);
+        message.setRecipients(MimeMessage.RecipientType.TO, email);
+        message.setSubject("이메일 인증");
+        String body =    "<html lang='ko'>" +
+        	    "<head>" +
+        	    "<meta charset='UTF-8'>" +
+        	    "<meta name='viewport' content='width=device-width, initial-scale=1.0'>" +
+        	    "<title>이메일 인증</title>" +
+        	    "</head>" +
+        	    "<body style='font-family: Arial, sans-serif; background-color: #f4f4f9; margin: 0; padding: 0; text-align: center;'>" +
+        	    "<div style='width: 100%; max-width: 600px; margin: 0 auto; background-color: #ffffff; border-radius: 10px; box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1); padding: 30px; text-align: center;'>" +
+        	    "<h3 style='font-size: 24px; color: #333333; margin-bottom: 20px; font-weight: bold;'>BOSS 사이트 인증 번호</h3>" +
+        	    "<p style='font-size: 18px; color: #555555;'>요청하신 인증 번호는 아래와 같습니다.</p>" +
+        	    "<div style='font-size: 48px; color: #ffffff; font-weight: bold; background-color: #4294F2; padding: 20px; border-radius: 10px; display: inline-block; margin: 20px 0;'>" +
+        	    "<h1 style='margin: 0;'>" + authCode + "</h1>" +
+        	    "</div>" +
+        	    "<p style='font-size: 16px; color: #777777; margin-top: 30px;'>이메일 인증에 감사드립니다.</p>" +
+        	    "<p style='font-size: 18px; color: #666666; margin-top: 10px;'>감사합니다.</p>" +
+        	    "</div>" +
+        	    "</body>" +
+        	    "</html>";
+        message.setText(body, "UTF-8", "html");
+
+        return message;
+    }
+
 
 	@Override
 	public User getUserById(Long userId) {
