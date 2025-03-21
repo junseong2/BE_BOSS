@@ -7,7 +7,6 @@ import org.springframework.stereotype.Service;
 
 import com.onshop.shop.product.Product;
 import com.onshop.shop.product.ProductRepository;
-import com.onshop.shop.user.User;
 
 @Service
 public class CartService {
@@ -28,7 +27,9 @@ public class CartService {
 			Product product = cart.getProduct();
 			return new CartDTO(cart.getCartId(),cart.getQuantity(),cart.getUserId(), cart.getProduct().getProductId(),  
 					product.getName(), // ✅ productName 추가
+					
 					product.getPrice() // ✅ productPrice 추가
+					
 			);
 		}).collect(Collectors.toList());
 	}

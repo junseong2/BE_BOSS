@@ -4,6 +4,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CookieValue;
@@ -18,7 +20,6 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.onshop.shop.security.JwtUtil;
-
 @RestController
 @RequestMapping("/cart")
 @CrossOrigin(origins = "http://localhost:5173", allowCredentials = "true") // ✅ CORS 설정
@@ -31,11 +32,14 @@ public class CartController {
         this.cartService = cartService;
         this.jwtUtil = jwtUtil;
     }
+    private static final Logger log = LoggerFactory.getLogger(CartController.class); // ✅ 직접 Logger 선언
 
     // ✅ 장바구니 조회 (쿠키 기반 JWT 인증)
     @GetMapping
     public ResponseEntity<Map<String, Object>> getCart(@CookieValue(name = "jwt", required = false) String jwtToken) {
-        if (jwtToken == null) {
+        log.info("🛒 장바구니 조회 요청 수신!");
+
+    	if (jwtToken == null) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(Map.of("error", "JWT 토큰이 없습니다."));
         }
 
@@ -45,6 +49,12 @@ public class CartController {
         Map<String, Object> response = new HashMap<>();
         response.put("cartItems", cartItems);
         response.put("message", "장바구니 조회 성공");
+        
+        System.out.println("✅ Extracted UserId: " + cartItems);
+
+        System.out.println("✅ Extracted UserId: " + userId);
+
+        log.info("✅ Extracted UserId: \" + cartItems");
 
         return ResponseEntity.ok(response);
     }
