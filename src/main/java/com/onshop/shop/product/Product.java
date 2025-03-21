@@ -8,6 +8,8 @@ import java.util.List;
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.onshop.shop.category.Category;
 import com.onshop.shop.store.Seller;
 
@@ -25,7 +27,6 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-
 @Entity
 @Table(name = "product")
 @Getter
@@ -46,7 +47,7 @@ public class Product {
     @OnDelete(action = OnDeleteAction.NO_ACTION) // Seller 삭제 시 관련 Inventory 삭제
     private Category category;
 
-    
+    @JsonIgnore
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "seller_id", nullable = false) 
     @OnDelete(action = OnDeleteAction.CASCADE) // Seller 삭제 시 관련 Inventory 삭제
@@ -84,4 +85,15 @@ public class Product {
         return name;
     }
     
+    @Override
+    public String toString() {
+        return "Product{" +
+                "productId=" + productId +
+                ", name='" + name + '\'' +
+                ", description='" + description + '\'' +
+                ", price=" + price +
+                ", gImage='" + gImage + '\'' +
+                ", expiryDate=" + expiryDate +
+                '}';
+    }
 }

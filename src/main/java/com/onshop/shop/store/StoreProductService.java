@@ -23,7 +23,7 @@ public class StoreProductService {
     @Transactional
     public List<Product> getProductsBySellerId(Long sellerId) {
         try {
-            List<Product> products = storeProductRepository.findBySellerId(sellerId);  // Seller와 Product의 관계를 찾는 쿼리
+            List<Product> products = storeProductRepository.findBySeller_SellerId(sellerId);  // Seller와 Product의 관계를 찾는 쿼리
             System.out.println("✅ 상품 목록 조회 성공: " + products.size() + "개 상품 반환");
             return products;
         } catch (Exception e) {
