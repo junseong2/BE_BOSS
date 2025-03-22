@@ -4,7 +4,7 @@ import java.util.List;
 
 import org.springframework.stereotype.Service;
 
-import com.onshop.shop.seller.inventory.InventoryOrderRequestDTO;
+import com.onshop.shop.inventory.InventoryOrderRequestDTO;
 
 import lombok.RequiredArgsConstructor;
 

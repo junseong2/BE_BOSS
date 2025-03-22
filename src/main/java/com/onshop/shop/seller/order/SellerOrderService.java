@@ -2,7 +2,7 @@ package com.onshop.shop.seller.order;
 
 import java.util.List;
 
-import com.onshop.shop.seller.inventory.InventoryOrderRequestDTO;
+import com.onshop.shop.inventory.InventoryOrderRequestDTO;
 
 public interface SellerOrderService {
 	
