@@ -13,15 +13,20 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CookieValue;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.onshop.shop.product.Product;
 import com.onshop.shop.product.ProductsService;
 import com.onshop.shop.security.JwtUtil;
@@ -183,5 +188,47 @@ public ResponseEntity<Map<String, Object>> xxx() {
             return ResponseEntity.internalServerError().body(Map.of("error", "서버 오류 발생", "message", e.getMessage()));
         }
     }
+  
+  
+  
+  
+  
+  
+
+  
+  @PutMapping("/{id}/updateBackgroundColor")
+  public ResponseEntity<Seller> updateSellerBackgroundColor(@PathVariable Long id, @RequestBody Map<String, String> request) {
+      String backgroundColor = request.get("backgroundColor");
+
+      // Seller 찾기
+      Seller seller = sellerService.findBysellerId(id);
+
+      // 기존 settings 가져오기
+      String settings = seller.getSettings(); // JSON 형태로 저장되어 있다고 가정
+
+      // settings 업데이트 (backgroundColor 값만 수정)
+      try {
+          ObjectMapper objectMapper = new ObjectMapper();
+          Map<String, Object> settingsMap = objectMapper.readValue(settings, Map.class);
+          settingsMap.put("backgroundColor", backgroundColor);
+
+          // 새로운 JSON 값으로 저장
+          seller.setSettings(objectMapper.writeValueAsString(settingsMap));
+          sellerService.save(seller);
+      } catch (JsonProcessingException e) {
+          e.printStackTrace();
+          return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
+      }
+
+      return ResponseEntity.ok(seller);
+  }
+
+  
+  
+  
+  
+  
+  
+  
     
 }

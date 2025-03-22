@@ -8,7 +8,6 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
-
 import lombok.Data;
 
 @Data
@@ -39,6 +38,16 @@ public class Seller {
     @Column(name = "navigation_id", nullable = false)
     private Integer navigationId;  // 네비게이션 ID (페이지 이동 방식)
 
+    
+    
+    
+    @Column(name = "settings", columnDefinition = "json")
+    private String settings;  // 설정값을 JSON으로 저장 (배경색 등)
+
+    
+    
+    
+    
     @Column(name = "seller_menubar_color", length = 7, nullable = true)
     private String sellerMenubarColor;  // ✅ 메뉴바 색상 (예: "#808080")
 
@@ -58,6 +67,13 @@ public class Seller {
         this.headerId = headerId;
         this.menuBarId = menuBarId;
         this.navigationId = navigationId;
+        
+        
+        this.settings = settings; // JSON 데이터 추가
+
+        
+        
+        
         this.sellerMenubarColor = sellerMenubarColor; // ✅ 추가
         this.createdAt = createdAt;
         this.updatedAt = updatedAt;
