@@ -28,7 +28,7 @@ public class Cart {
     @Column(name = "user_id", nullable = false)
     private Long userId;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "product_id", nullable = false)
     @OnDelete(action = OnDeleteAction.CASCADE) // Product 삭제 시, 관련된 Cart도 삭제됨
     private Product product;
