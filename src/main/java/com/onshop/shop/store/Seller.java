@@ -7,8 +7,8 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.Lob;
 import jakarta.persistence.Table;
-
 import lombok.Data;
 
 @Data
@@ -29,7 +29,17 @@ public class Seller {
 
     @Column(name = "description")
     private String description;  // 상점 설명
+    
+    @Lob
+    @Column(name = "settings", columnDefinition = "LONGTEXT")
+    private String settings;  // 판매자 설정 (JSON 형식으로 저장)
 
+    
+    @Lob
+    @Column(name = "mobilesettings", columnDefinition = "LONGTEXT")
+    private String mobilesettings;  // 판매자 설정 (JSON 형식으로 저장)
+
+    
     @Column(name = "header_id", nullable = false)
     private Integer headerId;  // 상단바 ID (디자인 변경 가능)
 
@@ -39,7 +49,9 @@ public class Seller {
     @Column(name = "navigation_id", nullable = false)
     private Integer navigationId;  // 네비게이션 ID (페이지 이동 방식)
 
-    @Column(name = "created_at", columnDefinition = "DATETIME DEFAULT CURRENT_TIMESTAMP")
+    
+    
+        @Column(name = "created_at", columnDefinition = "DATETIME DEFAULT CURRENT_TIMESTAMP")
     private LocalDateTime createdAt;  // 생성일
 
     @Column(name = "updated_at", columnDefinition = "DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP")
@@ -47,15 +59,26 @@ public class Seller {
 
     public Seller() {}
 
-    public Seller(Long sellerId, Long userId, String storename, String description, Integer headerId, Integer menuBarId, Integer navigationId, LocalDateTime createdAt, LocalDateTime updatedAt) {
+    public Seller(Long sellerId, Long userId, String storename, String description, Integer headerId, Integer menuBarId, Integer navigationId, String sellerMenubarColor, LocalDateTime createdAt, LocalDateTime updatedAt) {
         this.sellerId = sellerId;
-    	this.userId = userId;
+        this.userId = userId;
         this.storename = storename;
         this.description = description;
         this.headerId = headerId;
         this.menuBarId = menuBarId;
         this.navigationId = navigationId;
+        
+        
+        this.settings = settings; // JSON 데이터 추가
+
+        
+        
+        
+       
         this.createdAt = createdAt;
         this.updatedAt = updatedAt;
     }
+
+    // ✅ Getter 및 Setter 추가
+
 }
