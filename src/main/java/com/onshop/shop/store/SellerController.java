@@ -1,11 +1,13 @@
 package com.onshop.shop.store;
 
+
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.HashMap;
 import java.util.List;
+
 import java.util.Map;
 import java.util.Optional;
 import com.fasterxml.jackson.core.type.TypeReference;
@@ -31,7 +33,9 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
+
 import com.fasterxml.jackson.databind.ObjectMapper;
+
 import com.onshop.shop.product.Product;
 import com.onshop.shop.product.ProductsService;
 import com.onshop.shop.security.JwtUtil;
@@ -69,9 +73,11 @@ public class SellerController {
                     "sellerId",seller.getSellerId(),
                     "headerId", seller.getHeaderId(),
                     "menuBarId", seller.getMenuBarId(),
-                    "navigationId", seller.getNavigationId()
+                    "navigationId", seller.getNavigationId(),
+                    "seller_menubar_color", seller.getSellerMenubarColor()
             );
             
+
             System.out.println("Response Data: " + response);  // 응답 데이터 로그
 
 
@@ -466,6 +472,59 @@ public class SellerController {
     }
 
 
+
+    @GetMapping("/product2")
+    public ResponseEntity<XXXDTO> getProductsBySeller2(
+            @RequestParam Long sellerId,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "8") int size,
+            @RequestParam(defaultValue = "asc") String sort
+    ) {
+        try {
+        	logger.info("🔍 Received request for sellerId2: " + sellerId);
+            
+            // sellerId가 null이거나 음수인 경우
+           // if (sellerId == null || sellerId <= 0) {
+           //     return ResponseEntity.badRequest().body(Map.of("error", "Invalid sellerId"));
+         //   }
+
+            Pageable pageable = PageRequest.of(page, size, 
+                sort.equals("asc") ? Sort.by("price").ascending() : Sort.by("price").descending());
+            
+            // 이 부분에서 오류가 발생할 가능성 있음
+            Page<Product> productsPage = productsService.getProductsBySeller(sellerId, pageable);
+            System.out.println("🔍 Products Page Data: " + productsPage);  // 페이지 데이터 출력
+
+            if (productsPage.isEmpty()) {
+                return ResponseEntity.noContent().build();
+            }
+
+            Map<String, Object> response = new HashMap<>();
+            
+            response.put("products", productsPage.getContent().get(0));
+            response.put("currentPage", productsPage.getNumber());
+            response.put("totalItems", productsPage.getTotalElements());
+            response.put("totalPages", productsPage.getTotalPages());
+            response.put("sortOrder", sort);
+
+           
+            
+
+                    
+        	logger.info("🔍 Received request for product2: " + productsPage.getContent());
+
+        	
+        	
+          //  return ResponseEntity.ok(response);
+            
+        } catch (Exception e) {
+            e.printStackTrace(); // 예외 출력
+            //return ResponseEntity.internalServerError().body(Map.of("error", "서버 오류 발생", "message", e.getMessage()));
+        }
+        return null;
+    }
+    
+
   @GetMapping("/product")
     public ResponseEntity<Map<String, Object>> getProductsBySeller(
             @RequestParam Long sellerId,
@@ -511,4 +570,6 @@ public class SellerController {
         }
     }
     
+
 }
+

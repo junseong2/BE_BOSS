@@ -1,4 +1,4 @@
-package com.onshop.shop.seller.inventory;
+package com.onshop.shop.inventory;
 
 import java.util.List;
 
@@ -22,9 +22,9 @@ import lombok.extern.slf4j.Slf4j;
 @RequiredArgsConstructor
 @RequestMapping("/seller/inventories")
 @Slf4j
-public class SellerInventoryController {
+public class InventoryController {
 	
-	private final SellerInventoryService sellerInventoryService;
+	private final InventoryService inventoryService;
 	
 	
 	// 상품 재고 조회
@@ -34,7 +34,7 @@ public class SellerInventoryController {
 			@RequestParam("page") @Min(value = 0, message="page는 최소 0 이상이어야 합니다.") int page,
 			@RequestParam("size") @Min(value = 5, message="size는 최소 5 이상이어야 합니다.") int size
 			){
-		List<SellerInventoryResponseDTO> inventories = sellerInventoryService.getAllInventory(page, size);
+		List<SellerInventoryResponseDTO> inventories = inventoryService.getAllInventory(page, size);
 		return ResponseEntity.ok(inventories);
 	}
 	
@@ -46,7 +46,7 @@ public class SellerInventoryController {
 		
 		
 		log.info("order:{}", orderRequest);
-		sellerInventoryService.updateInventory(orderRequest);
+		inventoryService.updateInventory(orderRequest);
 		
 		return ResponseEntity.ok().build();
 	}
@@ -60,7 +60,7 @@ public class SellerInventoryController {
 			@RequestParam("size") @Min(value = 5, message="size는 최소 5 이상이어야 합니다.") int size
 			){
 		
-		List<SellerInventoryResponseDTO> inventories = sellerInventoryService.searchInventories(search, page, size);
+		List<SellerInventoryResponseDTO> inventories = inventoryService.searchInventories(search, page, size);
 		return ResponseEntity.ok(inventories);
 	}
 	

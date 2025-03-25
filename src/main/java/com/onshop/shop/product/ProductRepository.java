@@ -11,8 +11,6 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.onshop.shop.seller.products.SellerProductsDTO;
-
 @Repository
 public interface ProductRepository extends JpaRepository<Product, Long> {
 

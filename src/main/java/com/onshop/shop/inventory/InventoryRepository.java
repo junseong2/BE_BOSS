@@ -9,8 +9,6 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 
-import com.onshop.shop.seller.inventory.SellerInventoryResponseDTO;
-
 public interface InventoryRepository extends JpaRepository<Inventory, Long> {
 
 	// 판매자ID 별 재고 조회
@@ -40,4 +38,5 @@ public interface InventoryRepository extends JpaRepository<Inventory, Long> {
     @Query(value = "SELECT stock FROM inventory WHERE product_id = :productId", nativeQuery = true)
     Optional<Long> findStockByProductId(@Param("productId") Long productId);
   
+
 }

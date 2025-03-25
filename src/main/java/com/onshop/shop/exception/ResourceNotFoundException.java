@@ -1,11 +1,13 @@
 package com.onshop.shop.exception;
 
-public class ResourceNotFoundException extends RuntimeException {
+import org.springframework.http.HttpStatus;
+
+public class ResourceNotFoundException extends CustomException {
 
 	private static final long serialVersionUID = 1L;
 
 	public ResourceNotFoundException(String message) {
-		super(message);
+		super(message, HttpStatus.NOT_FOUND);
  
 	}
 }
