@@ -3,6 +3,7 @@ package com.onshop.shop.user;
 import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonAlias;
+import com.onshop.shop.address.AddressRequest;
 
 import lombok.Getter;
 import lombok.Setter;
@@ -12,7 +13,7 @@ import lombok.Setter;
 public class UserUpdateRequest {
 	
     @JsonAlias("userId") // JSON에서 userId가 String일 경우 Integer로 변환
-    private Integer userId;
+    private Long userId;
     private String email;
     private String password; // 비밀번호 변경 가능
 
