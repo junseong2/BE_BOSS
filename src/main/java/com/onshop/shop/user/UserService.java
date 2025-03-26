@@ -5,6 +5,7 @@ import org.springframework.transaction.annotation.Transactional;
 import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeMessage;
 
+
 public interface UserService {
     @Transactional
     void registerUser(User user);
@@ -13,7 +14,7 @@ public interface UserService {
     User findBySocialId(String socialId);
     void updateUser(User updatedUser);
     User getUserById(Long userId); // ✅ 인터페이스에는 선언만!
-    
+
     
     /**이메일*/
     MimeMessage createMail(String email, String authCode) throws MessagingException;

@@ -55,4 +55,5 @@ public interface InventoryRepository extends JpaRepository<Inventory, Long> {
                                   @Param("name") String name,
                                   @Param("state") String state);
   
+
 }

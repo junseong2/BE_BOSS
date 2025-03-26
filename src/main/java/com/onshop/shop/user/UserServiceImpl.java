@@ -1,4 +1,6 @@
 package com.onshop.shop.user;
+
+
 import java.util.Hashtable;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
@@ -28,6 +30,8 @@ import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeMessage;
 import lombok.extern.slf4j.Slf4j;
 
+
+
 @Service
 @Slf4j
 public class UserServiceImpl implements UserService {
@@ -55,6 +59,7 @@ public class UserServiceImpl implements UserService {
         this.senderEmail = senderEmail;
         this.emailUtils = emailUtils;
         
+
     }
 
     @Override
@@ -119,6 +124,12 @@ public class UserServiceImpl implements UserService {
         userRepository.save(existingUser);
     }
     
+    @Override
+    public User getUserById(Long userId) {
+        return userRepository.findByUserId(userId).orElse(null);
+    }
+
+
     /** 이메일 인증*/
     // 이메일 인증
     @Override
@@ -213,12 +224,6 @@ public class UserServiceImpl implements UserService {
         return message;
         
     }
-    
-	@Override
-	public User getUserById(Long userId) {
-		// TODO Auto-generated method stub
-		return null;
-	}
 
 
     /** 이메일 찾기*/
@@ -232,6 +237,4 @@ public class UserServiceImpl implements UserService {
 		
 		return forgetResponseDTO;
 	}
-
-
 }
