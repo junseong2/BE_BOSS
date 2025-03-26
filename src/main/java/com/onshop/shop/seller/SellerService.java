@@ -1,4 +1,4 @@
-package com.onshop.shop.store;
+package com.onshop.shop.seller;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -88,39 +88,8 @@ public class SellerService {
         return sellerRepository.findById(sellerId).orElseThrow(() -> new RuntimeException("Seller not found"));
     }
 
-    
-    public void updateSettings(Long sellerId, List<UIElementDTO> elements) {
-        Seller seller = sellerRepository.findById(sellerId)
-            .orElseThrow(() -> new RuntimeException("판매자를 찾을 수 없음: " + sellerId));
-        
-        ObjectMapper objectMapper = new ObjectMapper();
-        try {
-            // ✅ DTO 리스트 → JSON 배열 변환
-            String json = objectMapper.writeValueAsString(elements);
-            seller.setSettings(json);
-            sellerRepository.save(seller);
-        } catch (JsonProcessingException e) {
-            throw new RuntimeException("JSON 변환 실패: " + e.getMessage());
-        }
-    }
-    
- // SellerService.java
-    public List<UIElementDTO> getSettings(Long sellerId) {
-        Seller seller = sellerRepository.findById(sellerId)
-            .orElseThrow(() -> new RuntimeException("판매자를 찾을 수 없음: " + sellerId));
-        
-        if (seller.getSettings() == null) return List.of();
-        
-        ObjectMapper objectMapper = new ObjectMapper();
-        try {
-            return objectMapper.readValue(
-                seller.getSettings(),
-                new TypeReference<List<UIElementDTO>>(){}
-            );
-        } catch (JsonProcessingException e) {
-            throw new RuntimeException("JSON 파싱 실패: " + e.getMessage());
-        }
-    }
+
+
     // 배경색 업데이트
     public Seller updateHeaderBackgroundColor(Long sellerId, String backgroundColor) {
         // Seller 객체 찾기

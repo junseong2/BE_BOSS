@@ -10,6 +10,8 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.onshop.shop.product.Product;
+import com.onshop.shop.seller.Seller;
+import com.onshop.shop.seller.SellerService;
 
 @RestController
 @CrossOrigin(origins = "http://localhost:5173")
