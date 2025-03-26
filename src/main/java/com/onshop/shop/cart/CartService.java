@@ -7,7 +7,8 @@ import org.springframework.stereotype.Service;
 
 import com.onshop.shop.product.Product;
 import com.onshop.shop.product.ProductRepository;
-import com.onshop.shop.user.User;
+
+import jakarta.transaction.Transactional;
 
 @Service
 public class CartService {
@@ -21,6 +22,7 @@ public class CartService {
 	    }
 
 	// 사용자 ID로 장바구니 아이템 조회
+	@Transactional
 	public List<CartDTO> getCartByUserId(Long userId) {
 		List<Cart> carts = cartRepository.findByUserId(userId);
 

@@ -10,26 +10,24 @@ import java.util.Map;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
-
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
-import org.springframework.beans.factory.annotation.Value;
 
 import com.onshop.shop.category.Category;
 import com.onshop.shop.category.CategoryRepository;
 import com.onshop.shop.exception.ResourceNotFoundException;
 import com.onshop.shop.inventory.Inventory;
 import com.onshop.shop.inventory.InventoryRepository;
-import com.onshop.shop.store.Seller;
-import com.onshop.shop.store.SellerRepository;
+import com.onshop.shop.seller.Seller;
+import com.onshop.shop.seller.SellerRepository;
 
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
 
 @Service
 @RequiredArgsConstructor
