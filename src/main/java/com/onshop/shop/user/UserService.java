@@ -20,5 +20,8 @@ public interface UserService {
     boolean emailVerification(EmailVerificationRequestDTO verificationRequestDTO);
     void sendVerificationCode(String toMail) throws MessagingException;
     boolean validateMx(String domain);
+    
+    /** 아이디 찾기*/
+    ForgetResponseDTO findUserEmail(ForgetReqeustDTO forgetReqeustDTO);
 
 }

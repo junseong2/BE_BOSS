@@ -1,5 +1,7 @@
 package com.onshop.shop.product;
 
+import java.util.List;
+
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -9,12 +11,8 @@ import lombok.Data;
 @Data
 @Builder
 public class SellerProductsResponseDTO {
-	
-	private String productName;
-	private String category;// 상품 카테고리
-	private String description;// 상품 설명
-	private Integer stock;
-	private Integer price; 
+	Long totalCount;
+	List<SellerProductsDTO> products;
 	
 
 }

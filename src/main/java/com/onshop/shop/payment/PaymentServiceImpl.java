@@ -1,10 +1,15 @@
 package com.onshop.shop.payment;
 
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+
+import com.onshop.shop.exception.ResourceNotFoundException;
 import com.onshop.shop.order.Order;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
@@ -14,7 +19,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.client.RestTemplate;
 
-import com.onshop.shop.order.Order;
 import com.onshop.shop.order.OrderRepository;
 
 @Service
@@ -89,6 +93,36 @@ public class PaymentServiceImpl implements PaymentService {
         ResponseEntity<Map> response = restTemplate.exchange(url, HttpMethod.GET, request, Map.class);
         return response.getBody();
     }
+
+    
+    /** 판매자*/
+    // 판매자의 고객 결제 내역 조회
+	@Override
+	public SellerPaymentResponseDTO getSellerPayments(int page, int size, String search, String status) {
+		
+		Long sellerId = 999L;
+		
+		Pageable pageable = PageRequest.of(page, size);
+		
+		// 결제 내역
+		List<SellerPaymentsDTO> payments = paymentRepository.findPaymentDetailsBySellerIdAndSearchAndStatus(sellerId,search, pageable).toList();
+		
+		if(payments.isEmpty()){
+			throw new ResourceNotFoundException("조회할 결제 내역을 찾을 수 없습니다.");
+		}
+		
+		// 전체 개수
+		Long totalCount = paymentRepository.countBySellerIdAndSearchAndStatus(sellerId, search);
+		
+		
+
+		
+		
+		return SellerPaymentResponseDTO.builder()
+				.payments(payments)
+				.totalCount(totalCount)
+				.build();
+	}
 
 
 }

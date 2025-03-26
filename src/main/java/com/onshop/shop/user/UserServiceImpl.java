@@ -21,6 +21,7 @@ import org.springframework.transaction.annotation.Transactional;
 import com.onshop.shop.address.Address;
 import com.onshop.shop.address.AddressRepository;
 import com.onshop.shop.exception.BadRequestException;
+import com.onshop.shop.exception.ResourceNotFoundException;
 import com.onshop.shop.util.EmailUtils;
 
 import jakarta.mail.MessagingException;
@@ -210,13 +211,27 @@ public class UserServiceImpl implements UserService {
         message.setText(body, "UTF-8", "html");
 
         return message;
+        
     }
-
-
+    
 	@Override
 	public User getUserById(Long userId) {
 		// TODO Auto-generated method stub
 		return null;
 	}
+
+
+    /** 이메일 찾기*/
+	@Override
+	public ForgetResponseDTO findUserEmail(ForgetReqeustDTO forgetReqeustDTO) {
+		
+		ForgetResponseDTO forgetResponseDTO= userRepository.findByUsernameAndPassword(forgetReqeustDTO.getUsername(), forgetReqeustDTO.getPassword());
+		if(forgetResponseDTO == null) {
+			throw new ResourceNotFoundException("해당 유저는 존재하지 않습니다.");
+		}
+		
+		return forgetResponseDTO;
+	}
+
 
 }

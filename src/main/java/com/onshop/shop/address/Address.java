@@ -28,7 +28,7 @@ public class Address {
     @GeneratedValue
     private Long addressId;
 
-    @ManyToOne(fetch = FetchType.LAZY) // User와 다대일 관계
+    @ManyToOne(fetch = FetchType.EAGER) // User와 다대일 관계
     @JoinColumn(name = "user_id", nullable = false)
     @OnDelete(action = OnDeleteAction.CASCADE) // User 삭제 시, 관련된 Address도 삭제됨
     private User user;
