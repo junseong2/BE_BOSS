@@ -23,6 +23,8 @@ import com.onshop.shop.exception.SuccessMessageResponse;
 import jakarta.validation.Valid;
 
 import java.util.List;
+
+import org.springframework.web.bind.annotation.CookieValue;
 import org.springframework.web.bind.annotation.DeleteMapping;
 
 @RestController
@@ -66,10 +68,12 @@ public class ProductsController {
 	@GetMapping("/seller/products")
 	public ResponseEntity<?> getAllProducts(
 			@RequestParam int page,
-			@RequestParam int size
+			@RequestParam int size,
+			@RequestParam String search
 			){
 		
-		List<SellerProductsDTO> products = productsService.getAllProducts(page, size);
+		log.info("검색어:{}",search);
+		SellerProductsResponseDTO products = productsService.getAllProducts(page, size, search);
 		return ResponseEntity.ok(products);
 	}
 	
@@ -89,6 +93,7 @@ public class ProductsController {
 	// 상품 추가(
 	@PostMapping("/seller/products")
 	public ResponseEntity<?> registerProduct(
+//			@CookieValue(value = "jwt", required = false) String token,
 			@Valid @RequestParam("product") String productJSON,
 			@RequestParam("images") List<MultipartFile> images
 			) throws JsonMappingException, JsonProcessingException{
@@ -105,25 +110,12 @@ public class ProductsController {
 		return ResponseEntity.created(null).body(null);
 	}
 	
-	// 상품 검색
-	@GetMapping("/seller/products/search")
-	public ResponseEntity<?> searchProduct(
-			@RequestParam String search,
-			@RequestParam int page,
-			@RequestParam int size
-			){
-		
-		log.info("search:{}, page:{}, size:{}", search, page,size);
-		List<SellerProductsDTO> products = productsService.searchProducts(search, page, size);
-		return ResponseEntity.ok(products);
-		
-	}
-	
 	
 	
 	// 상품 수정
 	@PatchMapping("/seller/products/{productId}")
 	public ResponseEntity<?> updateProduct(
+//			@CookieValue(value = "jwt", required = false) String token,
 			@PathVariable Long productId,
 			@Valid @RequestBody SellerProductsRequestDTO productDTO
 			){
@@ -137,9 +129,10 @@ public class ProductsController {
 		SuccessMessageResponse response = new SuccessMessageResponse(
 				HttpStatus.OK, 
 				"선택 상품의 정보가 수정되었습니다.", 		
-				SellerProductsResponseDTO.builder()
-					.category(productDTO.getCategoryName())
-					.productName(productDTO.getName())
+				SellerProductsDTO.builder()
+					.productId(productId)
+					.categoryName(productDTO.getCategoryName())
+					.name(productDTO.getName())
 					.price(productDTO.getPrice())
 					.stock(productDTO.getStock())
 					.build());
@@ -149,6 +142,7 @@ public class ProductsController {
 	// 상품 삭제(단일, 다중 모두 처리)
 	@DeleteMapping("/seller/products")
 	public ResponseEntity<?> removeProducts(
+//			@CookieValue(value = "jwt", required = false) String token,
 			@Valid @RequestBody SellerProductIdsDTO productIds
 			){
 		log.info("ids:{}", productIds);

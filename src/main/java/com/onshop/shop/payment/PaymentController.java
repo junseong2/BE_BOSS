@@ -13,7 +13,7 @@ import java.util.Map;
 import java.util.Optional;
 
 @RestController
-@RequestMapping("/payment")
+@RequestMapping()
 public class PaymentController {
 
     private final PaymentService paymentService;
@@ -27,13 +27,13 @@ public class PaymentController {
     }
     
     // ✅ 프론트에서 사용할 채널 키 반환 API 추가
-    @GetMapping("/channel-key/{paymentMethod}")
+    @GetMapping("/payment/channel-key/{paymentMethod}")
     public Map<String, String> getChannelKey(@PathVariable String paymentMethod) {
         String channelKey = paymentConfig.getChannelKey(paymentMethod);
         return Map.of("channelKey", channelKey);
     }
 
-    @PostMapping("/portone")
+    @PostMapping("/payment/portone")
     public ResponseEntity<?> createPayment(@RequestBody PaymentDTO paymentDTO) {
         try {
             System.out.println("📩 [DEBUG] 받은 결제 요청 데이터: " + paymentDTO); // ✅ 디버깅 로그 추가
@@ -51,7 +51,7 @@ public class PaymentController {
     }
 
 
-    @PostMapping("/update-status")
+    @PostMapping("/payment/update-status")
     public ResponseEntity<?> updatePaymentStatus(@RequestBody Map<String, String> request) {
         try {
             String impUid = request.get("impUid");
@@ -64,5 +64,19 @@ public class PaymentController {
         }
     }
    
-
+    
+    /** 판매자 결제 내역 조회*/
+    @GetMapping("/seller/payments")
+    public ResponseEntity<SellerPaymentResponseDTO> getSellerPayments(
+    		@RequestParam int page,
+    		@RequestParam int size,
+    		@RequestParam String search,
+    		@RequestParam String status
+    		
+    		){
+    	
+    	 SellerPaymentResponseDTO payment = paymentService.getSellerPayments(page, size, search, status);
+    	
+    	return ResponseEntity.ok(payment);
+    }
 }

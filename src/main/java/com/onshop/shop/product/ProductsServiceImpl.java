@@ -124,34 +124,23 @@ public class ProductsServiceImpl implements ProductsService {
     /** 판매자 쿼리 */
     // 점주 상품 조회
     @Override
-    public List<SellerProductsDTO> getAllProducts(int page, int size) {
-        Long sellerId = 1L; // 임시
+    public SellerProductsResponseDTO getAllProducts(int page, int size, String search) {
+        Long sellerId = 999L; // 임시
         Pageable pageable = PageRequest.of(page, size);
         
-        Page<Product> productPage = productRepository.findBySellerSellerId(sellerId, pageable);
-        Page<SellerProductsDTO> dtoPage = productPage.map(product -> {
-      
-        	
-            Long stock = inventoryRepository.
-            		findStockByProductId(product.getProductId()).orElse(0L);
-
-
-            return new SellerProductsDTO(
-                product.getProductId(),
-                product.getName(),
-                product.getPrice(),
-                product.getCategory().getName(),
-                product.getDescription(),
-                stock // ✅ Inventory에서 가져온 stock 값 사용
-            );
-        });
-
-        List<SellerProductsDTO> products = dtoPage.getContent(); // ✅ Page -> List 변환
+        List<SellerProductsDTO> products = productRepository.findBySellerSellerIdAndSearch(sellerId, search, pageable).toList();
+        Long productCount = productRepository.countBySellerSellerIdAndName(sellerId,search);
+        
 
         if (products.isEmpty()) {
             throw new ResourceNotFoundException("조회할 상품 목록을 찾을 수 없습니다.");
         }
-        return products;
+        
+        
+        return SellerProductsResponseDTO.builder()
+        		.products(products)
+        		.totalCount(productCount)
+        		.build();
 
     }
 
@@ -159,7 +148,7 @@ public class ProductsServiceImpl implements ProductsService {
     @Transactional
     @Override
     public void registerProducts(List<SellerProductsRequestDTO> productsDTO) {
-        Long sellerId = 1L; // 임시
+        Long sellerId = 999L; // 임시
         Seller seller = sellerRepository.findById(sellerId)
                 .orElseThrow(() -> new ResourceNotFoundException("Seller not found: " + sellerId));
 
@@ -207,7 +196,7 @@ public class ProductsServiceImpl implements ProductsService {
 	@Override
 	public Product registerProduct(SellerProductsRequestDTO product) {
 		
-		Long sellerId = 1L;
+		Long sellerId = 999L;
 		
 		String categoryName = product.getCategoryName();
 		Category category = categoryRepository.findByCategoryName(categoryName);
@@ -240,7 +229,7 @@ public class ProductsServiceImpl implements ProductsService {
     @Override
     @Transactional
     public void updateProducts(Long productId, SellerProductsRequestDTO productDTO) {
-        Long sellerId = 1L;
+        Long sellerId = 999L;
         
         Product oldProduct = productRepository.findBySellerIdAndProductId(sellerId, productId);
         if (oldProduct == null) {
@@ -275,21 +264,6 @@ public class ProductsServiceImpl implements ProductsService {
         productRepository.deleteAllByIdInBatch(productIds);
     }
     
-    // 상품 검색
-    @Override
-    public List<SellerProductsDTO> searchProducts(String search, int page, int size) {
-        Long sellerId = 1L; // 임시
-        Pageable pageable = PageRequest.of(page, size);
-        
-        List<SellerProductsDTO> products = productRepository.findByNameAndSellerId(search, sellerId, pageable).toList();
-        log.info("products: {}", products);
-        
-        if (products.isEmpty()) {
-            throw new ResourceNotFoundException("조회할 상품 목록을 찾을 수 없습니다.");
-        }
-        
-        return products;
-    }
     
     // 이미지 업로드(다중) --> TODO: 이 친구 병합 시 살립시다.
     @Override

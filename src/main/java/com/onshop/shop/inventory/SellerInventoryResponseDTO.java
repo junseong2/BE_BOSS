@@ -1,19 +1,19 @@
 package com.onshop.shop.inventory;
 
+import java.util.List;
+
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 @Data
 @Builder
 @AllArgsConstructor
+@NoArgsConstructor
 public class SellerInventoryResponseDTO {
-	private Long productId;
-	private Long inventoryId;
-	private String name;
-	private String category;
-	private Long stock;
-	private Long minStock;
-	private java.util.Date updatedDate;
+	
+	private List<SellerInventoryDTO> inventories;
+	private Long totalCount;
 
 }
