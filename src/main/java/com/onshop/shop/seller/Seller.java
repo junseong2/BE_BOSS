@@ -1,4 +1,4 @@
-package com.onshop.shop.store;
+package com.onshop.shop.seller;
 
 import java.time.LocalDateTime;
 

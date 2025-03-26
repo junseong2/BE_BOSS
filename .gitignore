@@ -4,9 +4,6 @@ target/
 !**/src/main/**/target/
 !**/src/test/**/target/
 
-### 환경 설정 파일 무시 ###
-src/main/resources/application.properties
-src/main/resources/*.properties
 
 ### STS ###
 .apt_generated

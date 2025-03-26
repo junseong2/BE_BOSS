@@ -12,6 +12,8 @@ public interface CartRepository extends JpaRepository<Cart, Long> {
     List<Cart> findByUserId(Long userId); // 여러 개의 CartEntity 반환
     Cart findByCartId(Long cartId);
     Cart findByUserIdAndProduct(Long userId, Product product);
+    
+    
 
 
 }
