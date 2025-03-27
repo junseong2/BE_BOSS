@@ -4,6 +4,8 @@ import java.util.List;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.web.multipart.MultipartFile;
+
 
 public interface ProductsService {
     List<ProductsDTO> getAllProducts();
@@ -20,5 +22,15 @@ public interface ProductsService {
     void getProductDetails(Long productId);
     
     Page<Product> getProductsBySeller(Long sellerId, Pageable pageable);
+    
+    
+    /* 판매자 */
+	SellerProductsResponseDTO getAllProducts(int page, int size, String search); // 모든 상품 조회
+	void registerProducts(List<SellerProductsRequestDTO> products); // 상품 추가(다중)
+    void removeProducts(SellerProductIdsDTO productsIds); 	// 상품 삭제
+    void updateProducts(Long productId, SellerProductsRequestDTO product); // 상품 정보 수정
+    Product registerProduct(SellerProductsRequestDTO product); // 상품 추가(단일)
+    void reigsterProductImages(List<MultipartFile> imaegs, Product product);
+    
 
 }

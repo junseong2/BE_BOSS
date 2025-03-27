@@ -36,10 +36,19 @@ import com.onshop.shop.security.JwtUtil;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
+import jakarta.mail.MessagingException;
+import jakarta.servlet.http.Cookie;
+import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpSession;
+import jakarta.validation.Valid;
+import lombok.extern.slf4j.Slf4j;
+
 
 @RestController
 @RequestMapping("/auth")
 @CrossOrigin(origins = "http://localhost:5173", allowCredentials = "true") // ✅ 프론트엔드에서 쿠키 사용 허용
+
+@Slf4j
 public class UserController {
 
     @Value("${naver.client.id}")
@@ -220,6 +229,7 @@ public class UserController {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("회원가입 실패: " + e.getMessage());
         }
     }
+
     @PostMapping("/locallogin") // 로컬 로그인
     public ResponseEntity<?> login(@RequestBody User loginRequest, HttpServletResponse response) {
         User user = userService.findByEmailAndPassword(loginRequest.getEmail(), loginRequest.getPassword());
@@ -455,5 +465,58 @@ public class UserController {
             newUser.setRole(role);
             return userRepository.save(newUser);
         }
+    }
+
+    
+    
+    
+    /** 이매일 인증 */
+    
+    // 인증번호 발송
+    @PostMapping("/email/send-code")
+    public ResponseEntity<?> sendVerificationCode(@Valid @RequestBody EmailAuthRequestDTO emailRequestDTO) {
+
+        log.info("email:{}",emailRequestDTO);
+     
+        try {
+            userService.sendVerificationCode(emailRequestDTO.getEmail());
+        } catch (MessagingException ex) {
+            return null;
+        }
+
+        return ResponseEntity.ok(null);
+    }
+    
+    // 인증번호 검증
+    @PostMapping("/email/code-verify")
+    public ResponseEntity<?> emailVerification(@Valid @RequestBody EmailVerificationRequestDTO verificationRequestDTO) {
+
+        boolean isVer = userService.emailVerification(verificationRequestDTO);
+        if(isVer){
+            return ResponseEntity.noContent().build();
+        }
+
+        return ResponseEntity.ok().body("success");
+
+    }
+    
+    /** TODO: 구현중*/
+    // 아이디 찾기
+    @PostMapping("/auth/find-email")
+    public ResponseEntity<?> findEmail(
+    		@Valid @RequestBody ForgetReqeustDTO forgetReqeustDTO
+    		){
+    		
+    	ForgetResponseDTO forgetResponseDTO = userService.findUserEmail(forgetReqeustDTO);
+    	return ResponseEntity.ok(forgetResponseDTO);
+    }
+    
+    // 비밀번호 찾기
+    public ResponseEntity<?> findPassword(
+    		@Valid @RequestBody ForgetReqeustDTO forgetReqeustDTO
+    		){
+    	
+    	
+    	return ResponseEntity.ok(null);
     }
 }

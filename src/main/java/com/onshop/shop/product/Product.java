@@ -9,9 +9,8 @@ import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.onshop.shop.category.Category;
-import com.onshop.shop.store.Seller;
+import com.onshop.shop.seller.Seller;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
