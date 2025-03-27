@@ -55,9 +55,9 @@ public class OrderDetailServiceImpl implements OrderDetailService {
 
 	// 주문 번호 별 주문 상세 내역 조회
 	@Override
-	public OrderDetailResponseDTO getOrderDetailByOrderId(Long orderId) {
+	public List<OrderDetailResponseDTO> getOrderDetailByOrderId(Long orderId) {
 		
-		OrderDetailResponseDTO orderDetails = orderDetailRepository.findOrderDetailsByOrderId(orderId);
+		List<OrderDetailResponseDTO> orderDetails = orderDetailRepository.findOrderDetailsByOrderId(orderId);
 		if(orderDetails == null) {
 			throw new ResourceNotFoundException("주문번호:"+orderId+"에 해당하는 주문상세 내역을 찾을 수 없습니다.");
 		}

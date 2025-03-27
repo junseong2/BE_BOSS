@@ -18,7 +18,7 @@ public interface OrderDetailRepository extends JpaRepository<OrderDetail, Long> 
 		        o.orderId,
 		        u.username,
 		        o.createdDate,
-		        SUM(od.quantity),
+			    COALESCE(SUM(od.quantity), 0),
 		        p.paymentMethod,
 		        o.totalPrice,
 		        o.status
@@ -46,15 +46,13 @@ public interface OrderDetailRepository extends JpaRepository<OrderDetail, Long> 
 		    SELECT new com.onshop.shop.orderDetail.OrderDetailResponseDTO(
 		        o.orderId, 
 		        o.createdDate, 
-		        SUM(od.quantity), 
+		        COALESCE(SUM(od.quantity), 0),
 		        p.totalAmount - (p.totalAmount * 0.1) + 3000,
 		        p.paidDate, 
 		        p.paymentMethod, 
 		        u.username, 
 		        CONCAT(u.phone1, '-', u.phone2, '-', u.phone3), 
-		        ad.address1, 
-		        ad.address2, 
-		        ad.post, 
+		        CONCAT('[', COALESCE(ad.post, ''), ']', COALESCE(ad.address1, ''), ' ', COALESCE(ad.address2, '')),
 		        pr.name
 		    )
 		    FROM OrderDetail od
@@ -62,13 +60,11 @@ public interface OrderDetailRepository extends JpaRepository<OrderDetail, Long> 
 		    JOIN o.user u
 		    JOIN od.product pr
 		    JOIN Payment p ON p.order.orderId = o.orderId
-		    JOIN Address ad ON u.userId = ad.user.userId AND ad.isDefault = true
+		    LEFT JOIN Address ad ON u.userId = ad.user.userId AND ad.isDefault = true
 		    WHERE o.orderId = :orderId
 		    GROUP BY o.orderId, o.createdDate, p.totalAmount, p.paidDate, p.paymentMethod, 
 		             u.username, u.phone1, u.phone2, u.phone3, ad.address1, ad.address2, 
 		             ad.post, pr.name
-		""")
-		OrderDetailResponseDTO findOrderDetailsByOrderId(@Param("orderId") Long orderId);
-	
-
+		    """)
+		List<OrderDetailResponseDTO> findOrderDetailsByOrderId(@Param("orderId") Long orderId);
 }
