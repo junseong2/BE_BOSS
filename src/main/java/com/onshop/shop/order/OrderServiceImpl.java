@@ -61,7 +61,7 @@ public class OrderServiceImpl implements OrderService {
     /** 판매자 */
     // 주문 내역 조회
 	@Override
-	public SellerOrderResponseDTO getOrders(int page, int size, String search, String status) {
+	public SellerOrderResponseDTO getOrders(int page, int size, String search, String orderStatus, String paymentStatus) {
 		// TODO: 실제 판매자 ID 로 대체 해야 함
 		Long sellerId = 999L;
 		Pageable pageable = (Pageable) PageRequest.of(page, size);
@@ -69,7 +69,12 @@ public class OrderServiceImpl implements OrderService {
 		
 		
     	 // 주문 목록
-		List<SellerOrderDTO> orders = orderDetailRepository.findOrderSummaryBySellerIdAndStatus(sellerId, search, status, pageable);
+		List<SellerOrderDTO> orders = orderDetailRepository.findOrderSummaryBySellerIdAndStatus(
+				sellerId, 
+				search, 
+				orderStatus, 
+				paymentStatus , 
+				pageable);
 
 		if(orders.isEmpty()) {
 			throw new ResourceNotFoundException("조회할 주문목록이 없습니다.");

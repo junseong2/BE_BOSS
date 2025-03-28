@@ -62,8 +62,15 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
     @Query("SELECT COUNT(p) FROM Product p WHERE p.seller.id = :sellerId")
     int existsBySellerId(@Param("sellerId") Long sellerId);
     
+
+
+    @Query("SELECT p.name FROM Product p WHERE p.productId = :productId")
+    String findProductNameById(@Param("productId") Long productId);
+
     // 판매자가 등록한 상품 개수
     @Query("SELECT COUNT(p) FROM Product p WHERE p.seller.id = :sellerId AND p.name LIKE %:name%")
     Long countBySellerSellerIdAndName(@Param("sellerId") Long sellerId, @Param("name") String name);
+
+
 }
 

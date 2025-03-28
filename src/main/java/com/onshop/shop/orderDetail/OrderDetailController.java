@@ -23,16 +23,16 @@ public class OrderDetailController {
 	
 	
 	@GetMapping("/seller/orders/{orderId}")
-	public ResponseEntity<List<OrderDetailResponseDTO>> getOrderDetailsByOrderId(
+	public ResponseEntity<OrderDetailResponseDTO> getOrderDetailsByOrderId(
 			@PathVariable Long orderId
 			){
 		
 		
 		log.info("orderId:{}", orderId);
 		
-		List<OrderDetailResponseDTO> orderDetails  =  orderDetailService.getOrderDetailByOrderId(orderId);
+		OrderDetailResponseDTO orderDetail  =  orderDetailService.getOrderDetailByOrderId(orderId);
 		
-		return ResponseEntity.ok(orderDetails);
+		return ResponseEntity.ok(orderDetail);
 		
 	}
 

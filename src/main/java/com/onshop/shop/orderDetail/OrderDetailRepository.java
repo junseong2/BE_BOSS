@@ -21,6 +21,7 @@ public interface OrderDetailRepository extends JpaRepository<OrderDetail, Long> 
 			    COALESCE(SUM(od.quantity), 0),
 		        p.paymentMethod,
 		        o.totalPrice,
+		        p.paymentStatus,
 		        o.status
 		    )
 		    FROM OrderDetail od
@@ -29,15 +30,17 @@ public interface OrderDetailRepository extends JpaRepository<OrderDetail, Long> 
 		    JOIN od.product pr
 		    JOIN Payment p ON p.order.orderId = o.orderId
 		    WHERE pr.seller.sellerId = :sellerId 
-		    AND CAST(o.status AS string) LIKE %:status%
+		    AND CAST(o.status AS string) LIKE %:orderStatus%
+		    AND CAST(p.paymentStatus AS string) LIKE %:paymentStatus%
 		    AND u.username LIKE %:search%
-		    GROUP BY o.orderId, u.username, o.createdDate, p.paymentMethod, o.totalPrice, o.status
+		    GROUP BY o.orderId, u.username, o.createdDate, p.paymentMethod, p.paymentStatus, o.totalPrice, o.status
 		    ORDER BY o.createdDate DESC
 		""")
 		List<SellerOrderDTO> findOrderSummaryBySellerIdAndStatus(
 		    @Param("sellerId") Long sellerId, 
 		    @Param("search") String search,
-		    @Param("status") String status,
+		    @Param("orderStatus") String orderStatus,
+		    @Param("paymentStatus") String paymentStatus,
 		    Pageable pageable);
 	
 	
@@ -53,7 +56,7 @@ public interface OrderDetailRepository extends JpaRepository<OrderDetail, Long> 
 		        u.username, 
 		        CONCAT(u.phone1, '-', u.phone2, '-', u.phone3), 
 		        CONCAT('[', COALESCE(ad.post, ''), ']', COALESCE(ad.address1, ''), ' ', COALESCE(ad.address2, '')),
-		        pr.name
+		        FUNCTION('GROUP_CONCAT', pr.name)
 		    )
 		    FROM OrderDetail od
 		    JOIN od.order o
@@ -61,10 +64,10 @@ public interface OrderDetailRepository extends JpaRepository<OrderDetail, Long> 
 		    JOIN od.product pr
 		    JOIN Payment p ON p.order.orderId = o.orderId
 		    LEFT JOIN Address ad ON u.userId = ad.user.userId AND ad.isDefault = true
-		    WHERE o.orderId = :orderId
+		    WHERE o.orderId = :orderId AND pr.seller.sellerId = :sellerId
 		    GROUP BY o.orderId, o.createdDate, p.totalAmount, p.paidDate, p.paymentMethod, 
 		             u.username, u.phone1, u.phone2, u.phone3, ad.address1, ad.address2, 
-		             ad.post, pr.name
+		             ad.post
 		    """)
-		List<OrderDetailResponseDTO> findOrderDetailsByOrderId(@Param("orderId") Long orderId);
+		OrderDetailResponseDTO findOrderDetailsByOrderId(@Param("orderId") Long orderId, @Param("sellerId") Long sellerId);
 }

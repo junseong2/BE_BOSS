@@ -7,6 +7,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CookieValue;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -77,15 +78,23 @@ public class OrderController {
     		@RequestParam int page,
     		@RequestParam int size,
     		@RequestParam String search,
-    		@RequestParam String status
+    		@RequestParam String orderStatus,
+    		@RequestParam String paymentStatus
     		){
     	
-    	SellerOrderResponseDTO orders = orderService.getOrders(page, size, search, status);
+    	SellerOrderResponseDTO orders = orderService.getOrders(page, size, search, orderStatus, paymentStatus);
     	
     	return ResponseEntity.ok(orders);
     } 
     
     // 판매자 주문 상태 변경
+    @PatchMapping("/seller/orders/{orderId}")
+    public ResponseEntity<?> updateSellerOrderStatus(
+    		@RequestParam Long orderId
+    		){
+    	
+    	return null;
+    }
     
 
     @GetMapping("/orders/{userId}")
