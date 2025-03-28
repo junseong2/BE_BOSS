@@ -280,29 +280,41 @@ public class SellerController {
     private final ObjectMapper objectMapper = new ObjectMapper(); // ✅ 인스턴스 추가
 
 
+@GetMapping("/page-data")
+public ResponseEntity<?> getSellerPageData(@RequestParam("seller_id") Long sellerId) {
+    return sellerService.getSellerById(sellerId)
+            .map(seller -> {
+                try {
+                    String settingsJson = seller.getSettings();
+                    String mobileSettingsJson = seller.getMobilesettings();
 
-    @GetMapping("/page-data")
-    public ResponseEntity<?> getSellerPageData(@RequestParam("seller_id") Long sellerId) {
-        return sellerService.getSellerById(sellerId)
-                .map(seller -> {
-                    try {
-                       
-                    	List<Object> settings = objectMapper.readValue(seller.getSettings(), List.class);
-                        List<Object> mobilesettings = objectMapper.readValue(seller.getMobilesettings(), List.class);
+                    // ✅ settings 또는 mobilesettings가 null/빈 문자열이면 빈 배열로 대체
+                    if (settingsJson == null || settingsJson.trim().isEmpty()) {
+                        settingsJson = "[]";
+                    }
+                    if (mobileSettingsJson == null || mobileSettingsJson.trim().isEmpty()) {
+                        mobileSettingsJson = "[]";
+                    }
 
-                    	Map<String, Object> response = Map.of(
+                    List<Object> settings = objectMapper.readValue(settingsJson, List.class);
+                    List<Object> mobilesettings = objectMapper.readValue(mobileSettingsJson, List.class);
+
+                    Map<String, Object> response = Map.of(
                             "storename", seller.getStorename(),
                             "description", seller.getDescription(),
                             "settings", settings,
                             "mobilesettings", mobilesettings
-                        );
-                        return ResponseEntity.ok(response);
-                    } catch (Exception e) {
-                        return ResponseEntity.badRequest().body("JSON 파싱 오류");
-                    }
-                })
-                .orElse(ResponseEntity.badRequest().body("판매자 데이터를 찾을 수 없습니다."));
-    }
+                    );
+
+                    return ResponseEntity.ok(response);
+                } catch (Exception e) {
+                    e.printStackTrace(); // ✅ 콘솔에 실제 오류 로그 확인
+                    return ResponseEntity.badRequest().body("JSON 파싱 오류: " + e.getMessage());
+                }
+            })
+            .orElse(ResponseEntity.badRequest().body("판매자 데이터를 찾을 수 없습니다."));
+}
+
 
     
     
