@@ -8,6 +8,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 
 import com.onshop.shop.order.SellerOrderDTO;
+import com.onshop.shop.payment.SellerPaymentStatisticsDTO;
 
 public interface OrderDetailRepository extends JpaRepository<OrderDetail, Long> {
 	
@@ -70,4 +71,7 @@ public interface OrderDetailRepository extends JpaRepository<OrderDetail, Long> 
 		             ad.post
 		    """)
 		OrderDetailResponseDTO findOrderDetailsByOrderId(@Param("orderId") Long orderId, @Param("sellerId") Long sellerId);
+	
+
+
 }
