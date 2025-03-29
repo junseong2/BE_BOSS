@@ -69,7 +69,7 @@ public class PaymentController {
    
     
     /** 판매자 매출관리 통계 */
-    @GetMapping("/seller/payments/statistics")
+    @GetMapping("/seller/payments/summary-statistics")
     public ResponseEntity<?> getSellerPaymentstatistics(
     		@RequestParam LocalDate startDate,
     		@RequestParam LocalDate endDate
@@ -77,14 +77,14 @@ public class PaymentController {
     	
     	LocalDateTime startDateTime= startDate.atStartOfDay();
     	LocalDateTime endDateTime =  endDate.atTime(23, 59, 59);
-    	 SellerPaymentStatisticsDTO paymentStatisticsDTO= paymentService.getSellerPaymentStatistics(startDateTime, endDateTime);
+    	SellerPaymentStatisticsDTO paymentStatisticsDTO= paymentService.getSellerPaymentStatistics(startDateTime, endDateTime);
     	
     	return ResponseEntity.ok(paymentStatisticsDTO);
     	
     }
     
     /** 판매자 월별 매출 통계*/
-    @GetMapping("/seller/payments")
+    @GetMapping("/seller/payments/monthly-statistics")
     public ResponseEntity<?> getSellerPaymentsByMonth(
     		@RequestParam LocalDate startDate,
     		@RequestParam LocalDate endDate
@@ -92,5 +92,16 @@ public class PaymentController {
     	
     	Map<String,Long> payments = paymentService.getSellerPaymentsByMonth(startDate.atStartOfDay(), endDate.atTime(23,59,59));
     	return ResponseEntity.ok(payments);
+    }
+    
+    /** 판매자 카테고리별 매출 비율 통계*/
+    @GetMapping("/seller/payments/category-statistics")
+    public ResponseEntity<?> getSellerPaymentSalesByCategory(
+    		@RequestParam LocalDate startDate,
+    		@RequestParam LocalDate endDate
+    		){
+    	
+    	List<SellerCategorySalesDTO> categorySalesDTOs = paymentService.getSellerPaymentSalesByCategory(startDate.atStartOfDay(), endDate.atTime(23, 59, 59));
+    	return ResponseEntity.ok(categorySalesDTOs);
     }
 }

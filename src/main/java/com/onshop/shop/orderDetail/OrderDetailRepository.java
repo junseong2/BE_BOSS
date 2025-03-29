@@ -71,7 +71,4 @@ public interface OrderDetailRepository extends JpaRepository<OrderDetail, Long> 
 		             ad.post
 		    """)
 		OrderDetailResponseDTO findOrderDetailsByOrderId(@Param("orderId") Long orderId, @Param("sellerId") Long sellerId);
-	
-
-
 }

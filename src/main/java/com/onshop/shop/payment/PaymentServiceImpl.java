@@ -138,6 +138,17 @@ public class PaymentServiceImpl implements PaymentService {
 		return salesMap;
 		
 	}
-	
-	// 
+
+	// 판매자 월별 카테고리별 매출 통계 비율
+	@Override
+	public List<SellerCategorySalesDTO> getSellerPaymentSalesByCategory(LocalDateTime startDate,LocalDateTime endDate) {
+		
+		Long sellerId = 999L;
+		List<SellerCategorySalesDTO> categorySalesDTOs = paymentRepository.getCategorySalesBySeller(sellerId, startDate, endDate);
+		
+		if(categorySalesDTOs.isEmpty()) {
+			throw new ResourceNotFoundException("조회할 매출 내역이 없습니다.");
+		}
+		return categorySalesDTOs;
+	}
 }
