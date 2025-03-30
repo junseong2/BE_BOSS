@@ -8,7 +8,7 @@ public interface OrderService {
     
     
     /** 판매자 */
-    SellerOrderResponseDTO getOrders(int page, int size, String search, String orderStatus, String paymentStatus);
+    SellerOrderResponseDTO getOrders(int page, int size, String search, String orderStatus, String paymentStatus, Long userId);
     
 
     List<OrderResponseDTO> getOrdersByUserId(Long userId);

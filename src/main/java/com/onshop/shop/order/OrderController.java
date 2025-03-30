@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.onshop.shop.exception.NotAuthException;
 import com.onshop.shop.orderDetail.OrderDetailService;
 import com.onshop.shop.security.JwtUtil;
 
@@ -70,33 +71,6 @@ public class OrderController {
         return ResponseEntity.ok(order);
     }
     
-
-    /** 판매자*/
-    // 판매자 주문 조회
-    @GetMapping("/seller/orders")
-    public ResponseEntity<?> getSellerOrders(
-    		@RequestParam int page,
-    		@RequestParam int size,
-    		@RequestParam String search,
-    		@RequestParam String orderStatus,
-    		@RequestParam String paymentStatus
-    		){
-    	
-    	SellerOrderResponseDTO orders = orderService.getOrders(page, size, search, orderStatus, paymentStatus);
-    	
-    	return ResponseEntity.ok(orders);
-    } 
-    
-    // 판매자 주문 상태 변경
-    @PatchMapping("/seller/orders/{orderId}")
-    public ResponseEntity<?> updateSellerOrderStatus(
-    		@RequestParam Long orderId
-    		){
-    	
-    	return null;
-    }
-    
-
     @GetMapping("/orders/{userId}")
     @Transactional
     public ResponseEntity<?> getOrdersByUserId(@PathVariable Long userId) {
@@ -118,6 +92,43 @@ public class OrderController {
             e.printStackTrace();
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("주문 조회 실패: " + e.getMessage());
         }
+    }
+    
+    
+    /** 판매자*/
+    // 판매자 주문 조회
+    @GetMapping("/seller/orders")
+    public ResponseEntity<?> getSellerOrders(
+    		@RequestParam int page,
+    		@RequestParam int size,
+    		@RequestParam String search,
+    		@RequestParam String orderStatus,
+    		@RequestParam String paymentStatus,
+			@CookieValue(value = "jwt", required = false) String token) {
+    	
+        if (token == null) {
+            throw new NotAuthException("요청 권한이 없습니다.");
+        }
+
+        Long userId = jwtUtil.extractUserId(token);
+        
+    	SellerOrderResponseDTO orders = orderService.getOrders(page, size, search, orderStatus, paymentStatus, userId);
+    	
+    	return ResponseEntity.ok(orders);
+    } 
+    
+    // 판매자 주문 상태 변경
+    @PatchMapping("/seller/orders/{orderId}")
+    public ResponseEntity<?> updateSellerOrderStatus(
+    		@RequestParam Long orderId,
+			@CookieValue(value = "jwt", required = false) String token) {
+    	
+        if (token == null) {
+            throw new NotAuthException("요청 권한이 없습니다.");
+        }
+
+        Long userId = jwtUtil.extractUserId(token);
+    	return null;
     }
     
 }

@@ -15,6 +15,8 @@ import com.onshop.shop.seller.Seller;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.EntityListeners;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -37,10 +39,15 @@ public class Settlement {
     @JoinColumn(name = "seller_id", nullable = false) 
     @OnDelete(action = OnDeleteAction.CASCADE)
 	private Seller seller;
+	
+	@Enumerated(EnumType.STRING)
+	private SettlementStatus status;
+	
+	private Long requestedAmount; 
 
 	@CreatedDate
-	private LocalDateTime created_date;
+	private LocalDateTime createdDate;
 	@LastModifiedDate
-    private LocalDateTime updated_date;
+    private LocalDateTime updatedDate;
 
 }

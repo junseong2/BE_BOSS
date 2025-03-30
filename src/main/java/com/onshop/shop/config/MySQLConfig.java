@@ -33,7 +33,8 @@ import java.util.*;
 	            "com.onshop.shop.seller",
 	            "com.onshop.shop.store",
 	            "com.onshop.shop.user",
-	            "com.onshop.shop.util"
+	            "com.onshop.shop.util",
+	            "com.onshop.shop.settlement"
 
 	        // ❌ "com.onshop.shop.vector" 제외
 	    },
