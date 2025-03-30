@@ -3,6 +3,7 @@ package com.onshop.shop.user;
 
 import java.util.Hashtable;
 import java.util.List;
+import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
@@ -24,6 +25,8 @@ import com.onshop.shop.address.Address;
 import com.onshop.shop.address.AddressRepository;
 import com.onshop.shop.exception.BadRequestException;
 import com.onshop.shop.exception.ResourceNotFoundException;
+import com.onshop.shop.seller.Seller;
+import com.onshop.shop.seller.SellerRepository;
 import com.onshop.shop.util.EmailUtils;
 
 import jakarta.mail.MessagingException;
@@ -37,6 +40,7 @@ import lombok.extern.slf4j.Slf4j;
 public class UserServiceImpl implements UserService {
     private final UserRepository userRepository;
     private final AddressRepository addressRepository;
+    private final SellerRepository sellerRepository;
     private final RedisTemplate<String, Object> redisTemplate;
     private final JavaMailSender javaMailSender;
     private final String senderEmail;
@@ -45,7 +49,8 @@ public class UserServiceImpl implements UserService {
     @Autowired
     public UserServiceImpl(
     		UserRepository userRepository, 
-    		AddressRepository addressRepository,  
+    		AddressRepository addressRepository, 
+    		SellerRepository sellerRepository,
     		RedisTemplate<String, Object> redisTemplate,
     		JavaMailSender javaMailSender,
     		EmailUtils emailUtils,
@@ -54,6 +59,7 @@ public class UserServiceImpl implements UserService {
     	
         this.userRepository = userRepository;
         this.addressRepository = addressRepository;
+        this.sellerRepository = sellerRepository;
         this.redisTemplate =redisTemplate;
         this.javaMailSender = javaMailSender;
         this.senderEmail = senderEmail;
@@ -302,4 +308,5 @@ public class UserServiceImpl implements UserService {
 	        log.warn("❌ 판매자 거절 메일 전송 실패: {}", e.getMessage());
 	    }
 	}
+
 }

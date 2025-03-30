@@ -17,6 +17,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.CookieValue;
 import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -32,7 +33,9 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.onshop.shop.address.Address;
 import com.onshop.shop.address.AddressRepository;
+import com.onshop.shop.order.OrderRepository;
 import com.onshop.shop.security.JwtUtil;
+import com.onshop.shop.seller.SellerRepository;
 
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletResponse;
@@ -69,11 +72,15 @@ public class UserController {
 	private final RestTemplate restTemplate;// 외부 API에서 데이터를 가져오기위해 필요함
 
 	private final UserRepository userRepository;
+	private final SellerRepository sellerRepository;
+	private final OrderRepository orderRepository;
 	private final JwtUtil jwtUtil; // ✅ JWT 유틸 추가
 
-	public UserController(RestTemplate restTemplate, UserRepository userRepository, JwtUtil jwtUtil) {
+	public UserController(RestTemplate restTemplate, UserRepository userRepository,SellerRepository sellerRepository,OrderRepository orderRepository,JwtUtil jwtUtil) {
 		this.restTemplate = restTemplate;// 외부 API에서 데이터를 가져오기위해 필요함
 		this.userRepository = userRepository;
+		this.sellerRepository = sellerRepository;
+		this.orderRepository = orderRepository;
 		this.jwtUtil = jwtUtil;
 	}
 
@@ -492,4 +499,28 @@ public class UserController {
 	    userService.rejectSellerAndNotify(userId, storename);
 	    return ResponseEntity.ok("SELLER 거절 처리 및 메일 발송 완료");
 	}
+	
+	@GetMapping("/users/{userId}/phone")
+	public ResponseEntity<String> getUserPhones(@PathVariable Long userId) {
+	    User user = userRepository.findById(userId)
+	            .orElseThrow(() -> new RuntimeException("해당 고객을 찾을 수 없습니다"));
+
+	    String fullPhone = String.join("-", user.getPhones());
+	    return ResponseEntity.ok(fullPhone);
+	}
+	@Transactional
+	@DeleteMapping("/usersout/{userId}")
+	public ResponseEntity<String> goodByUser(@PathVariable Long userId) {
+	    User user = userRepository.findById(userId)
+	            .orElseThrow(() -> new RuntimeException("해당 고객을 찾을 수 없습니다"));
+//	    orderRepository.deleteByUserId(userId);
+	    sellerRepository.deleteByUserId(userId);
+	    userRepository.deleteById(userId); 
+	    return ResponseEntity.ok("회원 탈퇴 완료");
+	}
+
+
+
+
+
 }

@@ -1,6 +1,7 @@
 package com.onshop.shop.business;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+
 import lombok.RequiredArgsConstructor;
 
 import org.springframework.beans.factory.annotation.Value;
@@ -20,18 +21,17 @@ public class BusinessServiceImpl implements BusinessService {
 
     private final ObjectMapper objectMapper;
      
-//    @Value("${business.secret-key}")
-//    private String secretKey;
+    @Value("${business.secret-key}")
+    private String secretKey;
+    
     @Override
     public Map<String, Object> updateCompanyStatus(String bsnsLcns) {
         Map<String, Object> result = new HashMap<>();
         try {
             RestTemplate restTemplate = new RestTemplate();
             
-            String sekey ="";
-
             // URL을 URI 객체로 변환
-            String url = "https://api.odcloud.kr/api/nts-businessman/v1/status?serviceKey=" + sekey;
+            String url = "https://api.odcloud.kr/api/nts-businessman/v1/status?serviceKey=" + secretKey;
             URI uri = new URI(url);  // String url을 URI로 변환
             System.out.println("🔍 요청 URI: " + uri);
 

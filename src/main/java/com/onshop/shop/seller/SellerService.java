@@ -5,6 +5,7 @@ import java.util.Map;
 import java.util.Optional;
 
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
@@ -143,6 +144,11 @@ public class SellerService {
         return sellerRepository.save(newSeller);  // 저장
     }
     
+    // 이미 `userId`로 등록된 판매자가 있는지 확인
+    public boolean isUserAlreadySeller(Long userId) {
+        return sellerRepository.findByUserId(userId).isPresent();
+    }
+    
     // 관리자 판매업 등록 승인 및 거절
     public void approveSeller(Long sellerId) {
         Seller seller = sellerRepository.findById(sellerId)
@@ -167,8 +173,12 @@ public class SellerService {
     public List<Seller> getAllSellers(){
     	return sellerRepository.findAll();
     }
-
     
+    // seller중복가입 방지
+    public boolean isUserSeller(Long userId) {
+        return sellerRepository.findByUserId(userId).isPresent();
+    }
+
     
     
     

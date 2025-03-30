@@ -6,12 +6,14 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.onshop.shop.category.Category;
 import com.onshop.shop.product.Product;
 
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Lob;
+import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -33,8 +35,9 @@ public class Seller {
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	@Column(name = "seller_id")
 	private Long sellerId; // 판매자 고유 ID
-
-	@Column(name = "user_id", nullable = false)
+	
+//	@OneToOne(cascade = CascadeType.ALL)
+	@Column(name = "user_id", nullable = false , unique = true)
 	private Long userId; // 사용자 ID (외래 키 참조)
 
 	@Column(name = "storename", unique = true, nullable = false)

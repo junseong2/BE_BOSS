@@ -19,6 +19,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CookieValue;
 import org.springframework.web.bind.annotation.CrossOrigin;
@@ -38,7 +39,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.onshop.shop.product.Product;
 import com.onshop.shop.product.ProductsService;
 import com.onshop.shop.security.JwtUtil;
-
+ 
 @RestController
 @RequestMapping("/seller")
 @CrossOrigin(origins = "http://localhost:5173", allowCredentials = "true")
@@ -434,25 +435,28 @@ public class SellerController {
 	}
 
 	@PostMapping("/register")
-	public ResponseEntity<Seller> registerSeller(@RequestBody SellerRequest request) {
-	    // 판매자 등록
+	public ResponseEntity<String> registerSeller(@RequestBody SellerRequest request) {
+	    Long userId = request.getUserId();
+
+	    // 판매자 등록 진행
 	    Seller seller = sellerService.registerSeller(
 	        request.getUserId(),
 	        request.getStorename(),
 	        request.getDescription(),
-	        request.getRepresentativeName(), // ✅ 대표자 이름
-	        request.getBusinessRegistrationNumber(), // ✅ 사업자등록번호
-	        request.getOnlineSalesNumber() // ✅ 통신판매업 신고번호
+	        request.getRepresentativeName(),
+	        request.getBusinessRegistrationNumber(),
+	        request.getOnlineSalesNumber()
 	    );
 
-	    return ResponseEntity.status(201).body(seller);
+	    return ResponseEntity.status(201).body("판매자 등록 신청이 완료되었습니다.");
+	}
+	
+	@GetMapping("/check/{userId}")
+	public ResponseEntity<Map<String, Boolean>> checkIfUserIsSeller(@PathVariable Long userId) {
+	    boolean isSeller = sellerService.isUserAlreadySeller(userId);
+	    return ResponseEntity.ok(Map.of("isSeller", isSeller));
 	}
 
-//	@PutMapping("/update-status/{sellerId}")
-//	public ResponseEntity<Seller> updateSellerStatus(@PathVariable Long sellerId, @RequestBody String status) {
-//		Seller updatedSeller = sellerService.updateSellerStatus(sellerId, status);
-//		return ResponseEntity.ok(updatedSeller);
-//	}
 
 	@GetMapping("/all")
 	public ResponseEntity<List<Seller>> getAllSellers() {
