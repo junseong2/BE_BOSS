@@ -17,20 +17,25 @@ import java.util.*;
 @EnableTransactionManagement
 @EnableJpaRepositories(
 	    basePackages = {
-	        "com.onshop.shop.address",
-	        "com.onshop.shop.article",
-	        "com.onshop.shop.cart",
-	        "com.onshop.shop.category",
-	        "com.onshop.shop.exception",
-	        "com.onshop.shop.inventory",
-	        "com.onshop.shop.product",
-	        "com.onshop.shop.reply",
-	        "com.onshop.shop.security",
-	        "com.onshop.shop.seller.inventory",
-	        "com.onshop.shop.seller.order",
-	        "com.onshop.shop.seller.products",
-	        "com.onshop.shop.store",
-	        "com.onshop.shop.user"
+	            "com.onshop.shop.address",
+	            "com.onshop.shop.article",
+	            "com.onshop.shop.cart",
+	            "com.onshop.shop.category",
+	            "com.onshop.shop.config",
+	            "com.onshop.shop.exception",
+	            "com.onshop.shop.inventory",
+	            "com.onshop.shop.order",
+	            "com.onshop.shop.orderDetail",
+	            "com.onshop.shop.payment",
+	            "com.onshop.shop.product",
+	            "com.onshop.shop.reply",
+	            "com.onshop.shop.security",
+	            "com.onshop.shop.seller",
+	            "com.onshop.shop.store",
+	            "com.onshop.shop.user",
+	            "com.onshop.shop.util",
+	            "com.onshop.shop.settlement"
+
 	        // ❌ "com.onshop.shop.vector" 제외
 	    },
 	    entityManagerFactoryRef = "mysqlEntityManagerFactory",

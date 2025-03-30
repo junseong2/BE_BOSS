@@ -1,5 +1,4 @@
-package com.onshop.shop.payment;
-
+package com.onshop.shop.settlement;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -10,8 +9,11 @@ import lombok.NoArgsConstructor;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class SellerPaymentsDTO {
-	private String date; 
-	private Long totalAmount;
+public class SettlementRequestDTO {
+	
+	private Long amount;
+	private String bank;
+	private String name;
+	private Long account;
 
 }
