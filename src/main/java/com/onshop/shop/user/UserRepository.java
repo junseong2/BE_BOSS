@@ -29,5 +29,8 @@ public interface UserRepository extends JpaRepository<User, Long> {
     
     // 유저 이메일 찾기
     ForgetResponseDTO findByUsernameAndPassword(String username, String password);
+    
+    //사용자 상태 조회
+    Optional<User> findByRole(String role);
 }
 
