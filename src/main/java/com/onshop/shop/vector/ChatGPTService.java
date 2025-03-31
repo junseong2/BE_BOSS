@@ -10,13 +10,17 @@ import java.util.*;
 
 import com.onshop.shop.product.Product;
 import com.onshop.shop.product.ProductRepository;
-
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 @Service
 @RequiredArgsConstructor
 @Slf4j
 public class ChatGPTService {
 
+
+	
+
+	
     @Value("${openai.api.key}")
     private String openAiApiKey;
     private final ProductRepository productRepository;
@@ -31,6 +35,7 @@ public class ChatGPTService {
      * 자연어 → 구조화된 쿼리 문자열 변환
      */
     public String rewriteToStructuredQuery(String userPrompt) {
+    	
     	String systemPrompt = """
     			사용자의 자연어 요청을 다음과 같은 형식으로 바꿔줘:
     			[키워드묶음 추천개수 평균가격 표준편차]
@@ -103,29 +108,45 @@ public class ChatGPTService {
     }
     
     
-    public List<Map<String, Object>> rerankWithGpt(List<Long> productIds, String originalQuery) {
+    public Map<String, Object> rerankWithGpt(List<Long> productIds, String originalQuery) {
         List<Product> products = productRepository.findAllById(productIds);
 
         StringBuilder sb = new StringBuilder();
         sb.append("아래는 사용자의 요청과 추천 가능한 상품들입니다."
-        		+ "사용자 요청에 가장 적합한 순서로 3~5개를 골라 추천하고"
-        		+ "각 추천의 이유도 간단히 설명해줘.\n");
+                + "사용자 요청에 가장 적합한 순서로 3~5개를 골라 추천하고"
+                + "각 추천의 이유도 간단히 설명해줘.\n");
         sb.append("사용자 요청: ").append(originalQuery).append("\n\n");
 
         for (int i = 0; i < products.size(); i++) {
             Product p = products.get(i);
             sb.append("[상품 ").append(i + 1).append("]\n");
+            sb.append("ID: ").append(p.getProductId()).append("\n"); // ✅ 추가
             sb.append("상품명: ").append(p.getName()).append("\n");
             sb.append("설명: ").append(p.getDescription()).append("\n");
             sb.append("가격: ").append(p.getPrice()).append("원\n\n");
         }
+
         sb.append("단, 사용자의 요청에서 핵심이 되는 제품분류군 하나를 골라서 그 분류와 적합한것을 우선적으로 추천해"
-        		+ "예시 : 운동 후 먹을 단백질 제품 2개 추천해달라는 요청 [단백질 볶음밥, 단백질 보충제, 프로틴 쉐이크]"
-        		+ "중에서 볶음밥은 보충제 종류가 아니므로 추천에서 제외해"
-        		+ "추천할 만한 상품이 없다면 아무것도 추천하지마"
-        		+ "또한 추천이유는 한줄 이내의 간결한 코멘트로 표현해."
-        		
-        		);
+                + "예시 : 운동 후 먹을 단백질 제품 2개 추천해달라는 요청 [단백질 볶음밥, 단백질 보충제, 프로틴 쉐이크]"
+                + "중에서 볶음밥은 보충제 종류가 아니므로 추천에서 제외해"
+                + "추천할 만한 상품이 없다면 아무것도 추천하지마"
+                + "또한 추천이유는 한줄 이내의 간결한 코멘트로 표현해."
+                + "다음과 같은 출력 포맷은 반드시 정확하게 지켜"
+                + "상품을 추천해 주는 대답이 아닐경우 반드시 0, 상품을 추천하는 말일경우 반드시 1"
+                + "대답은 반드시 다음 예시와 같은 json 형태에 담아서 할것"
+                + "상품을 추천해 주는 대답이 아닐 경우 : "
+                + "{\n  \"class\": 0,\n  \"sender\": \"bot\",\n  \"text\": \"저는 챗봇입니다.\" }"
+                + "상품을 추천해 주는 대답일 경우 : "
+                + "{\n"
+                + "  \"class\": 1,\n"
+                + "  \"sender\": \"bot\",\n"
+                + "  \"text\": \"김치를 추천해요!\",\n"
+                + "  \"recommendation\": [\n"
+                + "    { \"productId\": 289, \"reason\": \"국내산 김치로 맛이 깊어요.\" },\n"
+                + "    { \"productId\": 290, \"reason\": \"매콤한 맛을 좋아하는 분께 추천!\" }\n"
+                + "  ]\n"
+                + "}"
+        );
 
         Map<String, Object> body = new HashMap<>();
         body.put("model", MODEL);
@@ -145,20 +166,20 @@ public class ChatGPTService {
             List<Map<String, Object>> choices = (List<Map<String, Object>>) response.getBody().get("choices");
             Map<String, Object> message = (Map<String, Object>) choices.get(0).get("message");
             String content = (String) message.get("content");
+
             log.info("\n🧠 GPT 재정렬 응답: {}", content);
 
-            List<Map<String, Object>> result = new ArrayList<>();
-            for (String line : content.split("\\n")) {
-                if (!line.isBlank()) {
-                    Map<String, Object> map = new HashMap<>();
-                    map.put("result", line.trim());
-                    result.add(map);
-                }
-            }
-            return result;
+            // 응답 문자열을 실제 JSON으로 파싱
+            ObjectMapper mapper = new ObjectMapper();
+            return mapper.readValue(content, Map.class);
+
         } catch (Exception e) {
             log.error("❌ GPT 재정렬 실패: {}", e.getMessage());
-            return List.of(Map.of("error", "GPT 응답 실패"));
+            return Map.of(
+                    "class", 0,
+                    "sender", "bot",
+                    "text", "추천 응답 처리 중 오류가 발생했어요."
+            );
         }
     }
 }
