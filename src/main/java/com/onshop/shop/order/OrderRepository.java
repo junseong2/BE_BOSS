@@ -35,5 +35,6 @@ public interface OrderRepository extends JpaRepository<Order, Long> {
 		""")
 		Long countOrdersBySeller(@Param("sellerId") Long sellerId);
 
-
 }
+
+

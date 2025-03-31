@@ -1,5 +1,7 @@
 package com.onshop.shop.orderDetail;
 
+import java.util.List;
+
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -8,24 +10,29 @@ import org.springframework.web.bind.annotation.RestController;
 
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
 
 @RestController
-@RequestMapping
+@RequestMapping("")
 @RequiredArgsConstructor
+@Slf4j
 public class OrderDetailController {
 	
 	private final OrderDetailService orderDetailService;
 	
 	
-	@GetMapping("/seller/orders/{orderid}")
+	@GetMapping("/seller/orders/{orderId}")
 	public ResponseEntity<OrderDetailResponseDTO> getOrderDetailsByOrderId(
-			@Valid @PathVariable Long orderId
+			@PathVariable Long orderId
 			){
 		
-		OrderDetailResponseDTO orderDetails=  orderDetailService.getOrderDetailByOrderId(orderId);
 		
-		return ResponseEntity.ok(orderDetails);
+		log.info("orderId:{}", orderId);
+		
+		OrderDetailResponseDTO orderDetail  =  orderDetailService.getOrderDetailByOrderId(orderId);
+		
+		return ResponseEntity.ok(orderDetail);
 		
 	}
 

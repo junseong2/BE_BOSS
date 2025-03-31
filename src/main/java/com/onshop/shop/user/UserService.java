@@ -24,5 +24,12 @@ public interface UserService {
     
     /** 아이디 찾기*/
     ForgetResponseDTO findUserEmail(ForgetReqeustDTO forgetReqeustDTO);
+    
+    // 판매업자로 상태 업데이트
+    void promoteToSellerAndNotify(Long userId, String storeName);
+    // 판매업자로 승격 거절
+    void rejectSellerAndNotify(Long userId, String storeName);
+
+    
 
 }
