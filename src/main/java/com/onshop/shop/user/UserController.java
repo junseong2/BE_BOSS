@@ -5,6 +5,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -14,6 +16,8 @@ import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.crypto.bcrypt.BCrypt;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.CookieValue;
 import org.springframework.web.bind.annotation.CrossOrigin;
@@ -33,6 +37,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.onshop.shop.address.Address;
 import com.onshop.shop.address.AddressRepository;
+import com.onshop.shop.order.Order;
 import com.onshop.shop.order.OrderRepository;
 import com.onshop.shop.security.JwtUtil;
 import com.onshop.shop.seller.SellerRepository;
@@ -86,7 +91,7 @@ public class UserController {
 
 	// 쿠키를 사용
 	@GetMapping("/user-info")
-	public ResponseEntity<Map<String, String>> getUserInfo(@CookieValue(value = "jwt", required = false) String token) {
+	public ResponseEntity<Map<String, Object>> getUserInfo(@CookieValue(value = "jwt", required = false) String token) {
 		if (token == null) {
 			return ResponseEntity.status(401).body(Map.of("error", "로그인이 필요합니다."));
 		}
@@ -99,7 +104,9 @@ public class UserController {
 		}
 
 		return ResponseEntity.ok(Map.of("userId", user.getUserId().toString(), "userName", user.getUsername(),
-				"userEmail", user.getEmail()));
+				"userEmail", user.getEmail() , "userPassword" , user.getPassword() 
+				, "userPhone1", user.getPhone1(), "userPhone2", user.getPhone2(), "userPhone3", user.getPhone3()
+				));
 	}
 
 	@GetMapping("/user-infoemail")
@@ -136,6 +143,7 @@ public class UserController {
 	@Autowired
 	private AddressRepository addressRepository;
 
+	@Transactional
 	@PutMapping("/update-userinfo")
 	public ResponseEntity<String> updateUserInfo(@RequestBody UserUpdateRequest request,
 			@CookieValue(value = "jwt", required = false) String token) {
@@ -176,35 +184,91 @@ public class UserController {
 
 		System.out.println("📌 받은 요청 데이터: " + request);
 
-		// 새 주소 추가
-		List<Address> newAddresses = request.getAddresses().stream().limit(3) // 최대 3개 제한
-				.map(addrReq -> {
-					Address address = new Address();
-					address.setUser(user);
-					address.setAddress1(addrReq.getAddress1());
-					address.setAddress2(addrReq.getAddress2());
-					address.setPost(addrReq.getPost());
-					address.setIsDefault(addrReq.getIsDefault());
+	    // ✅ 기존 주소 리스트
+	    List<Address> existingAddresses = addressRepository.findByUser(user);
 
-					System.out.println("📌 새 주소 객체 생성 - address1: " + address.getAddress1() + ", address2: "
-							+ address.getAddress2() + ", post: " + address.getPost() + ", isDefault: "
-							+ address.getIsDefault());
-					return address;
-				}).toList();
+	    // ✅ 기본 주소 초기화
+	    for (Address addr : existingAddresses) {
+	        addr.setIsDefault(false);
+	    }
 
-		System.out.println("✅ 새로 저장할 주소 개수: " + newAddresses.size());
+	    // ✅ 프론트에서 전달된 address1 + post 조합 추출
+	    Set<String> incomingKeys = request.getAddresses().stream()
+	        .map(addr -> (addr.getAddress1().trim() + "::" + addr.getPost().trim()))
+	        .collect(Collectors.toSet());
 
-		// 새 주소 저장
-		addressRepository.saveAll(newAddresses);
+	    // ✅ 삭제 대상 추출
+	    List<Address> toDelete = existingAddresses.stream()
+	        .filter(addr -> !incomingKeys.contains(addr.getAddress1().trim() + "::" + addr.getPost().trim()))
+	        .collect(Collectors.toList());
 
-		// 회원 정보 업데이트
-		userRepository.save(user);
+	    // ✅ User의 주소 리스트에서도 제거 (orphanRemoval을 위해)
+	    for (Address addr : toDelete) {
+	        user.getAddresses().remove(addr);
+	    }
 
-		System.out.println("✅ 회원 정보 수정 완료");
+	    addressRepository.deleteAll(toDelete);
+	    System.out.println("🗑️ 삭제된 주소 수: " + toDelete.size());
 
-		return ResponseEntity.ok("회원 정보가 수정되었습니다!");
+	    // ✅ 중복 아닌 새 주소만 저장하고, 기존 주소 중 기본 주소만 재설정
+	    List<Address> newAddresses = request.getAddresses().stream()
+	        .limit(3)
+	        .filter(addrReq -> {
+	            boolean exists = addressRepository.existsByUserAndAddress1AndPost(user, addrReq.getAddress1(), addrReq.getPost());
+
+	            if (exists && Boolean.TRUE.equals(addrReq.getIsDefault())) {
+	                Address existing = addressRepository.findByUserAndAddress1AndPost(user, addrReq.getAddress1(), addrReq.getPost());
+	                if (existing != null) {
+	                    existing.setIsDefault(true);
+	                    addressRepository.save(existing);
+	                }
+	            }
+
+	            return !exists;
+	        })
+	        .map(addrReq -> {
+	            Address address = new Address();
+	            address.setUser(user);
+	            address.setAddress1(addrReq.getAddress1());
+	            address.setAddress2(addrReq.getAddress2());
+	            address.setPost(addrReq.getPost());
+	            address.setIsDefault(addrReq.getIsDefault());
+	            return address;
+	        })
+	        .collect(Collectors.toList());
+
+	    // ✅ 기본 주소가 여러 개면 하나만 true로
+	    boolean hasDefault = false;
+	    for (Address addr : newAddresses) {
+	        if (Boolean.TRUE.equals(addr.getIsDefault())) {
+	            if (hasDefault) {
+	                addr.setIsDefault(false);
+	            } else {
+	                hasDefault = true;
+	            }
+	        }
+	    }
+
+	    // ✅ 기존 주소에도 기본 주소가 없고, 새 주소도 기본이 없을 경우 → 첫 번째 새 주소를 기본으로 설정
+	    boolean dbHasDefault = addressRepository.findByUser(user).stream()
+	        .anyMatch(Address::getIsDefault);
+
+	    if (!dbHasDefault && !newAddresses.isEmpty()) {
+	        newAddresses.get(0).setIsDefault(true);
+	        System.out.println("⚠️ 기본 주소 없음 → 첫 번째 새 주소를 기본으로 설정");
+	    }
+
+	    addressRepository.saveAll(newAddresses);
+	    userRepository.save(user);
+
+	    System.out.println("✅ 새로 저장된 주소 수: " + newAddresses.size());
+	    System.out.println("✅ 회원 정보 수정 완료");
+
+	    return ResponseEntity.ok("회원 정보가 수정되었습니다!");
 	}
 
+	
+	
 	@Autowired
 	private UserService userService;
 
@@ -214,6 +278,15 @@ public class UserController {
 			if (user.getAddresses() == null) {
 				user.setAddresses(new ArrayList<>()); // ✅ addresses가 null이면 초기화
 			}
+			
+			 BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
+		        String encodedPassword = passwordEncoder.encode(user.getPassword());
+		        user.setPassword(encodedPassword); // 암호화된 비밀번호 저장
+			
+	        // 🛠 각 주소에 user 객체 연결
+	        for (Address addr : user.getAddresses()) {
+	            addr.setUser(user); // <-- 이게 핵심
+	        }
 
 			userService.registerUser(user);
 			// ✅ userId 확인
@@ -228,11 +301,16 @@ public class UserController {
 
 	@PostMapping("/locallogin") // 로컬 로그인
 	public ResponseEntity<?> login(@RequestBody User loginRequest, HttpServletResponse response) {
-		User user = userService.findByEmailAndPassword(loginRequest.getEmail(), loginRequest.getPassword());
+		User user = userService.findByEmail(loginRequest.getEmail());
 
 		if (user == null) {
 			return ResponseEntity.status(401).body(Map.of("error", "로그인 실패: 이메일 또는 비밀번호가 올바르지 않습니다."));
 		}
+		
+		 BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
+		    if (!passwordEncoder.matches(loginRequest.getPassword(), user.getPassword())) {
+		        return ResponseEntity.status(401).body(Map.of("error", "로그인 실패: 비밀번호가 일치하지 않습니다."));
+		    }
 
 		// JWT 생성
 		String token = jwtUtil.generateToken(user.getUserId());
@@ -513,10 +591,78 @@ public class UserController {
 	public ResponseEntity<String> goodByUser(@PathVariable Long userId) {
 	    User user = userRepository.findById(userId)
 	            .orElseThrow(() -> new RuntimeException("해당 고객을 찾을 수 없습니다"));
-//	    orderRepository.deleteByUserId(userId);
+	    List<Order> orders = orderRepository.findByUser(user);
+	    for (Order order : orders) {
+	        order.setUser(null);
+	    }	    orderRepository.deleteByUser(user);
 	    sellerRepository.deleteByUserId(userId);
 	    userRepository.deleteById(userId); 
 	    return ResponseEntity.ok("회원 탈퇴 완료");
+	}
+	
+	@PostMapping("/check-current-password")
+	public ResponseEntity<Map<String, String>> checkCurrentPassword(@RequestBody Map<String, String> request, 
+	                                                                  @CookieValue(value = "jwt", required = false) String token) {
+	    // JWT 토큰이 없으면 로그인하지 않은 상태
+	    if (token == null) {
+	        return ResponseEntity.status(401).body(Map.of("error", "로그인 정보가 없습니다."));
+	    }
+
+	    // JWT에서 userId 추출
+	    Long userId = jwtUtil.extractUserId(token);
+
+	    // 사용자 정보 조회
+	    User user = userRepository.findById(userId).orElse(null);
+	    if (user == null) {
+	        return ResponseEntity.status(404).body(Map.of("error", "유저를 찾을 수 없습니다."));
+	    }
+
+	    // 현재 비밀번호 확인
+	    String currentPassword = request.get("currentPassword");
+	    if (currentPassword == null || !BCrypt.checkpw(currentPassword, user.getPassword())) { // BCrypt 사용해서 비교
+	        return ResponseEntity.status(400).body(Map.of("error", "현재 비밀번호가 일치하지 않습니다."));
+	    }
+
+	    return ResponseEntity.ok(Map.of("message", "현재 비밀번호가 확인되었습니다."));
+	}
+
+	@PatchMapping("/update-password")
+	public ResponseEntity<Map<String, String>> updatePassword(@RequestBody Map<String, String> request, 
+	                                             @CookieValue(value = "jwt", required = false) String token) {
+	    // JWT 토큰이 없으면 로그인하지 않은 상태
+	    if (token == null) {
+	        return ResponseEntity.status(401).body(Map.of("error","로그인 정보가 없습니다."));
+	    }
+
+	    // JWT에서 userId 추출
+	    Long userId = jwtUtil.extractUserId(token);
+
+	    // 사용자 정보 조회
+	    User user = userRepository.findById(userId).orElse(null);
+	    if (user == null) {
+	        return ResponseEntity.status(404).body(Map.of("error","유저를 찾을 수 없습니다."));
+	    }
+
+	    // 현재 비밀번호 확인
+	    String currentPassword = request.get("currentPassword");
+	    BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
+	    if (currentPassword == null || !passwordEncoder.matches(currentPassword, user.getPassword())) {
+	        return ResponseEntity.status(400).body(Map.of("error","현재 비밀번호가 일치하지 않습니다."));
+	    }
+
+	    // 새 비밀번호와 비밀번호 확인이 일치하는지 확인
+	    String newPassword = request.get("newPassword");
+	    String confirmNewPassword = request.get("confirmNewPassword");
+	    if (!newPassword.equals(confirmNewPassword)) {
+	        return ResponseEntity.status(400).body(Map.of("message","새 비밀번호와 비밀번호 확인이 일치하지 않습니다."));
+	    }
+
+	    // 새 비밀번호로 변경
+	    String encodedNewPassword = passwordEncoder.encode(newPassword); // 새 비밀번호 암호화
+	    user.setPassword(encodedNewPassword);
+	    userRepository.save(user);
+
+	    return ResponseEntity.ok(Map.of("message", "비밀번호가 성공적으로 변경되었습니다."));
 	}
 
 

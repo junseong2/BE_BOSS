@@ -17,6 +17,7 @@ import java.util.*;
 @EnableTransactionManagement
 @EnableJpaRepositories(
 	    basePackages = {
+
 	            "com.onshop.shop.address",
 	            "com.onshop.shop.article",
 	            "com.onshop.shop.cart",
@@ -33,11 +34,13 @@ import java.util.*;
 	            "com.onshop.shop.seller",
 	            "com.onshop.shop.store",
 	            "com.onshop.shop.user",
+
 	            "com.onshop.shop.util",
 	            "com.onshop.shop.settlement",
 	            "com.onshop.shop.review"
 
 	        // ❌ "com.onshop.shop.vector" 제외
+
 	    },
 	    entityManagerFactoryRef = "mysqlEntityManagerFactory",
 	    transactionManagerRef = "mysqlTransactionManager"
