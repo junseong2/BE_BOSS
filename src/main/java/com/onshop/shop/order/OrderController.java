@@ -4,30 +4,42 @@ import java.util.Map;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.CookieValue;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.onshop.shop.orderDetail.OrderDetailService;
+import com.onshop.shop.security.JwtUtil;
+
 import jakarta.transaction.Transactional;
+import lombok.RequiredArgsConstructor;
 
 @RestController
-@RequestMapping("/orders")
+@RequiredArgsConstructor
+
 @CrossOrigin(origins = "http://localhost:5173", allowCredentials = "true")
 public class OrderController {
 
     private final OrderService orderService;
+    private final OrderDetailService orderDetailService;
+    private final JwtUtil jwtUtil;
 
-    public OrderController(OrderService orderService) {
-        this.orderService = orderService;
-    }
+    
+    
+    
+    @PostMapping("/orders/create")
+    public ResponseEntity<?> createOrder(
+    		@RequestBody OrderDTO orderDTO, 
+    		@CookieValue(value = "jwt", required = false) String token) {
+     
+    	Long userId = jwtUtil.extractUserId(token); // ✅ JWT에서 userId 추출
 
-    @PostMapping("/create")
-    public ResponseEntity<?> createOrder(@RequestBody OrderDTO orderDTO) {
-        try {
+    	try {
             System.out.println("📩 [DEBUG] 주문 생성 요청: " + orderDTO);
             System.out.println("🔹 userId: " + orderDTO.getUserId());
             System.out.println("🔹 totalPrice: " + orderDTO.getTotalPrice());
@@ -37,6 +49,8 @@ public class OrderController {
             }
 
             Order order = orderService.createOrder(orderDTO);
+            orderDetailService.createOrderDetail(userId, orderDTO, order);
+            
 
             System.out.println("✅ 주문 생성 완료! Order ID: " + order.getOrderId());
 
@@ -49,14 +63,32 @@ public class OrderController {
     }
 
     // ✅ 주문 조회 API
-    @GetMapping("/{orderId}")
-    public ResponseEntity<Order> getOrderById(@PathVariable Long orderId) {
+    @GetMapping("/orders/{orderId}")
+    public ResponseEntity<Order> getOrderById(@PathVariable Long orderId ) {
         Order order = orderService.getOrderById(orderId);
         return ResponseEntity.ok(order);
     }
     
+
+    /** 판매자*/
+    // 판매자 주문 조회
+    @GetMapping("/seller/orders")
+    public ResponseEntity<?> getSellerOrders(
+    		@RequestParam int page,
+    		@RequestParam int size,
+    		@RequestParam String search,
+    		@RequestParam String status
+    		){
+    	
+    	SellerOrderResponseDTO orders = orderService.getOrders(page, size, search, status);
+    	
+    	return ResponseEntity.ok(orders);
+    } 
     
-    @GetMapping("/user/{userId}")
+    // 판매자 주문 상태 변경
+    
+
+    @GetMapping("/orders/{userId}")
     @Transactional
     public ResponseEntity<?> getOrdersByUserId(@PathVariable Long userId) {
         try {

@@ -1,5 +1,7 @@
 package com.onshop.shop.seller;
 
+import lombok.extern.slf4j.Slf4j;
+
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -7,11 +9,8 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.HashMap;
 import java.util.List;
-
 import java.util.Map;
 import java.util.Optional;
-import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.ObjectMapper;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -33,9 +32,8 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
-
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
-
 import com.onshop.shop.product.Product;
 import com.onshop.shop.product.ProductsService;
 import com.onshop.shop.security.JwtUtil;
@@ -71,12 +69,11 @@ public class SellerController {
                     
             		"storename", seller.getStorename(),
                     "sellerId",seller.getSellerId(),
-                    "headerId", seller.getHeaderId(),
-                    "menuBarId", seller.getMenuBarId(),
-                    "navigationId", seller.getNavigationId(),
-                    "seller_menubar_color", seller.getSellerMenubarColor()
-            );
-            
+                    "headerId", seller.getHeaderId() != null ? seller.getHeaderId() : "N/A",
+                    	    "menuBarId", seller.getMenuBarId() != null ? seller.getMenuBarId() : "N/A",
+                    	    "navigationId", seller.getNavigationId() != null ? seller.getNavigationId() : "N/A",
+                    	    "seller_menubar_color", seller.getSellerMenubarColor() != null ? seller.getSellerMenubarColor() : "#FFFFFF"
+                    	);
 
             System.out.println("Response Data: " + response);  // 응답 데이터 로그
 
@@ -286,11 +283,20 @@ public class SellerController {
         return sellerService.getSellerById(sellerId)
                 .map(seller -> {
                     try {
-                       
-                    	List<Object> settings = objectMapper.readValue(seller.getSettings(), List.class);
-                        List<Object> mobilesettings = objectMapper.readValue(seller.getMobilesettings(), List.class);
+                        String settingsJson = seller.getSettings();
+                        String mobileSettingsJson = seller.getMobilesettings();
 
-                    	Map<String, Object> response = Map.of(
+                        if (settingsJson == null || settingsJson.isBlank()) {
+                            settingsJson = "[]";
+                        }
+                        if (mobileSettingsJson == null || mobileSettingsJson.isBlank()) {
+                            mobileSettingsJson = "[]";
+                        }
+
+                        List<Object> settings = objectMapper.readValue(settingsJson, List.class);
+                        List<Object> mobilesettings = objectMapper.readValue(mobileSettingsJson, List.class);
+
+                        Map<String, Object> response = Map.of(
                             "storename", seller.getStorename(),
                             "description", seller.getDescription(),
                             "settings", settings,
@@ -298,13 +304,13 @@ public class SellerController {
                         );
                         return ResponseEntity.ok(response);
                     } catch (Exception e) {
-                        return ResponseEntity.badRequest().body("JSON 파싱 오류");
+                        e.printStackTrace();
+                        return ResponseEntity.badRequest().body("JSON 파싱 오류: " + e.getMessage());
                     }
                 })
                 .orElse(ResponseEntity.badRequest().body("판매자 데이터를 찾을 수 없습니다."));
     }
 
-    
     
     
     
@@ -487,6 +493,7 @@ public class SellerController {
             response.put("totalItems", productsPage.getTotalElements());
             response.put("totalPages", productsPage.getTotalPages());
             response.put("sortOrder", sort);
+          
 
             
             
@@ -499,7 +506,6 @@ public class SellerController {
             return ResponseEntity.internalServerError().body(Map.of("error", "서버 오류 발생", "message", e.getMessage()));
         }
     }
-    
 
 }
 

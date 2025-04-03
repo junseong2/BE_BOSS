@@ -1,7 +1,13 @@
 package com.onshop.shop.product;
 
+import java.awt.print.Pageable;
+import java.util.List;
+
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -12,18 +18,15 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
-
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.onshop.shop.category.CategoryDTO;
 import com.onshop.shop.exception.SuccessMessageResponse;
 
 import jakarta.validation.Valid;
-
-import java.util.List;
-import org.springframework.web.bind.annotation.DeleteMapping;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
 @RestController
 @RequestMapping("")
@@ -38,6 +41,33 @@ public class ProductsController {
     @GetMapping("/products")
     public List<ProductsDTO> getAllProducts() {
         return productsService.getAllProducts();
+    }
+    
+    
+    @GetMapping("/products/popular")
+    public ResponseEntity<List<Product>> getPopularProducts(@RequestParam String sortBy) {
+        log.info("인기 상품 조회 요청: sortBy={}", sortBy);
+        
+        List<Product> products;
+        
+        switch (sortBy.toLowerCase()) {
+            case "daily":
+                products = productsService.getPopularProductsDaily();
+                break;
+            case "weekly":
+                products = productsService.getPopularProductsWeekly();
+                break;
+            case "monthly":
+                products = productsService.getPopularProductsMonthly();
+                break;
+            case "all":
+                products = productsService.getAllPopularProducts();
+                break;
+            default:
+                return ResponseEntity.badRequest().body(null);
+        }
+
+        return ResponseEntity.ok(products);
     }
 
     // 단일 상품 조회
@@ -54,7 +84,11 @@ public class ProductsController {
     public List<ProductsDTO> getProductsByCategory(@PathVariable Long categoryId) {
         return productsService.getProductsByCategory(categoryId);
     }
-    
+    @GetMapping("/seller/used-categories")
+    public ResponseEntity<List<CategoryDTO>> getUsedCategories(@RequestParam Long sellerId) {
+        List<CategoryDTO> usedCategories = productsService.getUsedCategoriesBySeller(sellerId);
+        return ResponseEntity.ok(usedCategories);
+    }
     @GetMapping("/products/search")
     public List<ProductsDTO> searchProducts(@RequestParam String query) {
         return productsService.searchProducts(query);
@@ -63,15 +97,25 @@ public class ProductsController {
     
     /** 판매자 */
 	// 모든 상품 조회
-	@GetMapping("/seller/products")
-	public ResponseEntity<?> getAllProducts(
-			@RequestParam int page,
-			@RequestParam int size
-			){
-		
-		List<SellerProductsDTO> products = productsService.getAllProducts(page, size);
-		return ResponseEntity.ok(products);
-	}
+    @GetMapping("/seller/products")
+    public ResponseEntity<?> getAllProducts(
+        @RequestParam Long sellerId,
+        @RequestParam int page,
+        @RequestParam int size,
+        @RequestParam(required = false, defaultValue = "") String search,
+        @RequestParam(required = false, defaultValue = "recommend") String sort,
+        @RequestParam(required = false) Long categoryId
+    ) {
+        log.info("📦 Seller ID: {}, 검색어: '{}', 정렬: {}, 카테고리: {}", sellerId, search, sort, categoryId);
+
+        // ✅ categoryId도 넘겨줍니다!
+        SellerProductsResponseDTO products = productsService.getAllProducts(
+            sellerId, page, size, search, sort, categoryId
+        );
+
+        return ResponseEntity.ok(products);
+    }
+
 	
 	// 상품 추가(다중)
 	@PostMapping("/seller/products/multiple")
@@ -89,6 +133,7 @@ public class ProductsController {
 	// 상품 추가(
 	@PostMapping("/seller/products")
 	public ResponseEntity<?> registerProduct(
+//			@CookieValue(value = "jwt", required = false) String token,
 			@Valid @RequestParam("product") String productJSON,
 			@RequestParam("images") List<MultipartFile> images
 			) throws JsonMappingException, JsonProcessingException{
@@ -105,25 +150,12 @@ public class ProductsController {
 		return ResponseEntity.created(null).body(null);
 	}
 	
-	// 상품 검색
-	@GetMapping("/seller/products/search")
-	public ResponseEntity<?> searchProduct(
-			@RequestParam String search,
-			@RequestParam int page,
-			@RequestParam int size
-			){
-		
-		log.info("search:{}, page:{}, size:{}", search, page,size);
-		List<SellerProductsDTO> products = productsService.searchProducts(search, page, size);
-		return ResponseEntity.ok(products);
-		
-	}
-	
 	
 	
 	// 상품 수정
 	@PatchMapping("/seller/products/{productId}")
 	public ResponseEntity<?> updateProduct(
+//			@CookieValue(value = "jwt", required = false) String token,
 			@PathVariable Long productId,
 			@Valid @RequestBody SellerProductsRequestDTO productDTO
 			){
@@ -137,9 +169,10 @@ public class ProductsController {
 		SuccessMessageResponse response = new SuccessMessageResponse(
 				HttpStatus.OK, 
 				"선택 상품의 정보가 수정되었습니다.", 		
-				SellerProductsResponseDTO.builder()
-					.category(productDTO.getCategoryName())
-					.productName(productDTO.getName())
+				SellerProductsDTO.builder()
+					.productId(productId)
+					.categoryName(productDTO.getCategoryName())
+					.name(productDTO.getName())
 					.price(productDTO.getPrice())
 					.stock(productDTO.getStock())
 					.build());
@@ -149,6 +182,7 @@ public class ProductsController {
 	// 상품 삭제(단일, 다중 모두 처리)
 	@DeleteMapping("/seller/products")
 	public ResponseEntity<?> removeProducts(
+//			@CookieValue(value = "jwt", required = false) String token,
 			@Valid @RequestBody SellerProductIdsDTO productIds
 			){
 		log.info("ids:{}", productIds);
@@ -157,4 +191,14 @@ public class ProductsController {
 		return ResponseEntity.noContent().build();
 		
 	}
+	@GetMapping("/seller/products/popular")
+	public ResponseEntity<List<SellerProductsDTO>> getSellerPopularProducts(
+	        @RequestParam Long sellerId,
+	        @RequestParam String sortBy
+	) {
+	    List<SellerProductsDTO> result = productsService.getPopularProductsBySeller(sellerId, sortBy);
+	    return ResponseEntity.ok(result);
+	}
+
+
 }

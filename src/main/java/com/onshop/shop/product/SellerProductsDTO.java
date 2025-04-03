@@ -13,10 +13,10 @@ public class SellerProductsDTO {
     private Long productId;
     private String name;
     private Integer price;
-    private String description;
     private String categoryName;
+    private String description;
     private Long stock;
 
- 
+    private String gImage; 
    
 }

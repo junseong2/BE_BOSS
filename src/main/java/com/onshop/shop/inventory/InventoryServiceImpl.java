@@ -19,21 +19,26 @@ public class InventoryServiceImpl implements InventoryService {
 
 	
 	// 판매자(점주) 재고 조회
+	// description: state 변수는 all, soldout, warn을 값으로 받아서 데이터베이스에서 데이터를 필터링하는데 사용됨
 	@Override
-	public List<SellerInventoryResponseDTO> getAllInventory(int page, int size) {
+	public SellerInventoryResponseDTO getAllInventory(int page, int size, String search, String state) {
 		
 		Pageable pageable = PageRequest.of(page, size);
 		
 		//TODO: 실제 인증된 판매자 ID 를 기반으로 인증되어야 함
-		Long sellerId = 1L;
+		Long sellerId = 999L;
 		
-		List<SellerInventoryResponseDTO> inventories = inventoryRepository.findAllBySellerId(sellerId, pageable).toList();
+		List<SellerInventoryDTO> inventories = inventoryRepository.findAllBySellerIdAndSearch(sellerId, search, state, pageable).toList();
+		Long totalCount = inventoryRepository.countBySellerIdAndSearch(sellerId,search, state); // 토탈 재고 목록 개수
 		
 		if(inventories.isEmpty() || inventories == null) {
 			throw new ResourceNotFoundException("해당 재고 목록은 존재하지 않습니다.");
 		}
 		
-		return inventories;
+		return SellerInventoryResponseDTO.builder()
+				.inventories(inventories)
+				.totalCount(totalCount)
+				.build();
 	}
 
 
@@ -87,23 +92,5 @@ public class InventoryServiceImpl implements InventoryService {
 		
 		inventoryRepository.saveAll(updatedInventories);
 		
-	}
-
-
-	// 재고 상품 검색
-	@Override
-	public List<SellerInventoryResponseDTO> searchInventories(String search, int page, int size) {
-		Pageable pageable = PageRequest.of(page, size);
-		
-		//TODO: 실제 인증된 판매자 ID 를 기반으로 인증되어야 함
-		Long sellerId = 1L;
-		
-		List<SellerInventoryResponseDTO> inventories = inventoryRepository.findAllByNameAndSellerId(search, sellerId, pageable).toList();
-		
-		if(inventories.isEmpty() || inventories == null) {
-			throw new ResourceNotFoundException("해당 재고 목록은 존재하지 않습니다.");
-		}
-		
-		return inventories;
 	}
 }

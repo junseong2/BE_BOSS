@@ -499,5 +499,24 @@ public class UserController {
         return ResponseEntity.ok().body("success");
 
     }
-
+    
+    /** TODO: 구현중*/
+    // 아이디 찾기
+    @PostMapping("/auth/find-email")
+    public ResponseEntity<?> findEmail(
+    		@Valid @RequestBody ForgetReqeustDTO forgetReqeustDTO
+    		){
+    		
+    	ForgetResponseDTO forgetResponseDTO = userService.findUserEmail(forgetReqeustDTO);
+    	return ResponseEntity.ok(forgetResponseDTO);
+    }
+    
+    // 비밀번호 찾기
+    public ResponseEntity<?> findPassword(
+    		@Valid @RequestBody ForgetReqeustDTO forgetReqeustDTO
+    		){
+    	
+    	
+    	return ResponseEntity.ok(null);
+    }
 }

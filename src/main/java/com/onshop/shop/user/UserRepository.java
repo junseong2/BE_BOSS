@@ -26,5 +26,8 @@ public interface UserRepository extends JpaRepository<User, Long> {
     
     boolean existsByEmail(String email); // 해당 이메일을 가진 유저가 존재하는지 체크
 
+    
+    // 유저 이메일 찾기
+    ForgetResponseDTO findByUsernameAndPassword(String username, String password);
 }
 
