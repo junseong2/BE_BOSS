@@ -16,7 +16,7 @@ public class JwtUtil {
 
     private static final Logger logger = LoggerFactory.getLogger(JwtUtil.class);
     private static final String SECRET_KEY = "bossbossbossbossbossbossbossboss"; // ✅ 최소 32바이트 이상
-    private static final long EXPIRATION_TIME = 3600000; // ✅ 1시간 (밀리초)
+    private static final long EXPIRATION_TIME = 360000000; // ✅ 1시간 (밀리초)
 
     // 🔹 SECRET_KEY를 HMAC-SHA 키로 변환
     private Key getSigningKey() {

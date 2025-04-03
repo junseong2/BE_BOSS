@@ -36,7 +36,8 @@ import java.util.*;
 	            "com.onshop.shop.user",
 
 	            "com.onshop.shop.util",
-	            "com.onshop.shop.settlement"
+	            "com.onshop.shop.settlement",
+	            "com.onshop.shop.review"
 
 	        // ❌ "com.onshop.shop.vector" 제외
 

@@ -18,7 +18,9 @@ import lombok.extern.slf4j.Slf4j;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.onshop.shop.exception.NotAuthException;
 import com.onshop.shop.exception.SuccessMessageResponse;
+import com.onshop.shop.security.JwtUtil;
 
 import jakarta.validation.Valid;
 
@@ -34,6 +36,7 @@ import org.springframework.web.bind.annotation.DeleteMapping;
 public class ProductsController {
 
     private final ProductsService productsService;
+    private final JwtUtil jwtUtil;
 
     /** 구매자*/
     // 모든 상품 조회
@@ -69,22 +72,33 @@ public class ProductsController {
 	public ResponseEntity<?> getAllProducts(
 			@RequestParam int page,
 			@RequestParam int size,
-			@RequestParam String search
-			){
-		
-		log.info("검색어:{}",search);
-		SellerProductsResponseDTO products = productsService.getAllProducts(page, size, search);
+			@RequestParam String search,
+			@CookieValue(value = "jwt", required = false) String token) {
+
+        if (token == null) {
+            throw new NotAuthException("요청 권한이 없습니다.");
+        }
+
+        Long userId = jwtUtil.extractUserId(token);
+  
+		SellerProductsResponseDTO products = productsService.getAllProducts(page, size, search, userId);
 		return ResponseEntity.ok(products);
 	}
 	
 	// 상품 추가(다중)
 	@PostMapping("/seller/products/multiple")
 	public ResponseEntity<?> registerProducts(
-			@Valid @RequestParam List<SellerProductsRequestDTO> productsDTO
-			){
-		
+			@Valid @RequestParam List<SellerProductsRequestDTO> productsDTO,
+			@CookieValue(value = "jwt", required = false) String token) {
+
+        if (token == null) {
+            throw new NotAuthException("요청 권한이 없습니다.");
+        }
+
+        Long userId = jwtUtil.extractUserId(token);
 		log.info("productsDTO:{}", productsDTO);
-		productsService.registerProducts(productsDTO);
+		
+		productsService.registerProducts(productsDTO, userId);
 		
 		
 		return ResponseEntity.created(null).body(null);
@@ -93,19 +107,25 @@ public class ProductsController {
 	// 상품 추가(
 	@PostMapping("/seller/products")
 	public ResponseEntity<?> registerProduct(
-//			@CookieValue(value = "jwt", required = false) String token,
 			@Valid @RequestParam("product") String productJSON,
-			@RequestParam("images") List<MultipartFile> images
-			) throws JsonMappingException, JsonProcessingException{
+			@RequestParam("images") List<MultipartFile> images,
+			@CookieValue(value = "jwt", required = false) String token) 
+			throws JsonMappingException, JsonProcessingException{
 		
+
+		if (token == null) {
+		       throw new NotAuthException("요청 권한이 없습니다.");
+		}
+
+		Long userId = jwtUtil.extractUserId(token);
 		
 	       // JSON 문자열을 Product 객체로 변환
         ObjectMapper objectMapper = new ObjectMapper();
         SellerProductsRequestDTO productDTO = objectMapper.readValue(productJSON, SellerProductsRequestDTO.class);
         
-        Product savedProduct = productsService.registerProduct(productDTO);
+        Product savedProduct = productsService.registerProduct(productDTO, userId);
         
-        productsService.reigsterProductImages(images, savedProduct);
+        productsService.registerProductImages(images, savedProduct);
 		
 		return ResponseEntity.created(null).body(null);
 	}
@@ -115,15 +135,20 @@ public class ProductsController {
 	// 상품 수정
 	@PatchMapping("/seller/products/{productId}")
 	public ResponseEntity<?> updateProduct(
-//			@CookieValue(value = "jwt", required = false) String token,
 			@PathVariable Long productId,
-			@Valid @RequestBody SellerProductsRequestDTO productDTO
-			){
+			@Valid @RequestBody SellerProductsRequestDTO productDTO,
+			@CookieValue(value = "jwt", required = false) String token) {
+		
+		if (token == null) {
+				       throw new NotAuthException("요청 권한이 없습니다.");
+				}
+
+		Long userId = jwtUtil.extractUserId(token);
 		if(productId == null) {
 			throw new NullPointerException("상품ID는 필수입니다.");
 		}
 		
-		productsService.updateProducts(productId, productDTO);
+		productsService.updateProducts(productId, productDTO, userId);
 		
 
 		SuccessMessageResponse response = new SuccessMessageResponse(
@@ -143,10 +168,17 @@ public class ProductsController {
 	@DeleteMapping("/seller/products")
 	public ResponseEntity<?> removeProducts(
 //			@CookieValue(value = "jwt", required = false) String token,
-			@Valid @RequestBody SellerProductIdsDTO productIds
-			){
+			@Valid @RequestBody SellerProductIdsDTO productIds,
+			@CookieValue(value = "jwt", required = false) String token) {
+		
+		if (token == null) {
+			throw new NotAuthException("요청 권한이 없습니다.");
+		}
+
+		Long userId = jwtUtil.extractUserId(token);
+		
 		log.info("ids:{}", productIds);
-		productsService.removeProducts(productIds);
+		productsService.removeProducts(productIds, userId);
 		
 		return ResponseEntity.noContent().build();
 		
