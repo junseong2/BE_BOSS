@@ -4,6 +4,7 @@ package com.onshop.shop.order;
 import com.onshop.shop.exception.NotAuthException;
 import com.onshop.shop.exception.ResourceNotFoundException;
 import com.onshop.shop.orderDetail.OrderDetailRepository;
+import com.onshop.shop.orderDetail.OrderDetailService;
 import com.onshop.shop.seller.Seller;
 import com.onshop.shop.seller.SellerRepository;
 import com.onshop.shop.user.User;
@@ -32,6 +33,7 @@ public class OrderServiceImpl implements OrderService {
 
     private final OrderRepository orderRepository;
     private final OrderDetailRepository orderDetailRepository;
+    private final OrderDetailService orderDetailService;
     private final UserRepository userRepository;
     private final SellerRepository sellerRepository;
 
@@ -41,7 +43,6 @@ public class OrderServiceImpl implements OrderService {
     public Order createOrder(OrderDTO orderDTO) {
         Long userId = orderDTO.getUserId();
 
-        // ✅ 변환된 `userId` 사용
         User user = userRepository.findByUserId(userId)
             .orElseThrow(() -> new IllegalArgumentException("사용자를 찾을 수 없습니다. userId: " + userId));
 
@@ -52,8 +53,14 @@ public class OrderServiceImpl implements OrderService {
             .createdDate(LocalDateTime.now())
             .build();
 
-        return orderRepository.save(order);
+        Order savedOrder = orderRepository.save(order);
+
+        // ✅ 주문 상세 저장도 꼭 호출!
+        orderDetailService.createOrderDetail(userId, orderDTO, savedOrder);
+
+        return savedOrder;
     }
+
 
 
     @Override

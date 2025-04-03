@@ -11,5 +11,13 @@ public class AddressDTO {
     private String address2;
     private String post;
     private Boolean isDefault;
+    
+    public static AddressDTO fromEntity(Address address) {
+        AddressDTO dto = new AddressDTO();
+        dto.setAddress1(address.getAddress1());
+        dto.setAddress2(address.getAddress2());
+        dto.setPost(address.getPost());
+        dto.setIsDefault(address.getIsDefault());
+        return dto;
 }
-
+}

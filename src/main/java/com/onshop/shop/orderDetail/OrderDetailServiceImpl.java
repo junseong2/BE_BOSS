@@ -9,6 +9,8 @@ import com.onshop.shop.cart.CartRepository;
 import com.onshop.shop.exception.ResourceNotFoundException;
 import com.onshop.shop.order.Order;
 import com.onshop.shop.order.OrderDTO;
+import com.onshop.shop.order.OrderRepository;
+
 import lombok.RequiredArgsConstructor;
 
 @Service
@@ -17,6 +19,7 @@ public class OrderDetailServiceImpl implements OrderDetailService {
 	
 	
 	private final OrderDetailRepository orderDetailRepository;
+	private final OrderRepository orderRepository;
 	private final CartRepository cartRepository;
 	
 	
@@ -53,6 +56,18 @@ public class OrderDetailServiceImpl implements OrderDetailService {
 	}
 
 
+	@Override
+	public OrderDetailResponseDTO getDetailByOrderId(Long orderId) {
+	    OrderDetailResponseDTO dto = orderDetailRepository.findOrderMetaByOrderId(orderId);
+	    if (dto == null) {
+	    	System.out.println("❌ 주문 상세 없음: orderId = " + orderId);
+	        throw new ResourceNotFoundException("주문 정보가 없습니다.");
+	    }
+	    List<ProductItemDTO> products = orderDetailRepository.findOrderProductsByOrderId(orderId);
+	    dto.setProducts(products);
+	    return dto;
+	}
+	
 	// 주문 번호, 판매자 별 주문 상세 내역 조회
 	@Override
 	public OrderDetailResponseDTO getOrderDetailByOrderId(Long orderId) {
@@ -64,5 +79,7 @@ public class OrderDetailServiceImpl implements OrderDetailService {
 		}
 		return orderDetail;
 	}
-	
+
+
+
 }
