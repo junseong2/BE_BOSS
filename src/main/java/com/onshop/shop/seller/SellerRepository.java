@@ -10,6 +10,12 @@ public interface SellerRepository extends JpaRepository<Seller, Long> {
     Optional<Seller> findByStorename(String storename);  // ✅ Optional<Seller>로 수정
     Seller findBySellerId(Long sellerId);
     Optional<Seller>  findByUserId(Long userId);
+<<<<<<< Updated upstream
+=======
+    void deleteByUserId(Long userId);
+    
+    long countByRegistrationStatus(String status);
+>>>>>>> Stashed changes
 
 
 }

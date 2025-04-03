@@ -55,8 +55,12 @@ public class OrderController {
         return ResponseEntity.ok(order);
     }
     
+<<<<<<< Updated upstream
     
     @GetMapping("/user/{userId}")
+=======
+    @GetMapping("/orders/user/{userId}")
+>>>>>>> Stashed changes
     @Transactional
     public ResponseEntity<?> getOrdersByUserId(@PathVariable Long userId) {
         try {

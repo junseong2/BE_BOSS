@@ -62,31 +62,23 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    @Transactional(propagation = Propagation.REQUIRED) // ✅ 트랜잭션 적용
+    @Transactional
     public void registerUser(User user) {
-        User savedUser = userRepository.save(user);
-
-        List<Address> addresses = user.getAddresses() != null ? user.getAddresses() : List.of();
-        if (!addresses.isEmpty()) {
-            List<Address> addressEntities = addresses.stream()
-                .map(address -> {
-                    Address addressEntity = new Address();
-                    addressEntity.setUser(savedUser);
-                    addressEntity.setAddress1(address.getAddress1());
-                    addressEntity.setAddress2(address.getAddress2());
-                    addressEntity.setPost(address.getPost());
-                    addressEntity.setIsDefault(address.getIsDefault());
-                    return addressEntity;
-                }).collect(Collectors.toList());
-
-            addressRepository.saveAll(addressEntities);
+        if (user.getAddresses() != null) {
+            for (Address addr : user.getAddresses()) {
+                addr.setUser(user); // 연관관계 설정
+            }
         }
+
+        userRepository.save(user); // user + address까지 cascade 저장됨 (OneToMany + CascadeType.ALL 설정돼있을 경우)
     }
+
+    
 
     @Override
     @Transactional(readOnly = true) // ✅ 읽기 전용 트랜잭션 (Lazy Loading 문제 방지)
-    public User findByEmailAndPassword(String email, String password) {
-        return userRepository.findByEmailAndPassword(email, password).orElse(null);
+    public User findByEmail(String email) {
+        return userRepository.findByEmail(email).orElse(null);
     }
 
     @Override

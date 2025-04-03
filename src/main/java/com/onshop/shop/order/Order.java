@@ -45,8 +45,13 @@ public class Order {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long orderId;
 
+<<<<<<< Updated upstream
     @ManyToOne
     @JoinColumn(name = "user_id", nullable = false)
+=======
+    @ManyToOne(cascade = CascadeType.ALL)
+    @JoinColumn(name = "user_id", nullable = true)
+>>>>>>> Stashed changes
     private User user;  
 
     private int totalPrice;

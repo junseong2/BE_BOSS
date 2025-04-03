@@ -128,6 +128,43 @@ public class SellerService {
     }
 
     
+<<<<<<< Updated upstream
+=======
+    public void rejectSeller(Long sellerId) {
+        Seller seller = sellerRepository.findById(sellerId)
+            .orElseThrow(() -> new RuntimeException("판매자 정보를 찾을 수 없습니다."));
+
+        seller.setRegistrationStatus("등록 거절");
+        sellerRepository.save(seller);
+
+//        userService.promoteToSellerAndNotify(seller.getUserId(), seller.getStorename());
+    }
+    
+    public List<Seller> getAllSellers(){
+    	return sellerRepository.findAll();
+    }
+    
+    // seller중복가입 방지
+    public boolean isUserSeller(Long userId) {
+        return sellerRepository.findByUserId(userId).isPresent();
+    }
+    
+    public Map<String, Integer> getSellerStats() {
+        int totalSellers = (int) sellerRepository.count();
+        int waitingApproval = (int) sellerRepository.countByRegistrationStatus("등록 대기");
+        int approved = (int) sellerRepository.countByRegistrationStatus("등록 완료");
+        int rejected = (int) sellerRepository.countByRegistrationStatus("등록 거절");
+
+        // 통계를 반환하는 Map
+        return Map.of(
+            "totalSellers", totalSellers,
+            "waitingApproval", waitingApproval,
+            "approved", approved,
+            "rejected", rejected
+        );
+    }
+
+>>>>>>> Stashed changes
     
     
     

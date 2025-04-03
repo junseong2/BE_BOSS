@@ -10,7 +10,7 @@ public interface UserService {
     @Transactional
     void registerUser(User user);
 
-    User findByEmailAndPassword(String email, String password);
+    User findByEmail(String email);
     User findBySocialId(String socialId);
     void updateUser(User updatedUser);
     User getUserById(Long userId); // ✅ 인터페이스에는 선언만!
