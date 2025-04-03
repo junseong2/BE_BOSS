@@ -72,5 +72,7 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
     Long countBySellerSellerIdAndName(@Param("sellerId") Long sellerId, @Param("name") String name);
 
 
+    @Query("SELECT p.productId FROM Product p")
+    Page<Long> findRandomProductIds(Pageable pageable);
 }
 

@@ -19,6 +19,7 @@ public class OpenAIEmbeddingService {
     private String apiKey;
 
     public float[] getEmbedding(String inputText) {
+    	log.info("🔐 주입된 API 키: {}", apiKey);
         try {
             String requestBody = """
                 {
