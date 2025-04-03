@@ -70,12 +70,17 @@ public class Product {
     @Column(name="created_register")
     private LocalDateTime createdRegister;
     
+    @Builder.Default
+    @Column(nullable = false)
+    private Long viewCount = 0L;
+    
     // ✅ 쉼표(,)로 구분된 gImages를 리스트로 변환하여 반환
     public List<String> getImageList() {
         return (this.gImage != null && !this.gImage.isEmpty())
                 ? Arrays.asList(this.gImage.split(","))
                 : List.of();
     }
+    
     public Long getProductId() {
         return productId;
     }

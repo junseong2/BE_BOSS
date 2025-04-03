@@ -11,6 +11,8 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.onshop.shop.seller.Seller;
+
 @Repository
 public interface ProductRepository extends JpaRepository<Product, Long> {
 	
@@ -55,8 +57,8 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
     // 상품 삭제(다중) - DELETE 쿼리로 변경
     @Modifying
     @Transactional
-    @Query("DELETE FROM Product p WHERE p.id IN (:ids)")
-    int deleteProductsByIds(@Param("ids") List<Long> productIds);
+    @Query("DELETE FROM Product p WHERE p.id IN (:ids) AND p.seller = :seller")
+    int deleteAllByIdInBatchAndSeller(@Param("ids") List<Long> productIds, Seller seller);
 
     // 판매자가 등록한 상품 존재 유무 확인
     @Query("SELECT COUNT(p) FROM Product p WHERE p.seller.id = :sellerId")
