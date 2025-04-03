@@ -86,15 +86,15 @@ public class UserServiceImpl implements UserService {
                     return addressEntity;
                 }).collect(Collectors.toList());
 
-            addressRepository.saveAll(addressEntities);
         }
     }
 
     @Override
     @Transactional(readOnly = true) // ✅ 읽기 전용 트랜잭션 (Lazy Loading 문제 방지)
-    public User findByEmailAndPassword(String email, String password) {
-        return userRepository.findByEmailAndPassword(email, password).orElse(null);
+    public User findByEmail(String email) {
+        return userRepository.findByEmail(email).orElse(null);
     }
+
 
     @Override
     @Transactional(readOnly = true) // ✅ 읽기 전용 트랜잭션 (Lazy Loading 문제 방지)
