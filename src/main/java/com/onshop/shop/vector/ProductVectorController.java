@@ -114,34 +114,36 @@ public class ProductVectorController {
             if (!tokens[i].matches("\\d+")) return false;
         }
 
+        // 두 번째 숫자가 0이면 비정상으로 간주
+        if (tokens.length >= 2 && tokens[1].equals("0")) return false;
+
         return true;
     }
     // GET http://localhost:5000/vector/rag?query=운동 후 먹을 단백질 제품 100개 추천해줘 예산은 6만원쯤!
     // 사용자별로 20회 정도 대화하고 나면 일정주기 동안 대화 불가능하게 하는 로직 같은게 필요해 보임.
     
     @GetMapping("/rag")
-    public ResponseEntity<List<Map<String,Object>>> recommendByRag(@RequestParam String query) {
+    public ResponseEntity<Map<String, Object>> recommendByRag(@RequestParam String query) {
         log.info("🧠 [RAG] 검색 요청 (자연어): {}", query);
 
-        // 1. 자연어 → 정형 쿼리 변환
         String rewritten = chatGPTService.rewriteToStructuredQuery(query);
         log.info("📝 변환된 쿼리: {}", rewritten);
 
-        // ✅ 1-1. GPT 응답이 비정상적인 경우 (예: 숫자 개수가 부족하거나 너무 짧을 때)
         if (!isValidStructuredQuery(rewritten)) {
             log.warn("⚠️ GPT 응답이 올바른 형식이 아님: {}", rewritten);
             return ResponseEntity
                     .badRequest()
-                    .body(List.of()); // 혹은 커스텀 메시지 DTO로 에러 전달 가능
+                    .body(Map.of(
+                            "class", 0,
+                            "sender", "bot",
+                            "text", "검색어 형식이 올바르지 않습니다."
+                    ));
         }
 
-        // 2. RAG로직으로 전달
         List<Long> recommended = productVectorService.recommendProductsByRag(rewritten);
-        
-     // 3. GPT 후처리
-        List<Map<String, Object>> finalResult = chatGPTService.rerankWithGpt(recommended, query);
 
-        // 4. 결과 반환
-        return ResponseEntity.ok(finalResult);
+        Map<String, Object> result = chatGPTService.rerankWithGpt(recommended, query);
+
+        return ResponseEntity.ok(result);
     }
 }
