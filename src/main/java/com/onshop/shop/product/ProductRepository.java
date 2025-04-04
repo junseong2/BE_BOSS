@@ -263,4 +263,6 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
 	Page<SellerProductsDTO> findBySellerAndCategory(@Param("sellerId") Long sellerId,
 			@Param("categoryId") Long categoryId, @Param("search") String search, Pageable pageable);
 
+    @Query("SELECT p.productId FROM Product p")
+    Page<Long> findRandomProductIds(Pageable pageable);
 }
