@@ -70,9 +70,29 @@ public class Product {
     @Column(name="created_register")
     private LocalDateTime createdRegister;
     
+
     @Builder.Default
     @Column(nullable = false)
     private Long viewCount = 0L;
+
+    
+    @Builder.Default
+    @Column(name = "daily_sales")
+    private Long dailySales = 0L;
+
+    @Builder.Default
+    @Column(name = "weekly_sales")
+    private Long weeklySales = 0L;
+
+    @Builder.Default
+    @Column(name = "monthly_sales")
+    private Long monthlySales = 0L;
+
+    @Builder.Default
+    @Column(name = "overall_sales")
+    private Long overallSales = 0L;
+
+
     
     // ✅ 쉼표(,)로 구분된 gImages를 리스트로 변환하여 반환
     public List<String> getImageList() {
@@ -100,4 +120,19 @@ public class Product {
                 ", expiryDate=" + expiryDate +
                 '}';
     }
+    
+    public void increaseSales(int quantity) {
+        this.dailySales = (this.dailySales == null) ? 0L : this.dailySales;
+        this.weeklySales = (this.weeklySales == null) ? 0L : this.weeklySales;
+        this.monthlySales = (this.monthlySales == null) ? 0L : this.monthlySales;
+        this.overallSales = (this.overallSales == null) ? 0L : this.overallSales;
+
+        this.dailySales += quantity;
+        this.weeklySales += quantity;
+        this.monthlySales += quantity;
+        this.overallSales += quantity;
+        
+        
+    }
+  
 }

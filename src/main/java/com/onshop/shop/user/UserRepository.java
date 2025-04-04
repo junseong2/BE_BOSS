@@ -33,4 +33,3 @@ public interface UserRepository extends JpaRepository<User, Long> {
     //사용자 상태 조회
     Optional<User> findByRole(String role);
 }
-
