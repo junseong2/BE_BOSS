@@ -14,10 +14,12 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.onshop.shop.category.Category;
+import com.onshop.shop.category.CategoryDTO;
 import com.onshop.shop.category.CategoryRepository;
 import com.onshop.shop.exception.NotAuthException;
 import com.onshop.shop.exception.ResourceNotFoundException;
@@ -153,6 +155,136 @@ public class ProductsServiceImpl implements ProductsService {
         		.build();
 
     }
+    
+    /** 판매자 쿼리 */
+    // 점주 상품 조회
+    @Override
+    public SellerProductsResponseDTO getAllProducts(int page, int size, String search, String sort) {
+        Long sellerId = 999L; // TODO: 추후 로그인 정보에서 받아오도록 수정
+
+        Pageable pageable;
+
+        switch ((sort != null ? sort.toLowerCase() : "recommend")) {
+        case "low":
+            pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.ASC, "price"));
+            break;
+        case "high":
+            pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "price"));
+            break;
+        case "latest":
+            pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "createdRegister"));
+            break;
+        case "popular":
+            pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "overallSales"));
+            break;
+        case "recommend":
+        default:
+            pageable = PageRequest.of(page, size);
+            break;
+    }
+
+  
+        List<SellerProductsDTO> products = productRepository.findBySellerSellerIdAndSearch(sellerId, search, pageable).toList();
+        Long productCount = productRepository.countBySellerSellerIdAndName(sellerId, search);
+
+        if (products.isEmpty()) {
+            throw new ResourceNotFoundException("조회할 상품 목록을 찾을 수 없습니다.");
+        }
+
+        return SellerProductsResponseDTO.builder()
+                .products(products)
+                .totalCount(productCount)
+                .build();
+    }
+
+    @Override
+    public SellerProductsResponseDTO getAllProducts(Long sellerId, int page, int size, String search, String sort) {
+        Pageable pageable = PageRequest.of(page, size);
+
+        log.info("🔍 정렬 방식: {}", sort);
+
+        Page<SellerProductsDTO> productsPage;
+
+        switch (sort.toLowerCase()) {
+        case "low":
+            productsPage = productRepository.findBySellerSellerIdAndSearchOrderByPriceAsc(sellerId, search, pageable);
+            break;
+        case "high":
+            productsPage = productRepository.findBySellerSellerIdAndSearchOrderByPriceDesc(sellerId, search, pageable);
+            break;
+        case "latest":
+            productsPage = productRepository.findBySellerSellerIdAndSearchOrderByCreatedRegisterDesc(sellerId, search, pageable);
+            break;
+        case "popular":
+            productsPage = productRepository.findBySellerSellerIdAndSearchOrderByOverallSalesDesc(sellerId, search, pageable);
+            break;
+        default: // recommend 또는 unknown -> 기본정렬
+            productsPage = productRepository.findBySellerSellerIdAndSearch(sellerId, search, pageable);
+    }
+
+        if (productsPage.isEmpty()) {
+            throw new ResourceNotFoundException("조회할 상품 목록을 찾을 수 없습니다.");
+        }
+
+        return SellerProductsResponseDTO.builder()
+                .products(productsPage.getContent())
+                .totalCount(productsPage.getTotalElements())
+                .build();
+    }
+    @Override
+    public SellerProductsResponseDTO getAllProducts(Long sellerId, int page, int size, String search, String sort, Long categoryId) {
+        Pageable pageable = PageRequest.of(page, size);
+        log.info("🔍 정렬 방식: {}, 카테고리 ID: {}", sort, categoryId);
+
+        Page<SellerProductsDTO> productsPage;
+
+        // 정렬 + categoryId 여부에 따라 쿼리 분기
+        if (categoryId != null) {
+            switch (sort.toLowerCase()) {
+                case "low":
+                    productsPage = productRepository.findBySellerAndCategoryOrderByPriceAsc(sellerId, categoryId, search, pageable);
+                    break;
+                case "high":
+                    productsPage = productRepository.findBySellerAndCategoryOrderByPriceDesc(sellerId, categoryId, search, pageable);
+                    break;
+                case "latest":
+                    productsPage = productRepository.findBySellerAndCategoryOrderByCreatedRegisterDesc(sellerId, categoryId, search, pageable);
+                    break;
+                case "popular":
+                    productsPage = productRepository.findBySellerAndCategoryOrderByOverallSalesDesc(sellerId, categoryId, search, pageable);
+                    break;
+                default:
+                    productsPage = productRepository.findBySellerAndCategory(sellerId, categoryId, search, pageable);
+            }
+        } else {
+            switch (sort.toLowerCase()) {
+                case "low":
+                    productsPage = productRepository.findBySellerSellerIdAndSearchOrderByPriceAsc(sellerId, search, pageable);
+                    break;
+                case "high":
+                    productsPage = productRepository.findBySellerSellerIdAndSearchOrderByPriceDesc(sellerId, search, pageable);
+                    break;
+                case "latest":
+                    productsPage = productRepository.findBySellerSellerIdAndSearchOrderByCreatedRegisterDesc(sellerId, search, pageable);
+                    break;
+                case "popular":
+                    productsPage = productRepository.findBySellerSellerIdAndSearchOrderByOverallSalesDesc(sellerId, search, pageable);
+                    break;
+                default:
+                    productsPage = productRepository.findBySellerSellerIdAndSearch(sellerId, search, pageable);
+            }
+        }
+
+        if (productsPage.isEmpty()) {
+            throw new ResourceNotFoundException("조회할 상품 목록을 찾을 수 없습니다.");
+        }
+
+        return SellerProductsResponseDTO.builder()
+                .products(productsPage.getContent())
+                .totalCount(productsPage.getTotalElements())
+                .build();
+    }
+
 
     // 점주 상품 추가
     @Transactional
@@ -208,7 +340,7 @@ public class ProductsServiceImpl implements ProductsService {
 
         inventoryRepository.saveAll(unsavedInventories);
     }
-    
+
     // 상품 저장(단일) -> TODO: 병합 시 이 친구를 살려야 합니다.   
 	@Override
 	public Product registerProduct(SellerProductsRequestDTO product, Long userId) {
@@ -241,7 +373,7 @@ public class ProductsServiceImpl implements ProductsService {
 		
 		
 	}
-    
+
     // 상품 수정
     @Override
     @Transactional
@@ -251,7 +383,7 @@ public class ProductsServiceImpl implements ProductsService {
 
 	    Long sellerId = seller.getSellerId();
 	    
-        Product oldProduct = productRepository.findBySellerIdAndProductId(sellerId, productId);
+       Product oldProduct = productRepository.findBySeller_SellerIdAndProductId(sellerId, productId);
         if (oldProduct == null) {
             throw new ResourceNotFoundException("상품ID:" + productId + " 로 등록된 상품을 찾을 수 없습니다.");
         }
@@ -355,4 +487,51 @@ public class ProductsServiceImpl implements ProductsService {
 //        productImageRepository.saveAll(productImages);
 //		
 //	}   
+    @Override
+    public List<Product> getPopularProductsDaily() {
+        return productRepository.findAllByOrderByDailySalesDesc();  // List<Product>로 반환
+    }
+
+    @Override
+    public List<Product> getPopularProductsWeekly() {
+        return productRepository.findAllByOrderByWeeklySalesDesc(); // List<Product>로 반환
+    }
+
+    @Override
+    public List<Product> getPopularProductsMonthly() {
+        return productRepository.findAllByOrderByMonthlySalesDesc(); // List<Product>로 반환
+    }
+
+    @Override
+    public List<Product> getAllPopularProducts() {
+        return productRepository.findAllByOrderByOverallSalesDesc(); // List<Product>로 반환
+    }
+
+    @Override
+    public List<CategoryDTO> getUsedCategoriesBySeller(Long sellerId) {
+        List<Long> usedCategoryIds = productRepository.findDistinctCategoryIdsBySellerId(sellerId);
+        List<Category> categories = categoryRepository.findAllById(usedCategoryIds);
+        
+        return categories.stream()
+            .map(category -> new CategoryDTO(category.getId(), category.getName()))
+            .collect(Collectors.toList());
+    }
+    @Override
+    public List<Product> getPopularProductsBySellerDaily(Long sellerId) {
+        return productRepository.findBySeller_SellerIdOrderByDailySalesDesc(sellerId);
+    }
+
+    @Override
+    public List<Product> getPopularProductsBySellerWeekly(Long sellerId) {
+    	return productRepository.findBySeller_SellerIdOrderByWeeklySalesDesc(sellerId);
+    }
+
+    @Override
+    public List<Product> getPopularProductsBySellerMonthly(Long sellerId) {
+    	return productRepository.findBySeller_SellerIdOrderByMonthlySalesDesc(sellerId);
+    }
+
+
+
+
 }
