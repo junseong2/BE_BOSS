@@ -237,7 +237,21 @@ public class ProductsServiceImpl implements ProductsService {
                 .build();
         
         
-		return productRepository.save(unsavedProduct);
+    
+        // 상품 정보 저장
+        Product savedProduct = productRepository.save(unsavedProduct);
+        
+        // 초기 재고 저장
+        inventoryRepository.save(        
+        		Inventory.builder()
+                .seller(seller)
+                .minStock(product.getMinStock())
+                .stock(product.getStock())
+                .product(savedProduct)
+                .build());
+
+        
+		return savedProduct ;
 		
 		
 	}
@@ -282,11 +296,13 @@ public class ProductsServiceImpl implements ProductsService {
 	    
         List<Long> productIds = productsIdsDTO.getIds();
         
+        log.info("ids:{}",productIds);
+        
         if (productIds == null || productIds.isEmpty()) {
             throw new IllegalArgumentException("삭제할 상품 ID 목록이 비어 있습니다.");
         }
         
-        productRepository.deleteAllByIdInBatchAndSeller(productIds, seller);
+        productRepository.deleteAllByIdInBatchAndSeller(productsIdsDTO.getIds(), seller);
     }
     
     

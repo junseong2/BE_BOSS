@@ -1,9 +1,7 @@
 package com.onshop.shop.settlement;
 
 public enum SettlementStatus {
-    PENDING,  // 요청중
-    
-    PAID,     // 완료
-    
-    FAILED    // 정산실패
+    PENDING, // 대기
+    COMPLETED, // 완료
+    REJECTED // 거절
 }

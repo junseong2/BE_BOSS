@@ -20,6 +20,7 @@ import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.onshop.shop.exception.NotAuthException;
 import com.onshop.shop.exception.SuccessMessageResponse;
+import com.onshop.shop.inventory.Inventory;
 import com.onshop.shop.security.JwtUtil;
 
 import jakarta.validation.Valid;
@@ -119,7 +120,7 @@ public class ProductsController {
 
 		Long userId = jwtUtil.extractUserId(token);
 		
-	       // JSON 문자열을 Product 객체로 변환
+	     // JSON 문자열을 Product 객체로 변환
         ObjectMapper objectMapper = new ObjectMapper();
         SellerProductsRequestDTO productDTO = objectMapper.readValue(productJSON, SellerProductsRequestDTO.class);
         
@@ -167,7 +168,6 @@ public class ProductsController {
 	// 상품 삭제(단일, 다중 모두 처리)
 	@DeleteMapping("/seller/products")
 	public ResponseEntity<?> removeProducts(
-//			@CookieValue(value = "jwt", required = false) String token,
 			@Valid @RequestBody SellerProductIdsDTO productIds,
 			@CookieValue(value = "jwt", required = false) String token) {
 		
@@ -177,7 +177,6 @@ public class ProductsController {
 
 		Long userId = jwtUtil.extractUserId(token);
 		
-		log.info("ids:{}", productIds);
 		productsService.removeProducts(productIds, userId);
 		
 		return ResponseEntity.noContent().build();

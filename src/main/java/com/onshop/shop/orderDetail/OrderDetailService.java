@@ -11,7 +11,7 @@ public interface OrderDetailService {
 	OrderDetailResponseDTO getDetailByOrderId(Long orderId);
 
 	// 주문번호 별 주문 상세 내역 조회
-	OrderDetailResponseDTO getOrderDetailByOrderId(Long orderId);	
+	SellerOrderDetailResponseDTO getOrderDetailByOrderId(Long orderId);	
 	
 	
 }

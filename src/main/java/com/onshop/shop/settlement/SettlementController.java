@@ -50,7 +50,6 @@ public class SettlementController {
 		
 		SettlementsDTO settlements= settlementService.requestSettlement(requestDTO, userId);
 		
-		
 		return ResponseEntity.ok(settlements);
 		
 	}

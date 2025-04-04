@@ -55,10 +55,11 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
 
     
     // 상품 삭제(다중) - DELETE 쿼리로 변경
-    @Modifying
+    @Modifying(clearAutomatically = true)
     @Transactional
-    @Query("DELETE FROM Product p WHERE p.id IN (:ids) AND p.seller = :seller")
-    int deleteAllByIdInBatchAndSeller(@Param("ids") List<Long> productIds, Seller seller);
+    @Query("DELETE FROM Product p WHERE p.id IN (:productIds) AND p.seller = :seller")
+    int deleteAllByIdInBatchAndSeller(@Param("productIds") List<Long> productIds, @Param("seller") Seller seller);
+
 
     // 판매자가 등록한 상품 존재 유무 확인
     @Query("SELECT COUNT(p) FROM Product p WHERE p.seller.id = :sellerId")

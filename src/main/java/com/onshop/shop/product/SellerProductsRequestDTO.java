@@ -32,7 +32,9 @@ public class SellerProductsRequestDTO {
 	@Max(value= 1000, message ="재고는 최대 1000이하이어야 합니다.")
 	private Long stock; // 재고
 	
-	
+	@Min(value = 0, message = "재고는 최소 0 이상이어야 합니다.")
+	@Max(value= 1000, message ="재고는 최대 1000이하이어야 합니다.")
+	private Long minStock; // 재고
 	
 	
 }
