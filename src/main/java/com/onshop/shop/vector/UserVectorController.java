@@ -6,6 +6,8 @@ import java.util.List;
 
 import org.springframework.web.bind.annotation.*;
 
+import com.onshop.shop.security.JwtUtil;
+
 
 @RestController
 @RequestMapping("/vector")
@@ -13,16 +15,20 @@ import org.springframework.web.bind.annotation.*;
 public class UserVectorController {
 
     private final UserVectorService userVectorService;
+    private final JwtUtil jwtUtil;
 
     /**
      * ✅ 테스트용 POST 요청
      * 예: POST /vector/recommend?userId=1&topK=20&neighborCount=3
      */
     @PostMapping("/update")
+    
     public String updateUserVector(
-            @RequestParam Long userId,
-            @RequestParam Long productId
+            @RequestParam Long productId,
+        	@CookieValue(value = "jwt", required = false) String token
     ) {
+    	
+    	Long userId = jwtUtil.extractUserId(token); 
         userVectorService.handleAddToCartAndUpdateUserVector(userId, productId);
         return "✅ 사용자 벡터 업데이트 완료: userId=" + userId + ", productId=" + productId;
     }
