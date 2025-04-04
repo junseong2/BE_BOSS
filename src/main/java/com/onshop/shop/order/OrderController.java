@@ -89,7 +89,6 @@ public class OrderController {
     }
     
     
-    
     /** 판매자*/
     // 판매자 주문 조회
     @GetMapping("/seller/orders")
@@ -125,6 +124,5 @@ public class OrderController {
         Long userId = jwtUtil.extractUserId(token);
     	return null;
     }
-    
-    
 }
+
