@@ -24,6 +24,10 @@ public interface CategoryRepository extends JpaRepository<Category, Long> {
     
     // 포함되는 카테고리를 한 번에 조회
     List<Category> findByNameIn(List<String> categoryNames);
+    
+    // 대중분류 카테고리 전체 조회
+    @Query("SELECT c FROM Category c WHERE SIZE(c.subCategories) > 0")
+    List<Category> findAllWithChildren();
 }
 
 

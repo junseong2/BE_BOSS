@@ -74,7 +74,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                 System.out.println("❌ JWT 검증 실패 - 유효하지 않은 토큰");
             }
         } catch (Exception e) {
-            System.out.println("❌ JWT 검증 중 오류 발생: " + e.getMessage());
+            System.out.println("JWT Exception 아이디: " + e.getMessage());
         }
 
         chain.doFilter(request, response);
