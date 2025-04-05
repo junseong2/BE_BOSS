@@ -4,26 +4,34 @@ import java.util.Map;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.CookieValue;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.onshop.shop.exception.NotAuthException;
+import com.onshop.shop.orderDetail.OrderDetailService;
+import com.onshop.shop.security.JwtUtil;
+
 import jakarta.transaction.Transactional;
+import lombok.RequiredArgsConstructor;
 
 @RestController
+@RequiredArgsConstructor
 @RequestMapping("/orders")
 @CrossOrigin(origins = "http://localhost:5173", allowCredentials = "true")
 public class OrderController {
 
     private final OrderService orderService;
+    private final OrderDetailService orderDetailService;
+    private final JwtUtil jwtUtil;
 
-    public OrderController(OrderService orderService) {
-        this.orderService = orderService;
-    }
 
     @PostMapping("/create")
     public ResponseEntity<?> createOrder(@RequestBody OrderDTO orderDTO) {
@@ -80,4 +88,42 @@ public class OrderController {
         }
     }
     
+    
+    /** 판매자*/
+    // 판매자 주문 조회
+    @GetMapping("/seller/orders")
+    public ResponseEntity<?> getSellerOrders(
+    		@RequestParam int page,
+    		@RequestParam int size,
+    		@RequestParam String search,
+    		@RequestParam String orderStatus,
+    		@RequestParam String paymentStatus,
+			@CookieValue(value = "jwt", required = false) String token) {
+    	
+        if (token == null) {
+            throw new NotAuthException("요청 권한이 없습니다.");
+        }
+
+        Long userId = jwtUtil.extractUserId(token);
+        
+    	SellerOrderResponseDTO orders = orderService.getOrders(page, size, search, orderStatus, paymentStatus, userId);
+    	
+    	return ResponseEntity.ok(orders);
+    } 
+    
+    // 판매자 주문 상태 변경
+    @PatchMapping("/seller/orders/{orderId}")
+    public ResponseEntity<?> updateSellerOrderStatus(
+    		@RequestParam Long orderId,
+			@CookieValue(value = "jwt", required = false) String token) {
+    	
+        if (token == null) {
+            throw new NotAuthException("요청 권한이 없습니다.");
+        }
+
+        Long userId = jwtUtil.extractUserId(token);
+    	return null;
+    }
 }
+
+

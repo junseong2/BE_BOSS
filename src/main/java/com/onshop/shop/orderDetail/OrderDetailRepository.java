@@ -39,31 +39,37 @@ public interface OrderDetailRepository extends JpaRepository<OrderDetail, Long> 
 	List<SellerOrderDTO> findOrderSummaryBySellerIdAndStatus(@Param("sellerId") Long sellerId,
 			@Param("search") String search, @Param("orderStatus") String orderStatus,
 			@Param("paymentStatus") String paymentStatus, Pageable pageable);
+	
+	
+	
+	// 판매자 주문 상세 조회
 
-//	 주문 상세 조회
-	@Query(value = """
-			SELECT 
-			    o.order_id AS orderId,
-			    o.created_date AS createdDate,
-			    SUM(od.quantity) AS quantity,
-			    p.total_amount - (p.total_amount * 0.1) + 3000 AS totalAmount,
-			    p.paid_date AS paidDate,
-			    p.payment_method AS paymentMethod,
-			    u.username AS username,
-			    CONCAT(u.phone1, '-', u.phone2, '-', u.phone3) AS phoneNumber,
-			    CONCAT('[', IFNULL(ad.post, ''), '] ', IFNULL(ad.address1, ''), ' ', IFNULL(ad.address2, '')) AS address,
-			    GROUP_CONCAT(pr.name) AS productNames,
-			    GROUP_CONCAT(pr.g_image) AS productImages
-			FROM order_detail od
-			JOIN orders o ON od.order_id = o.order_id
-			JOIN user u ON o.user_id = u.user_id
-			JOIN product pr ON od.product_id = pr.product_id
-			JOIN payment p ON p.order_id = o.order_id
-			LEFT JOIN address ad ON u.user_id = ad.user_id AND ad.is_default = 1
-			WHERE o.order_id = :orderId AND pr.seller_id = :sellerId
-			GROUP BY o.order_id
-		""", nativeQuery = true)
-		OrderDetailResponseDTO findOrderDetailsByOrderId(@Param("orderId") Long orderId, @Param("sellerId") Long sellerId);
+		@Query("""
+			    SELECT new com.onshop.shop.orderDetail.SellerOrderDetailResponseDTO(
+			        o.orderId, 
+			        o.createdDate, 
+			        COALESCE(SUM(od.quantity), 0),
+			        p.totalAmount - (p.totalAmount * 0.1) + 3000,
+			        p.paidDate, 
+			        p.paymentMethod, 
+			        u.username, 
+			        CONCAT(u.phone1, '-', u.phone2, '-', u.phone3), 
+			        CONCAT('[', COALESCE(ad.post, ''), ']', COALESCE(ad.address1, ''), ' ', COALESCE(ad.address2, '')),
+			        FUNCTION('GROUP_CONCAT', pr.name)
+			    )
+			    FROM OrderDetail od
+			    JOIN od.order o
+			    JOIN o.user u
+			    JOIN od.product pr
+			    JOIN Payment p ON p.order.orderId = o.orderId
+			    LEFT JOIN Address ad ON u.userId = ad.user.userId AND ad.isDefault = true
+			    WHERE o.orderId = :orderId AND pr.seller.sellerId = :sellerId
+			    GROUP BY o.orderId, o.createdDate, p.totalAmount, p.paidDate, p.paymentMethod, 
+			             u.username, u.phone1, u.phone2, u.phone3, ad.address1, ad.address2, 
+			             ad.post
+			    """)
+			SellerOrderDetailResponseDTO findOrderDetailsByOrderId(@Param("orderId") Long orderId, @Param("sellerId") Long sellerId);
+	
 
 
 //	@Query("""
@@ -100,6 +106,7 @@ public interface OrderDetailRepository extends JpaRepository<OrderDetail, Long> 
 //			    ad.address2
 //			""")
 //			OrderDetailResponseDTO findDetailByOrderId(@Param("orderId") Long orderId);
+		
 
 	@Query("""
 		    SELECT new com.onshop.shop.orderDetail.OrderDetailResponseDTO(

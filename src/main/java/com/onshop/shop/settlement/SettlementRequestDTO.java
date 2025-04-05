@@ -12,8 +12,8 @@ import lombok.NoArgsConstructor;
 public class SettlementRequestDTO {
 	
 	private Long amount;
-	private String bank;
-	private String name;
-	private Long account;
+	private String bank; // 은행이름
+	private String name; // 예금주
+	private String account; // 계좌번호
 
 }

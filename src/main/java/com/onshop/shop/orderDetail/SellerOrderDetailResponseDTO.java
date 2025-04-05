@@ -1,8 +1,6 @@
 package com.onshop.shop.orderDetail;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -16,7 +14,7 @@ import lombok.NoArgsConstructor;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class OrderDetailResponseDTO {
+public class SellerOrderDetailResponseDTO {
     private Long orderId; // 주문 번호
     private LocalDateTime createdDate; // 주문 일시
     private Object totalQuantity; // 주문 상품 총 개수
@@ -26,20 +24,6 @@ public class OrderDetailResponseDTO {
     private Object username; // 받는 사람
     private Object phoneNumber; // 연락처
     private Object address; // 배송 주소
-    private List<ProductItemDTO> products;
-    
-    public OrderDetailResponseDTO(Long orderId, LocalDateTime createdDate, Object totalQuantity, Object totalPayment,
-    	    Object paidDate, PaymentMethod paymentMethod, Object username, Object phoneNumber, Object address) {
-    	    this.orderId = orderId;
-    	    this.createdDate = createdDate;
-    	    this.totalQuantity = totalQuantity;
-    	    this.totalPayment = totalPayment;
-    	    this.paidDate = paidDate;
-    	    this.paymentMethod = paymentMethod;
-    	    this.username = username;
-    	    this.phoneNumber = phoneNumber;
-    	    this.address = address;
-    	    this.products = new ArrayList<ProductItemDTO>();
-    	}
+    private Object productName;
 
 }
