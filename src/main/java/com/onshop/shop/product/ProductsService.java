@@ -4,6 +4,10 @@ import java.util.List;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.web.multipart.MultipartFile;
+
+import com.onshop.shop.category.CategoryDTO;
+
 
 public interface ProductsService {
     List<ProductsDTO> getAllProducts();
@@ -20,5 +24,40 @@ public interface ProductsService {
     void getProductDetails(Long productId);
     
     Page<Product> getProductsBySeller(Long sellerId, Pageable pageable);
+    
+    
+    /* 판매자 */
+	SellerProductsResponseDTO getAllDashboardProducts(int page, int size, String search, Long userId); // 모든 상품 조회
+	void registerProducts(List<SellerProductsRequestDTO> products, Long userId); // 상품 추가(다중)
+    void removeProducts(SellerProductIdsDTO productsIds, Long userId); 	// 상품 삭제
+    void updateProducts(Long productId, SellerProductsRequestDTO product, Long userId); // 상품 정보 수정
+    Product registerProduct(SellerProductsRequestDTO product, Long userId); // 상품 추가(단일)
+	void registerProductImages(List<MultipartFile> images, Product product);
+
+
+    SellerProductsResponseDTO getAllProducts(int page, int size, String search, String sort);
+    SellerProductsResponseDTO getAllProducts(Long sellerId, int page, int size, String search, String sort);
+    SellerProductsResponseDTO getAllProducts(Long sellerId, int page, int size, String search, String sort, Long categoryId);
+
+
+    
+    public List<CategoryDTO> getUsedCategoriesBySeller(Long sellerId);
+
+    
+    // 일간 인기 상품 조회
+    public List<Product> getPopularProductsDaily();
+
+    // 주간 인기 상품 조회
+    public List<Product> getPopularProductsWeekly();
+    // 월간 인기 상품 조회
+    public List<Product> getPopularProductsMonthly();
+
+    // 전체 인기 상품 조회
+    public List<Product> getAllPopularProducts();
+    
+    List<Product> getPopularProductsBySellerDaily(Long sellerId);
+    List<Product> getPopularProductsBySellerWeekly(Long sellerId);
+    List<Product> getPopularProductsBySellerMonthly(Long sellerId);
+    List<SellerProductsListDTO> getAllSellerProducts(Long sellerId, int page, int size, String search, String sort, Long categoryId);
 
 }

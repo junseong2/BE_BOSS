@@ -4,9 +4,12 @@ target/
 !**/src/main/**/target/
 !**/src/test/**/target/
 
+<<<<<<< HEAD
 ### 환경 설정 파일 무시 ###
 src/main/resources/application.properties
 src/main/resources/*.properties
+=======
+>>>>>>> c38f5a64c84cf82ab6d099185d92825f77365556
 
 ### STS ###
 .apt_generated
@@ -16,6 +19,7 @@ src/main/resources/*.properties
 .settings
 .springBeans
 .sts4-cache
+.env
 
 ### IntelliJ IDEA ###
 .idea
