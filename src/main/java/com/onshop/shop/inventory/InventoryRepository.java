@@ -9,6 +9,8 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 
+import com.onshop.shop.product.Product;
+
 public interface InventoryRepository extends JpaRepository<Inventory, Long> {
 
 	// 판매자ID 별 재고 조회
@@ -54,6 +56,9 @@ public interface InventoryRepository extends JpaRepository<Inventory, Long> {
 	Long countBySellerIdAndSearch(@Param("sellerId") Long sellerId,
                                   @Param("name") String name,
                                   @Param("state") String state);
+	
+	// 상품별 재고 조회
+	Inventory findByProduct(Product product);
   
 
 }

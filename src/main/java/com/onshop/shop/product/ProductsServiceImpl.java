@@ -38,7 +38,7 @@ import lombok.extern.slf4j.Slf4j;
 public class ProductsServiceImpl implements ProductsService {
 
     private final ProductRepository productRepository;
-    private final CategoryRepository categoryRepository; // ✅ 추가
+    private final CategoryRepository categoryRepository; 
     private final InventoryRepository inventoryRepository;
     private final SellerRepository sellerRepository;
     
@@ -130,9 +130,10 @@ public class ProductsServiceImpl implements ProductsService {
     
     
     /** 판매자 쿼리 */
-    // 점주 상품 조회
+    
+    // 점주 대시보드 상품 조회
     @Override
-    public SellerProductsResponseDTO getAllProducts(int page, int size, String search, Long userId) {
+    public SellerProductsResponseDTO getAllDashboardProducts(int page, int size, String search, Long userId) {
     	
     	Seller seller = sellerRepository.findByUserId(userId).orElseThrow(()->
     		new NotAuthException("판매자만 이용 가능합니다.")
@@ -156,8 +157,62 @@ public class ProductsServiceImpl implements ProductsService {
 
     }
     
-    /** 판매자 쿼리 */
-    // 점주 상품 조회
+
+    // 점주 상품 추가
+    @Transactional
+    @Override
+    public void registerProducts(List<SellerProductsRequestDTO> productsDTO, Long userId) {
+     
+        Seller seller = sellerRepository.findByUserId(userId)
+                .orElseThrow(() -> new NotAuthException("판매자만 이용 가능합니다."));
+
+        
+        // 카테고리 목록 조회
+        List<String> categoryNames = productsDTO.stream()
+                                                .map(SellerProductsRequestDTO::getCategoryName)
+                                                .distinct()
+                                                .collect(Collectors.toList());
+
+        
+        // 카테고리 목록에 존재한다면, 카테고리 이름을 키로, 카테고리 객체를 값으로 한 맵 객체를 생성
+        Map<String, Category> categoryMap = categoryRepository.findByNameIn(categoryNames)
+                                                              .stream()
+                                                              .collect(Collectors.toMap(Category::getName, category -> category));
+        
+        // 생성한 카테고리 맵 객체에 저장된 카테고리 정보와 저장하고자 하는 상품의 카테고리가 매칭 되는 경우 Product 엔티티에 저장
+        List<Product> unsavedProducts = productsDTO.stream()
+            .map(productDTO -> {
+                Category category = categoryMap.get(productDTO.getCategoryName());
+                if (category == null) {
+                    throw new IllegalArgumentException("Category not found: " + productDTO.getCategoryName());
+                }
+
+                return Product.builder()
+                        .category(category)
+                        .seller(seller)
+                        .name(productDTO.getName())
+                        .description(productDTO.getDescription())
+                        .price(productDTO.getPrice())
+                        .build();
+            })
+            .collect(Collectors.toList());
+
+        
+        // 엔티티를 실제 데이터베이스로 저장
+        List<Product> savedProducts = productRepository.saveAll(unsavedProducts);
+
+        // 추가된 상품의 초기 재고를 설정
+        List<Inventory> unsavedInventories = savedProducts.stream().map(product ->
+            Inventory.builder()
+                    .product(product)
+                    .stock(0L)
+                    .minStock(0L)
+                    .build()
+        ).collect(Collectors.toList());
+
+        inventoryRepository.saveAll(unsavedInventories);
+    }
+    
     @Override
     public SellerProductsResponseDTO getAllProducts(int page, int size, String search, String sort) {
         Long sellerId = 999L; // TODO: 추후 로그인 정보에서 받아오도록 수정
@@ -284,63 +339,7 @@ public class ProductsServiceImpl implements ProductsService {
                 .totalCount(productsPage.getTotalElements())
                 .build();
     }
-
-
-    // 점주 상품 추가
-    @Transactional
-    @Override
-    public void registerProducts(List<SellerProductsRequestDTO> productsDTO, Long userId) {
-     
-        Seller seller = sellerRepository.findByUserId(userId)
-                .orElseThrow(() -> new NotAuthException("판매자만 이용 가능합니다."));
-
-        
-        // 카테고리 목록 조회
-        List<String> categoryNames = productsDTO.stream()
-                                                .map(SellerProductsRequestDTO::getCategoryName)
-                                                .distinct()
-                                                .collect(Collectors.toList());
-
-        
-        // 카테고리 목록에 존재한다면, 카테고리 이름을 키로, 카테고리 객체를 값으로 한 맵 객체를 생성
-        Map<String, Category> categoryMap = categoryRepository.findByNameIn(categoryNames)
-                                                              .stream()
-                                                              .collect(Collectors.toMap(Category::getName, category -> category));
-        
-        // 생성한 카테고리 맵 객체에 저장된 카테고리 정보와 저장하고자 하는 상품의 카테고리가 매칭 되는 경우 Product 엔티티에 저장
-        List<Product> unsavedProducts = productsDTO.stream()
-            .map(productDTO -> {
-                Category category = categoryMap.get(productDTO.getCategoryName());
-                if (category == null) {
-                    throw new IllegalArgumentException("Category not found: " + productDTO.getCategoryName());
-                }
-
-                return Product.builder()
-                        .category(category)
-                        .seller(seller)
-                        .name(productDTO.getName())
-                        .description(productDTO.getDescription())
-                        .price(productDTO.getPrice())
-                        .build();
-            })
-            .collect(Collectors.toList());
-
-        
-        // 엔티티를 실제 데이터베이스로 저장
-        List<Product> savedProducts = productRepository.saveAll(unsavedProducts);
-
-        // 추가된 상품의 초기 재고를 설정
-        List<Inventory> unsavedInventories = savedProducts.stream().map(product ->
-            Inventory.builder()
-                    .product(product)
-                    .stock(0L)
-                    .minStock(0L)
-                    .build()
-        ).collect(Collectors.toList());
-
-        inventoryRepository.saveAll(unsavedInventories);
-    }
-
+    
     // 상품 저장(단일) -> TODO: 병합 시 이 친구를 살려야 합니다.   
 	@Override
 	public Product registerProduct(SellerProductsRequestDTO product, Long userId) {
@@ -354,7 +353,7 @@ public class ProductsServiceImpl implements ProductsService {
 		
 		// 카테고리 없으면 예외 처리
         if (category == null) {
-            throw new IllegalArgumentException("Category not found: " + product.getCategoryName());
+            throw new ResourceNotFoundException("Category not found: " + product.getCategoryName());
         }
         
  
@@ -387,7 +386,7 @@ public class ProductsServiceImpl implements ProductsService {
 		
 		
 	}
-
+    
     // 상품 수정
     @Override
     @Transactional
@@ -415,6 +414,11 @@ public class ProductsServiceImpl implements ProductsService {
         oldProduct.setPrice(productDTO.getPrice());
         
         productRepository.save(oldProduct);
+        
+        // 재고 저장
+        Inventory inventory = inventoryRepository.findByProduct(oldProduct);
+        inventory.setStock(productDTO.getStock());
+        inventoryRepository.save(inventory);
     }
     
     // 상품 삭제
@@ -467,6 +471,7 @@ public class ProductsServiceImpl implements ProductsService {
     }
     
     
+    
     // 이미지 업로드(다중) --> TODO: 이 친구 병합 시 살립시다.
 //    @Override
 //	public void reigsterProductImages(List<MultipartFile> images, Product product) {
@@ -503,6 +508,7 @@ public class ProductsServiceImpl implements ProductsService {
 //        productImageRepository.saveAll(productImages);
 //		
 //	}   
+    
     @Override
     public List<Product> getPopularProductsDaily() {
         return productRepository.findAllByOrderByDailySalesDesc();  // List<Product>로 반환
@@ -546,8 +552,5 @@ public class ProductsServiceImpl implements ProductsService {
     public List<Product> getPopularProductsBySellerMonthly(Long sellerId) {
     	return productRepository.findBySeller_SellerIdOrderByMonthlySalesDesc(sellerId);
     }
-
-
-
 
 }

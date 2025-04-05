@@ -1,10 +1,7 @@
 package com.onshop.shop.product;
 
-import java.util.List;
-
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -15,29 +12,23 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-
-import com.onshop.shop.exception.NotAuthException;
-
 import com.onshop.shop.category.CategoryDTO;
-
+import com.onshop.shop.exception.NotAuthException;
 import com.onshop.shop.exception.SuccessMessageResponse;
-import com.onshop.shop.inventory.Inventory;
 import com.onshop.shop.security.JwtUtil;
 
 import jakarta.validation.Valid;
-
 
 import java.util.List;
 
 import org.springframework.web.bind.annotation.CookieValue;
 import org.springframework.web.bind.annotation.DeleteMapping;
-
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
-
 
 @RestController
 @RequestMapping("")
@@ -54,6 +45,7 @@ public class ProductsController {
     public List<ProductsDTO> getAllProducts() {
         return productsService.getAllProducts();
     }
+    
     @GetMapping("/seller/products/popular")
     public ResponseEntity<?> getSellerPopularProducts(
             @RequestParam Long sellerId,
@@ -126,13 +118,35 @@ public class ProductsController {
         List<CategoryDTO> usedCategories = productsService.getUsedCategoriesBySeller(sellerId);
         return ResponseEntity.ok(usedCategories);
     }
+    
     @GetMapping("/products/search")
     public List<ProductsDTO> searchProducts(@RequestParam String query) {
         return productsService.searchProducts(query);
     }
     
     
+    /** 판매자 */
+	// 판매자 대시보드 상품 조회
+    @GetMapping("/seller/dashboard/products")
+    public ResponseEntity<?> getAllDashboardProducts(
+        @RequestParam int page,
+        @RequestParam int size,
+        @RequestParam(required = false, defaultValue = "") String search,
+		@CookieValue(value = "jwt", required = false) String token) {
 
+        if (token == null) {
+            throw new NotAuthException("요청 권한이 없습니다.");
+        }
+
+        Long userId = jwtUtil.extractUserId(token);
+        
+        SellerProductsResponseDTO products = productsService.getAllDashboardProducts(
+            page, size, search, userId );
+
+        return ResponseEntity.ok(products);
+    }
+
+	// 모든 상품 조회
     @GetMapping("/seller/products")
     public ResponseEntity<?> getAllProducts(
         @RequestParam Long sellerId,
@@ -151,7 +165,6 @@ public class ProductsController {
 
         return ResponseEntity.ok(products);
     }
-
 
 	
 	// 상품 추가(다중)
@@ -176,7 +189,6 @@ public class ProductsController {
 	// 상품 추가(
 	@PostMapping("/seller/products")
 	public ResponseEntity<?> registerProduct(
-//			@CookieValue(value = "jwt", required = false) String token,
 			@Valid @RequestParam("product") String productJSON,
 			@RequestParam("images") List<MultipartFile> images,
 			@CookieValue(value = "jwt", required = false) String token) 
@@ -205,7 +217,6 @@ public class ProductsController {
 	// 상품 수정
 	@PatchMapping("/seller/products/{productId}")
 	public ResponseEntity<?> updateProduct(
-//			@CookieValue(value = "jwt", required = false) String token,
 			@PathVariable Long productId,
 			@Valid @RequestBody SellerProductsRequestDTO productDTO,
 			@CookieValue(value = "jwt", required = false) String token) {
@@ -252,6 +263,5 @@ public class ProductsController {
 		return ResponseEntity.noContent().build();
 		
 	}
-	
 	
 }

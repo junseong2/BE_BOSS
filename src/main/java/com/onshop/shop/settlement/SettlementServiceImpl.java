@@ -1,6 +1,7 @@
 package com.onshop.shop.settlement;
 
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -88,5 +89,34 @@ public class SettlementServiceImpl implements SettlementService {
 				.totalCount(totalCount)
 				.build();
 	}
+
+	// 관리자 정산 조회
+	@Override
+	public List<Settlement> getAdminSettlementsByStatus(String status) {
+	    SettlementStatus settlementStatus = SettlementStatus.valueOf(status.toUpperCase());
+	    return settlementRepository.findByStatus(settlementStatus);
+	}
+	
+	// 관리자 정산 업데이트 
+	@Override
+	public void updateSettlementStatus(Long settlementId, SettlementStatus newStatus) {
+	    Settlement settlement = settlementRepository.findById(settlementId)
+	            .orElseThrow(() -> new RuntimeException("정산 내역을 찾을 수 없습니다."));
+
+	    settlement.setStatus(newStatus);
+	    settlementRepository.save(settlement);
+	}
+	
+	// 관리자 정산 인원 기록
+	@Override
+	public SettlementStatsDTO getSettlementStats() {
+	    long total = settlementRepository.count();
+	    long pending = settlementRepository.countByStatus(SettlementStatus.PENDING);
+	    long completed = settlementRepository.countByStatus(SettlementStatus.COMPLETED);
+	    long rejected = settlementRepository.countByStatus(SettlementStatus.REJECTED);
+
+	    return new SettlementStatsDTO(total, pending, completed, rejected);
+	}
+
 
 }
