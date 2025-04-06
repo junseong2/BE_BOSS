@@ -4,44 +4,30 @@ import java.util.Map;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.CookieValue;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.onshop.shop.exception.NotAuthException;
-import com.onshop.shop.orderDetail.OrderDetailService;
-import com.onshop.shop.security.JwtUtil;
-
 import jakarta.transaction.Transactional;
-import lombok.RequiredArgsConstructor;
 
 @RestController
-@RequiredArgsConstructor
-
+@RequestMapping("/orders")
 @CrossOrigin(origins = "http://localhost:5173", allowCredentials = "true")
 public class OrderController {
 
     private final OrderService orderService;
-    private final OrderDetailService orderDetailService;
-    private final JwtUtil jwtUtil;
 
-    
-    
-    
-    @PostMapping("/orders/create")
-    public ResponseEntity<?> createOrder(
-    		@RequestBody OrderDTO orderDTO, 
-    		@CookieValue(value = "jwt", required = false) String token) {
-     
-    	Long userId = jwtUtil.extractUserId(token); // ✅ JWT에서 userId 추출
+    public OrderController(OrderService orderService) {
+        this.orderService = orderService;
+    }
 
-    	try {
+    @PostMapping("/create")
+    public ResponseEntity<?> createOrder(@RequestBody OrderDTO orderDTO) {
+        try {
             System.out.println("📩 [DEBUG] 주문 생성 요청: " + orderDTO);
             System.out.println("🔹 userId: " + orderDTO.getUserId());
             System.out.println("🔹 totalPrice: " + orderDTO.getTotalPrice());
@@ -51,8 +37,6 @@ public class OrderController {
             }
 
             Order order = orderService.createOrder(orderDTO);
-            orderDetailService.createOrderDetail(userId, orderDTO, order);
-            
 
             System.out.println("✅ 주문 생성 완료! Order ID: " + order.getOrderId());
 
@@ -65,13 +49,15 @@ public class OrderController {
     }
 
     // ✅ 주문 조회 API
-    @GetMapping("/orders/{orderId}")
-    public ResponseEntity<Order> getOrderById(@PathVariable Long orderId ) {
+    @GetMapping("/{orderId}")
+    public ResponseEntity<Order> getOrderById(@PathVariable Long orderId) {
         Order order = orderService.getOrderById(orderId);
         return ResponseEntity.ok(order);
     }
     
-    @GetMapping("/orders/{userId}")
+
+    
+    @GetMapping("/user/{userId}")
     @Transactional
     public ResponseEntity<?> getOrdersByUserId(@PathVariable Long userId) {
         try {
@@ -92,43 +78,6 @@ public class OrderController {
             e.printStackTrace();
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("주문 조회 실패: " + e.getMessage());
         }
-    }
-    
-    
-    /** 판매자*/
-    // 판매자 주문 조회
-    @GetMapping("/seller/orders")
-    public ResponseEntity<?> getSellerOrders(
-    		@RequestParam int page,
-    		@RequestParam int size,
-    		@RequestParam String search,
-    		@RequestParam String orderStatus,
-    		@RequestParam String paymentStatus,
-			@CookieValue(value = "jwt", required = false) String token) {
-    	
-        if (token == null) {
-            throw new NotAuthException("요청 권한이 없습니다.");
-        }
-
-        Long userId = jwtUtil.extractUserId(token);
-        
-    	SellerOrderResponseDTO orders = orderService.getOrders(page, size, search, orderStatus, paymentStatus, userId);
-    	
-    	return ResponseEntity.ok(orders);
-    } 
-    
-    // 판매자 주문 상태 변경
-    @PatchMapping("/seller/orders/{orderId}")
-    public ResponseEntity<?> updateSellerOrderStatus(
-    		@RequestParam Long orderId,
-			@CookieValue(value = "jwt", required = false) String token) {
-    	
-        if (token == null) {
-            throw new NotAuthException("요청 권한이 없습니다.");
-        }
-
-        Long userId = jwtUtil.extractUserId(token);
-    	return null;
     }
     
 }

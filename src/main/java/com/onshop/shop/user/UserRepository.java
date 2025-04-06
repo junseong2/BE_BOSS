@@ -22,7 +22,7 @@ public interface UserRepository extends JpaRepository<User, Long> {
 
    
 
-    Optional<User> findByEmailAndPassword(String email, String password);//미래에 아이디비번찾기용도
+    Optional<User> findByEmail(String email);//미래에 아이디비번찾기용도
     
     boolean existsByEmail(String email); // 해당 이메일을 가진 유저가 존재하는지 체크
 

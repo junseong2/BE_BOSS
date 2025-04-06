@@ -1,4 +1,4 @@
-package com.onshop.shop.seller;
+	package com.onshop.shop.seller;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -476,4 +476,10 @@ public class SellerController {
 	    sellerService.rejectSeller(sellerId);
 	    return ResponseEntity.ok("거절 처리 완료");
 	}
+	
+    @GetMapping("/seller-stats")
+    public ResponseEntity<SellerStatsDTO> getSellerStats() {
+        SellerStatsDTO stats = sellerService.getSellerStats();
+        return ResponseEntity.ok(stats); // 통계 데이터를 반환
+    }
 }
