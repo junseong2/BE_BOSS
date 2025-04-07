@@ -54,17 +54,7 @@ public class Seller {
 	@Column(name = "mobilesettings", columnDefinition = "LONGTEXT")
 	private String mobilesettings; // 판매자 설정 (JSON 형식으로 저장)
 
-	@Column(name = "header_id", nullable = true)
-	private Integer headerId; // 상단바 ID (디자인 변경 가능)
 
-	@Column(name = "menu_bar_id", nullable = true)
-	private Integer menuBarId; // 메뉴바 ID (메뉴 스타일 변경 가능)
-
-	@Column(name = "navigation_id", nullable = true)
-	private Integer navigationId; // 네비게이션 ID (페이지 이동 방식)
-
-	@Column(name = "seller_menubar_color", length = 7, nullable = true)
-	private String sellerMenubarColor; // 메뉴바 색상 (예: "#808080")
 
 	@Column(name = "representative_name", nullable = true)
 	private String representativeName;
@@ -95,10 +85,7 @@ public class Seller {
 		this.userId = userId;
 		this.storename = storename;
 		this.description = description;
-		this.headerId = headerId;
-		this.menuBarId = menuBarId;
-		this.navigationId = navigationId;
-		this.sellerMenubarColor = sellerMenubarColor;
+
 		this.createdAt = createdAt;
 		this.registrationStatus = registrationStatus;
 		this.applicationDate = applicationDate;

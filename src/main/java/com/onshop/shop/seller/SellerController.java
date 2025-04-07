@@ -1,10 +1,10 @@
-package com.onshop.shop.seller;
-
+	package com.onshop.shop.seller;
 
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -44,13 +44,13 @@ public class SellerController {
 
 	private static final Logger logger = LoggerFactory.getLogger(SellerController.class);
 
-    @Autowired
-    private SellerService sellerService;
-    private JwtUtil jwtUtil; // ✅ JWT 유틸리티 추가
-    // ✅ Seller 정보 가져오기 (JWT 인증 기반, storename으로 검색)
-  
+	@Autowired
+	private SellerService sellerService;
 
+	@Autowired
+	private JwtUtil jwtUtil; // ✅ JWT 유틸리티 추가
 
+	// ✅ Seller 정보 가져오기 (JWT 인증 기반, storename으로 검색)
 	@GetMapping("/info/{storename}")
 	public ResponseEntity<Map<String, Object>> getSellerInfoByStoreName(@PathVariable String storename,
 			@CookieValue(value = "jwt", required = false) String token) {
@@ -63,9 +63,7 @@ public class SellerController {
 			// 🔥 ✅ `userId` 검증 제거 (누구나 판매자 정보 조회 가능)
 			Map<String, Object> response = Map.of(
 
-					"storename", seller.getStorename(), "sellerId", seller.getSellerId(), "headerId",
-					seller.getHeaderId(), "menuBarId", seller.getMenuBarId(), "navigationId", seller.getNavigationId(),
-					"seller_menubar_color", seller.getSellerMenubarColor());
+					"storename", seller.getStorename(), "sellerId", seller.getSellerId());
 
 			System.out.println("Response Data: " + response); // 응답 데이터 로그
 
@@ -247,22 +245,47 @@ public class SellerController {
 	}
 
 	private final ObjectMapper objectMapper = new ObjectMapper(); // ✅ 인스턴스 추가
-
 	@GetMapping("/page-data")
 	public ResponseEntity<?> getSellerPageData(@RequestParam("seller_id") Long sellerId) {
-		return sellerService.getSellerById(sellerId).map(seller -> {
-			try {
+	    return sellerService.getSellerById(sellerId).map(seller -> {
+	        try {
+	            // settings가 null이거나 빈 문자열이면 빈 리스트로 처리
+	            List<Object> settings = Optional.ofNullable(seller.getSettings())
+	                .filter(s -> !s.isBlank())
+	                .map(s -> {
+	                    try {
+	                        return objectMapper.readValue(s, List.class);
+	                    } catch (Exception e) {
+	                        return new ArrayList<>();
+	                    }
+	                })
+	                .orElse(new ArrayList<>());
 
-				List<Object> settings = objectMapper.readValue(seller.getSettings(), List.class);
-				List<Object> mobilesettings = objectMapper.readValue(seller.getMobilesettings(), List.class);
+	            // mobilesettings도 마찬가지로 처리
+	            List<Object> mobilesettings = Optional.ofNullable(seller.getMobilesettings())
+	                .filter(s -> !s.isBlank())
+	                .map(s -> {
+	                    try {
+	                        return objectMapper.readValue(s, List.class);
+	                    } catch (Exception e) {
+	                        return new ArrayList<>();
+	                    }
+	                })
+	                .orElse(new ArrayList<>());
 
-				Map<String, Object> response = Map.of("storename", seller.getStorename(), "description",
-						seller.getDescription(), "settings", settings, "mobilesettings", mobilesettings);
-				return ResponseEntity.ok(response);
-			} catch (Exception e) {
-				return ResponseEntity.badRequest().body("JSON 파싱 오류");
-			}
-		}).orElse(ResponseEntity.badRequest().body("판매자 데이터를 찾을 수 없습니다."));
+	            Map<String, Object> response = Map.of(
+	                "storename", seller.getStorename(),
+	                "description", seller.getDescription(),
+	                "settings", settings,
+	                "mobilesettings", mobilesettings
+	            );
+
+	            return ResponseEntity.ok(response);
+	        } catch (Exception e) {
+	            e.printStackTrace();
+	            return ResponseEntity.badRequest().body("JSON 파싱 오류");
+	        }
+	    }).orElse(ResponseEntity.badRequest().body("판매자 데이터를 찾을 수 없습니다."));
 	}
 
 	private final String uploadDir = "C:/uploads/";
@@ -312,9 +335,6 @@ public class SellerController {
 				Map<String, Object> response = new HashMap<>();
 				response.put("sellerId", seller.getSellerId());
 				response.put("storename", seller.getStorename());
-				response.put("headerId", seller.getHeaderId() != null ? seller.getHeaderId() : "N/A");
-				response.put("menuBarId", seller.getMenuBarId() != null ? seller.getMenuBarId() : "N/A");
-				response.put("navigationId", seller.getNavigationId() != null ? seller.getNavigationId() : "N/A");
 				// ✅ settings 값 추가 (JSON 문자열이면 그대로 반환)
 				String settings = seller.getSettings();
 				if (settings == null || settings.trim().isEmpty()) {
@@ -359,9 +379,6 @@ public class SellerController {
 				Map<String, Object> response = new HashMap<>();
 				response.put("sellerId", seller.getSellerId());
 				response.put("storename", seller.getStorename());
-				response.put("headerId", seller.getHeaderId() != null ? seller.getHeaderId() : "N/A");
-				response.put("menuBarId", seller.getMenuBarId() != null ? seller.getMenuBarId() : "N/A");
-				response.put("navigationId", seller.getNavigationId() != null ? seller.getNavigationId() : "N/A");
 				// ✅ settings 값 추가 (JSON 문자열이면 그대로 반환)
 				String settings = seller.getSettings();
 
@@ -473,4 +490,10 @@ public class SellerController {
 	    sellerService.rejectSeller(sellerId);
 	    return ResponseEntity.ok("거절 처리 완료");
 	}
+	
+    @GetMapping("/seller-stats")
+    public ResponseEntity<SellerStatsDTO> getSellerStats() {
+        SellerStatsDTO stats = sellerService.getSellerStats();
+        return ResponseEntity.ok(stats); // 통계 데이터를 반환
+    }
 }

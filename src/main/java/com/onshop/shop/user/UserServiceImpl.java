@@ -85,6 +85,7 @@ public class UserServiceImpl implements UserService {
                     addressEntity.setIsDefault(address.getIsDefault());
                     return addressEntity;
                 }).collect(Collectors.toList());
+            addressRepository.saveAll(addressEntities);
 
         }
     }

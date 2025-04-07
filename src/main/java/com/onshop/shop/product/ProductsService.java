@@ -24,15 +24,14 @@ public interface ProductsService {
     void getProductDetails(Long productId);
     
     Page<Product> getProductsBySeller(Long sellerId, Pageable pageable);
-
+    
+    
     /* 판매자 */
-
-	SellerProductsResponseDTO getAllProducts(int page, int size, String search, Long userId); // 모든 상품 조회
+	SellerProductsResponseDTO getAllDashboardProducts(int page, int size, String search, Long userId); // 모든 상품 조회
 	void registerProducts(List<SellerProductsRequestDTO> products, Long userId); // 상품 추가(다중)
     void removeProducts(SellerProductIdsDTO productsIds, Long userId); 	// 상품 삭제
     void updateProducts(Long productId, SellerProductsRequestDTO product, Long userId); // 상품 정보 수정
     Product registerProduct(SellerProductsRequestDTO product, Long userId); // 상품 추가(단일)
-
 	void registerProductImages(List<MultipartFile> images, Product product);
 
 
@@ -55,8 +54,10 @@ public interface ProductsService {
 
     // 전체 인기 상품 조회
     public List<Product> getAllPopularProducts();
-    List<SellerProductsDTO> getPopularProductsBySeller(Long sellerId, String sortBy);
-
     
+    List<Product> getPopularProductsBySellerDaily(Long sellerId);
+    List<Product> getPopularProductsBySellerWeekly(Long sellerId);
+    List<Product> getPopularProductsBySellerMonthly(Long sellerId);
+    List<SellerProductsListDTO> getAllSellerProducts(Long sellerId, int page, int size, String search, String sort, Long categoryId);
 
 }

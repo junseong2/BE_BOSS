@@ -36,10 +36,9 @@ import lombok.extern.slf4j.Slf4j;
 @RequiredArgsConstructor
 @Slf4j
 public class ProductsServiceImpl implements ProductsService {
-	// 필드 추가
 
     private final ProductRepository productRepository;
-    private final CategoryRepository categoryRepository; // ✅ 추가
+    private final CategoryRepository categoryRepository; 
     private final InventoryRepository inventoryRepository;
     private final SellerRepository sellerRepository;
     
@@ -66,8 +65,6 @@ public class ProductsServiceImpl implements ProductsService {
         
         return ProductsDTO.fromEntity(productRepository.save(product));
     }
-    
-    
 
     @Override
     public Page<Product> getAllProductsPage(Long sellerId, int page, int size) {
@@ -133,16 +130,15 @@ public class ProductsServiceImpl implements ProductsService {
     
     
     /** 판매자 쿼리 */
-    // 점주 상품 조회
+    
+    // 점주 대시보드 상품 조회
     @Override
-
-    public SellerProductsResponseDTO getAllProducts(int page, int size, String search, Long userId) {
+    public SellerProductsResponseDTO getAllDashboardProducts(int page, int size, String search, Long userId) {
     	
     	Seller seller = sellerRepository.findByUserId(userId).orElseThrow(()->
     		new NotAuthException("판매자만 이용 가능합니다.")
     	);
         Long sellerId = seller.getSellerId();
-
         Pageable pageable = PageRequest.of(page, size);
         
         List<SellerProductsDTO> products = productRepository.findBySellerSellerIdAndSearch(sellerId, search, pageable).toList();
@@ -160,17 +156,70 @@ public class ProductsServiceImpl implements ProductsService {
         		.build();
 
     }
+    
 
+    // 점주 상품 추가
+    @Transactional
+    @Override
+    public void registerProducts(List<SellerProductsRequestDTO> productsDTO, Long userId) {
+     
+        Seller seller = sellerRepository.findByUserId(userId)
+                .orElseThrow(() -> new NotAuthException("판매자만 이용 가능합니다."));
 
-    /** 판매자 쿼리 */
-    // 점주 상품 조회
+        
+        // 카테고리 목록 조회
+        List<String> categoryNames = productsDTO.stream()
+                                                .map(SellerProductsRequestDTO::getCategoryName)
+                                                .distinct()
+                                                .collect(Collectors.toList());
+
+        
+        // 카테고리 목록에 존재한다면, 카테고리 이름을 키로, 카테고리 객체를 값으로 한 맵 객체를 생성
+        Map<String, Category> categoryMap = categoryRepository.findByNameIn(categoryNames)
+                                                              .stream()
+                                                              .collect(Collectors.toMap(Category::getName, category -> category));
+        
+        // 생성한 카테고리 맵 객체에 저장된 카테고리 정보와 저장하고자 하는 상품의 카테고리가 매칭 되는 경우 Product 엔티티에 저장
+        List<Product> unsavedProducts = productsDTO.stream()
+            .map(productDTO -> {
+                Category category = categoryMap.get(productDTO.getCategoryName());
+                if (category == null) {
+                    throw new IllegalArgumentException("Category not found: " + productDTO.getCategoryName());
+                }
+
+                return Product.builder()
+                        .category(category)
+                        .seller(seller)
+                        .name(productDTO.getName())
+                        .description(productDTO.getDescription())
+                        .price(productDTO.getPrice())
+                        .build();
+            })
+            .collect(Collectors.toList());
+
+        
+        // 엔티티를 실제 데이터베이스로 저장
+        List<Product> savedProducts = productRepository.saveAll(unsavedProducts);
+
+        // 추가된 상품의 초기 재고를 설정
+        List<Inventory> unsavedInventories = savedProducts.stream().map(product ->
+            Inventory.builder()
+                    .product(product)
+                    .stock(0L)
+                    .minStock(0L)
+                    .build()
+        ).collect(Collectors.toList());
+
+        inventoryRepository.saveAll(unsavedInventories);
+    }
+    
     @Override
     public SellerProductsResponseDTO getAllProducts(int page, int size, String search, String sort) {
         Long sellerId = 999L; // TODO: 추후 로그인 정보에서 받아오도록 수정
 
         Pageable pageable;
 
-        switch (sort.toLowerCase()) {
+        switch ((sort != null ? sort.toLowerCase() : "recommend")) {
         case "low":
             pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.ASC, "price"));
             break;
@@ -178,16 +227,18 @@ public class ProductsServiceImpl implements ProductsService {
             pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "price"));
             break;
         case "latest":
-            pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "createdRegister")); // ✅ 필드명 주의!
+            pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "createdRegister"));
             break;
         case "popular":
-            pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "overallSales")); // 또는 weeklySales
+            pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "overallSales"));
             break;
         case "recommend":
         default:
-            pageable = PageRequest.of(page, size); // 특별한 정렬 없음
+            pageable = PageRequest.of(page, size);
             break;
     }
+
+  
         List<SellerProductsDTO> products = productRepository.findBySellerSellerIdAndSearch(sellerId, search, pageable).toList();
         Long productCount = productRepository.countBySellerSellerIdAndName(sellerId, search);
 
@@ -235,6 +286,58 @@ public class ProductsServiceImpl implements ProductsService {
                 .totalCount(productsPage.getTotalElements())
                 .build();
     }
+    @Override
+    public List<SellerProductsListDTO> getAllSellerProducts(Long sellerId, int page, int size, String search, String sort, Long categoryId) {
+        Pageable pageable = PageRequest.of(page, size);
+        Page<SellerProductsListDTO> productsPage;
+
+        // 카테고리 ID가 있을 경우 쿼리 분기 처리
+        if (categoryId != null) {
+            switch (sort.toLowerCase()) {
+                case "low":
+                    productsPage = productRepository.findSellerProductsByCategoryAndPriceAsc(sellerId, categoryId, search, pageable);
+                    break;
+                case "high":
+                    productsPage = productRepository.findSellerProductsByCategoryAndPriceDesc(sellerId, categoryId, search, pageable);
+                    break;
+                case "latest":
+                    productsPage = productRepository.findSellerProductsByCategoryAndCreatedDateDesc(sellerId, categoryId, search, pageable);
+                    break;
+                case "popular":
+                    productsPage = productRepository.findSellerProductsByCategoryAndSalesDesc(sellerId, categoryId, search, pageable);
+                    break;
+                default:
+                    productsPage = productRepository.findSellerProductsByCategory(sellerId, categoryId, search, pageable);
+            }
+        } else {
+            switch (sort.toLowerCase()) {
+                case "low":
+                    productsPage = productRepository.findSellerProductsByPriceAsc(sellerId, search, pageable);
+                    break;
+                case "high":
+                    productsPage = productRepository.findSellerProductsByPriceDesc(sellerId, search, pageable);
+                    break;
+                case "latest":
+                    productsPage = productRepository.findSellerProductsByCreatedDateDesc(sellerId, search, pageable);
+                    break;
+                case "popular":
+                    productsPage = productRepository.findSellerProductsBySalesDesc(sellerId, search, pageable);
+                    break;
+                default:
+                    productsPage = productRepository.findSellerProductsBySearch(sellerId, search, pageable);
+            }
+        }
+
+        // 상품이 없을 경우 예외 처리
+        if (productsPage.isEmpty()) {
+            throw new ResourceNotFoundException("조회할 상품 목록을 찾을 수 없습니다.");
+        }
+
+        return productsPage.getContent(); // SellerProductsListDTO 반환
+    }
+
+
+    
     @Override
     public SellerProductsResponseDTO getAllProducts(Long sellerId, int page, int size, String search, String sort, Long categoryId) {
         Pageable pageable = PageRequest.of(page, size);
@@ -288,80 +391,21 @@ public class ProductsServiceImpl implements ProductsService {
                 .totalCount(productsPage.getTotalElements())
                 .build();
     }
-
-
-    // 점주 상품 추가
-    @Transactional
-    @Override
-
-    public void registerProducts(List<SellerProductsRequestDTO> productsDTO, Long userId) {
-     
-        Seller seller = sellerRepository.findByUserId(userId)
-                .orElseThrow(() -> new NotAuthException("판매자만 이용 가능합니다."));
-
-
-        
-        // 카테고리 목록 조회
-        List<String> categoryNames = productsDTO.stream()
-                                                .map(SellerProductsRequestDTO::getCategoryName)
-                                                .distinct()
-                                                .collect(Collectors.toList());
-
-        
-        // 카테고리 목록에 존재한다면, 카테고리 이름을 키로, 카테고리 객체를 값으로 한 맵 객체를 생성
-        Map<String, Category> categoryMap = categoryRepository.findByNameIn(categoryNames)
-                                                              .stream()
-                                                              .collect(Collectors.toMap(Category::getName, category -> category));
-        
-        // 생성한 카테고리 맵 객체에 저장된 카테고리 정보와 저장하고자 하는 상품의 카테고리가 매칭 되는 경우 Product 엔티티에 저장
-        List<Product> unsavedProducts = productsDTO.stream()
-            .map(productDTO -> {
-                Category category = categoryMap.get(productDTO.getCategoryName());
-                if (category == null) {
-                    throw new IllegalArgumentException("Category not found: " + productDTO.getCategoryName());
-                }
-
-                return Product.builder()
-                        .category(category)
-                        .seller(seller)
-                        .name(productDTO.getName())
-                        .description(productDTO.getDescription())
-                        .price(productDTO.getPrice())
-                        .build();
-            })
-            .collect(Collectors.toList());
-
-        
-        // 엔티티를 실제 데이터베이스로 저장
-        List<Product> savedProducts = productRepository.saveAll(unsavedProducts);
-
-        // 추가된 상품의 초기 재고를 설정
-        List<Inventory> unsavedInventories = savedProducts.stream().map(product ->
-            Inventory.builder()
-                    .product(product)
-                    .stock(0L)
-                    .minStock(0L)
-                    .build()
-        ).collect(Collectors.toList());
-
-        inventoryRepository.saveAll(unsavedInventories);
-    }
     
     // 상품 저장(단일) -> TODO: 병합 시 이 친구를 살려야 합니다.   
 	@Override
 	public Product registerProduct(SellerProductsRequestDTO product, Long userId) {
 		
-
 	    Seller seller = sellerRepository.findByUserId(userId)
 	                .orElseThrow(() -> new NotAuthException("판매자만 이용 가능합니다."));
 
-
+		
 		String categoryName = product.getCategoryName();
 		Category category = categoryRepository.findByCategoryName(categoryName);
 		
 		// 카테고리 없으면 예외 처리
         if (category == null) {
-            throw new IllegalArgumentException("Category not found: " + product.getCategoryName());
+            throw new ResourceNotFoundException("Category not found: " + product.getCategoryName());
         }
         
  
@@ -376,60 +420,80 @@ public class ProductsServiceImpl implements ProductsService {
                 .build();
         
         
-		return productRepository.save(unsavedProduct);
-		
-		
-	}
-	@Override
-	@Transactional
-	public void updateProducts(Long productId, SellerProductsRequestDTO productDTO, Long userId) {
-	    Seller seller = sellerRepository.findByUserId(userId)
-	            .orElseThrow(() -> new NotAuthException("판매자만 이용 가능합니다."));
-	    Long sellerId = seller.getSellerId();
-
-	    Product oldProduct = productRepository.findBySellerIdAndProductId(sellerId, productId);
-	    if (oldProduct == null) {
-	        throw new ResourceNotFoundException("상품ID:" + productId + " 로 등록된 상품을 찾을 수 없습니다.");
-	    }
-
-	    Category category = categoryRepository.findByCategoryName(productDTO.getCategoryName());
-	    if (category == null) {
-	        throw new ResourceNotFoundException(productDTO.getCategoryName() + "로 등록된 카테고리를 찾을 수 없습니다.");
-	    }
-
-	    oldProduct.setName(productDTO.getName());
-	    oldProduct.setCategory(category);
-	    oldProduct.setDescription(productDTO.getDescription());
-	    oldProduct.setPrice(productDTO.getPrice());
-
-	    productRepository.save(oldProduct);
-	}
-
     
+        // 상품 정보 저장
+        Product savedProduct = productRepository.save(unsavedProduct);
+        
+        // 초기 재고 저장
+        inventoryRepository.save(        
+        		Inventory.builder()
+                .seller(seller)
+                .minStock(product.getMinStock())
+                .stock(product.getStock())
+                .product(savedProduct)
+                .build());
+
+        
+		return savedProduct ;
+		
+		
+	}
+    
+    // 상품 수정
     @Override
-    public List<SellerProductsDTO> getPopularProductsBySeller(Long sellerId, String sortBy) {
-        return switch (sortBy.toLowerCase()) {
-            case "daily" -> productRepository.findPopularDailyBySellerId(sellerId);
-            case "weekly" -> productRepository.findPopularWeeklyBySellerId(sellerId);
-            case "monthly" -> productRepository.findPopularMonthlyBySellerId(sellerId);
-            default -> productRepository.findPopularOverallBySellerId(sellerId);
-        };
+    @Transactional
+    public void updateProducts(Long productId, SellerProductsRequestDTO productDTO, Long userId) {
+	    Seller seller = sellerRepository.findByUserId(userId)
+                .orElseThrow(() -> new NotAuthException("판매자만 이용 가능합니다."));
+
+	    Long sellerId = seller.getSellerId();
+	    
+       Product oldProduct = productRepository.findBySeller_SellerIdAndProductId(sellerId, productId);
+        if (oldProduct == null) {
+            throw new ResourceNotFoundException("상품ID:" + productId + " 로 등록된 상품을 찾을 수 없습니다.");
+        }
+        
+        Category category = categoryRepository.findByCategoryName(productDTO.getCategoryName());
+        		
+  		if(category == null) {
+   			throw new ResourceNotFoundException(productDTO.getCategoryName() + "로 등록된 카테고리를 찾을 수 없습니다.");	
+   		}
+                
+        
+        oldProduct.setName(productDTO.getName());
+        oldProduct.setCategory(category);
+        oldProduct.setDescription(productDTO.getDescription());
+        oldProduct.setPrice(productDTO.getPrice());
+        
+        productRepository.save(oldProduct);
+        
+        // 재고 저장
+        Inventory inventory = inventoryRepository.findByProduct(oldProduct);
+        inventory.setStock(productDTO.getStock());
+        inventoryRepository.save(inventory);
     }
-
-
+    
+    // 상품 삭제
     @Override
     @Transactional
     public void removeProducts(SellerProductIdsDTO productsIdsDTO, Long userId) {
-        Seller seller = sellerRepository.findByUserId(userId)
+    	
+    	
+	    Seller seller = sellerRepository.findByUserId(userId)
                 .orElseThrow(() -> new NotAuthException("판매자만 이용 가능합니다."));
-
+	    
         List<Long> productIds = productsIdsDTO.getIds();
+        
+        log.info("ids:{}",productIds);
+        
         if (productIds == null || productIds.isEmpty()) {
             throw new IllegalArgumentException("삭제할 상품 ID 목록이 비어 있습니다.");
         }
-
-        productRepository.deleteAllByIdInBatchAndSeller(productIds, seller);
+        
+        productRepository.deleteAllByIdInBatchAndSeller(productsIdsDTO.getIds(), seller);
     }
+    
+    
     // 이미지 업로드
     @Override
     public void registerProductImages(List<MultipartFile> images, Product product) {
@@ -457,6 +521,7 @@ public class ProductsServiceImpl implements ProductsService {
         product.setGImage(gImageString);
         productRepository.save(product);
     }
+    
     
     
     // 이미지 업로드(다중) --> TODO: 이 친구 병합 시 살립시다.
@@ -496,35 +561,48 @@ public class ProductsServiceImpl implements ProductsService {
 //		
 //	}   
     
-    
     @Override
     public List<Product> getPopularProductsDaily() {
-        return productRepository.findAllByOrderByDailySalesDesc();
+        return productRepository.findAllByOrderByDailySalesDesc();  // List<Product>로 반환
     }
 
     @Override
     public List<Product> getPopularProductsWeekly() {
-        return productRepository.findAllByOrderByWeeklySalesDesc();
+        return productRepository.findAllByOrderByWeeklySalesDesc(); // List<Product>로 반환
     }
 
     @Override
     public List<Product> getPopularProductsMonthly() {
-        return productRepository.findAllByOrderByMonthlySalesDesc();
+        return productRepository.findAllByOrderByMonthlySalesDesc(); // List<Product>로 반환
     }
 
     @Override
     public List<Product> getAllPopularProducts() {
-        return productRepository.findAllByOrderByOverallSalesDesc();
+        return productRepository.findAllByOrderByOverallSalesDesc(); // List<Product>로 반환
     }
 
     @Override
     public List<CategoryDTO> getUsedCategoriesBySeller(Long sellerId) {
         List<Long> usedCategoryIds = productRepository.findDistinctCategoryIdsBySellerId(sellerId);
         List<Category> categories = categoryRepository.findAllById(usedCategoryIds);
-
+        
         return categories.stream()
             .map(category -> new CategoryDTO(category.getId(), category.getName()))
             .collect(Collectors.toList());
+    }
+    @Override
+    public List<Product> getPopularProductsBySellerDaily(Long sellerId) {
+        return productRepository.findBySeller_SellerIdOrderByDailySalesDesc(sellerId);
+    }
+
+    @Override
+    public List<Product> getPopularProductsBySellerWeekly(Long sellerId) {
+    	return productRepository.findBySeller_SellerIdOrderByWeeklySalesDesc(sellerId);
+    }
+
+    @Override
+    public List<Product> getPopularProductsBySellerMonthly(Long sellerId) {
+    	return productRepository.findBySeller_SellerIdOrderByMonthlySalesDesc(sellerId);
     }
 
 }

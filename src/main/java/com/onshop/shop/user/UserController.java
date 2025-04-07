@@ -103,9 +103,13 @@ public class UserController {
 			return ResponseEntity.status(404).body(Map.of("error", "유저 정보를 찾을 수 없습니다."));
 		}
 
-		return ResponseEntity.ok(Map.of("userId", user.getUserId().toString(), "userName", user.getUsername(),
-				"userEmail", user.getEmail() , "userPassword" , user.getPassword() 
-				, "userPhone1", user.getPhone1(), "userPhone2", user.getPhone2(), "userPhone3", user.getPhone3()
+		return ResponseEntity.ok(Map.of("userId", user.getUserId().toString(), 
+				"userName", user.getUsername(),
+		        "userEmail", Optional.ofNullable(user.getEmail()).orElse(""),
+				"userPassword" , user.getPassword(),
+				"userPhone1", Optional.ofNullable(user.getPhone1()).orElse(""),
+			    "userPhone2", Optional.ofNullable(user.getPhone2()).orElse(""),
+			    "userPhone3", Optional.ofNullable(user.getPhone3()).orElse("")
 				));
 	}
 
@@ -333,62 +337,64 @@ public class UserController {
 				+ "&redirect_uri=" + naverRedirectUri + "&state=" + state;
 		return ResponseEntity.status(302).header("Location", url).build();
 	}
-
 	@GetMapping("/naver/callback")
 	public ResponseEntity<String> naverCallback(@RequestParam String code, @RequestParam String state,
-			HttpServletResponse response) throws IOException {
+	                                            HttpServletResponse response) throws IOException {
+	    try {
+	        String accessTokenUrl = "https://nid.naver.com/oauth2.0/token";
+	        String tokenRequestBody = "grant_type=authorization_code" +
+	                "&client_id=" + naverClientId +
+	                "&client_secret=" + naverClientSecret +
+	                "&code=" + code +
+	                "&state=" + state;
 
-		String accessTokenUrl = "https://nid.naver.com/oauth2.0/token";
-		String tokenRequestBody = "grant_type=authorization_code" + "&client_id=" + naverClientId + "&client_secret="
-				+ naverClientSecret + "&code=" + code + "&state=" + state;
+	        HttpHeaders headers = new HttpHeaders();
+	        headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
+	        HttpEntity<String> entity = new HttpEntity<>(tokenRequestBody, headers);
+	        ResponseEntity<String> tokenResponse = restTemplate.postForEntity(accessTokenUrl, entity, String.class);
 
-		HttpHeaders headers = new HttpHeaders();
-		headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
-		HttpEntity<String> entity = new HttpEntity<>(tokenRequestBody, headers);
-		ResponseEntity<String> tokenResponse = restTemplate.postForEntity(accessTokenUrl, entity, String.class);
+	        if (tokenResponse.getBody() == null) {
+	            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Failed to get access token");
+	        }
 
-		if (tokenResponse.getBody() == null) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Failed to get access token");
-		}
+	        ObjectMapper objectMapper = new ObjectMapper();
+	        JsonNode tokenJson = objectMapper.readTree(tokenResponse.getBody());
+	        String accessToken = tokenJson.get("access_token").asText();
 
-		// JSON 파싱 (access_token 추출)
-		ObjectMapper objectMapper = new ObjectMapper();
-		JsonNode tokenJson = objectMapper.readTree(tokenResponse.getBody());
-		String accessToken = tokenJson.get("access_token").asText();
+	        String userInfoUrl = "https://openapi.naver.com/v1/nid/me";
+	        HttpHeaders userInfoHeaders = new HttpHeaders();
+	        userInfoHeaders.setBearerAuth(accessToken);
 
-		// 사용자 정보 요청
-		String userInfoUrl = "https://openapi.naver.com/v1/nid/me";
-		HttpHeaders userInfoHeaders = new HttpHeaders();
-		userInfoHeaders.setBearerAuth(accessToken);
+	        HttpEntity<String> userInfoEntity = new HttpEntity<>(userInfoHeaders);
+	        ResponseEntity<String> userInfoResponse = restTemplate.exchange(userInfoUrl, HttpMethod.GET, userInfoEntity, String.class);
 
-		HttpEntity<String> userInfoEntity = new HttpEntity<>(userInfoHeaders);
-		ResponseEntity<String> userInfoResponse = restTemplate.exchange(userInfoUrl, HttpMethod.GET, userInfoEntity,
-				String.class);
+	        if (userInfoResponse.getBody() == null) {
+	            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Failed to get user info");
+	        }
 
-		if (userInfoResponse.getBody() == null) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Failed to get user info");
-		}
+	        JsonNode userInfo = objectMapper.readTree(userInfoResponse.getBody()).path("response");
+	        String naverId = userInfo.get("id").asText();
+	        String userName = userInfo.has("name") ? userInfo.get("name").asText() : "네이버유저";
+	        String userEmail = userInfo.has("email") ? userInfo.get("email").asText() : "";
 
-		// 사용자 정보 저장 및 JWT 생성
-		JsonNode userInfo = objectMapper.readTree(userInfoResponse.getBody()).path("response");
-		String naverId = userInfo.get("id").asText();
-		String userName = userInfo.get("name").asText();
-		String userEmail = userInfo.has("email") ? userInfo.get("email").asText() : "";
-		UserRole role = UserRole.valueOf("CUSTOMER");
+	        UserRole role = UserRole.CUSTOMER;
+	        User user = saveOrUpdateSocialUser(naverId, userName, userEmail, "naver", role);
 
-		User user = saveOrUpdateSocialUser(naverId, userName, userEmail, "naver", role);
+	        String token = jwtUtil.generateToken(user.getUserId());
+	        Cookie cookie = new Cookie("jwt", token);
+	        cookie.setHttpOnly(true);
+	        cookie.setSecure(true);
+	        cookie.setPath("/");
+	        cookie.setMaxAge(3600);
+	        response.addCookie(cookie);
 
-		// JWT 생성 후 쿠키에 저장
-		String token = jwtUtil.generateToken(user.getUserId());
-		Cookie cookie = new Cookie("jwt", token);
-		cookie.setHttpOnly(true);
-		cookie.setSecure(true);
-		cookie.setPath("/");
-		cookie.setMaxAge(60 * 60);
-		response.addCookie(cookie);
-
-		// 302(리다이렉트합니다) 상태, 홈 페이지로 리다이렉트
-		return ResponseEntity.status(HttpStatus.FOUND).header(HttpHeaders.LOCATION, "http://localhost:5173/").build();
+	        return ResponseEntity.status(HttpStatus.FOUND)
+	                .header(HttpHeaders.LOCATION, "http://localhost:5173/")
+	                .build();
+	    } catch (Exception e) {
+	        log.error("❌ 네이버 콜백 처리 중 예외 발생: ", e);
+	        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("네이버 로그인 중 오류 발생: " + e.getMessage());
+	    }
 	}
 
 	@GetMapping("/kakao")
@@ -450,7 +456,7 @@ public class UserController {
 		String userEmail = userInfo.path("kakao_account").path("email").asText();
 
 		String socialProvider = "kakao";
-		UserRole role = UserRole.valueOf("CUSTOMER");
+		UserRole role = UserRole.CUSTOMER;
 
 		// 사용자 정보를 저장하거나 업데이트
 		User user = saveOrUpdateSocialUser(kakaoId, userName, userEmail, socialProvider, role);
