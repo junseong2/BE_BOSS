@@ -32,11 +32,9 @@ public class SecurityConfig {
                 .requestMatchers("/api/**","/auth/**", "/category",
 
 
-
                        "/product/**",    "/product",     "/payment/**",    "/orders/**", "/products/**",    "/products", "/category/**", "/products/**","/cart", "/cart/**", "/favicon.ico","/uploads/**"
                         ,"/store/**","/seller/**","/seller","/seller/info/**","articles", "/vector/**","/seller/orders/**", "/business/**"
-                        ,"/address/**" , "/orderdetail/**"
-
+                        ,"/address/**" , "/orderdetail/**", "/settlements/**"
                 		)
 
                 .permitAll()
