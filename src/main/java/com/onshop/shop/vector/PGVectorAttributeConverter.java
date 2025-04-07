@@ -1,4 +1,3 @@
-
 package com.onshop.shop.vector;
 
 import jakarta.persistence.AttributeConverter;
@@ -63,25 +62,17 @@ public class PGVectorAttributeConverter implements AttributeConverter<float[], S
         return sb.toString();
     }
     public static float[] fromPgVectorString(String pgVector) {
+        // 입력 형식이 '(0.1, 0.2, 0.3, ...)' 형태라고 가정
         if (pgVector == null || pgVector.isEmpty()) {
             return new float[0];
         }
 
-        // 괄호 제거: ( ), [ ] 모두 처리
-        String cleaned = pgVector.replaceAll("[\\[\\]()]", "").trim();
-        if (cleaned.isEmpty()) {
-            return new float[0];
-        }
-
-        String[] parts = cleaned.split(",");
+        String trimmed = pgVector.replaceAll("[()]", ""); // 괄호 제거
+        String[] parts = trimmed.split(",");
         float[] vector = new float[parts.length];
 
         for (int i = 0; i < parts.length; i++) {
-            try {
-                vector[i] = Float.parseFloat(parts[i].trim());
-            } catch (NumberFormatException e) {
-                vector[i] = 0f; // 잘못된 값은 0으로 처리
-            }
+            vector[i] = Float.parseFloat(parts[i].trim());
         }
 
         return vector;

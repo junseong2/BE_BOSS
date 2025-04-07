@@ -1,4 +1,5 @@
-	package com.onshop.shop.seller;
+package com.onshop.shop.seller;
+
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -6,11 +7,8 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.HashMap;
 import java.util.List;
-
 import java.util.Map;
 import java.util.Optional;
-import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.ObjectMapper;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -19,7 +17,6 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CookieValue;
 import org.springframework.web.bind.annotation.CrossOrigin;
@@ -34,8 +31,8 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
-
 import com.onshop.shop.product.Product;
 import com.onshop.shop.product.ProductsService;
 import com.onshop.shop.security.JwtUtil;
@@ -47,13 +44,13 @@ public class SellerController {
 
 	private static final Logger logger = LoggerFactory.getLogger(SellerController.class);
 
-	@Autowired
-	private SellerService sellerService;
+    @Autowired
+    private SellerService sellerService;
+    private JwtUtil jwtUtil; // ✅ JWT 유틸리티 추가
+    // ✅ Seller 정보 가져오기 (JWT 인증 기반, storename으로 검색)
+  
 
-	@Autowired
-	private JwtUtil jwtUtil; // ✅ JWT 유틸리티 추가
 
-	// ✅ Seller 정보 가져오기 (JWT 인증 기반, storename으로 검색)
 	@GetMapping("/info/{storename}")
 	public ResponseEntity<Map<String, Object>> getSellerInfoByStoreName(@PathVariable String storename,
 			@CookieValue(value = "jwt", required = false) String token) {
@@ -476,10 +473,4 @@ public class SellerController {
 	    sellerService.rejectSeller(sellerId);
 	    return ResponseEntity.ok("거절 처리 완료");
 	}
-	
-    @GetMapping("/seller-stats")
-    public ResponseEntity<SellerStatsDTO> getSellerStats() {
-        SellerStatsDTO stats = sellerService.getSellerStats();
-        return ResponseEntity.ok(stats); // 통계 데이터를 반환
-    }
 }

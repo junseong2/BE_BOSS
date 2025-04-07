@@ -17,6 +17,6 @@ public class SellerProductsDTO {
     private String description;
     private Long stock;
 
- 
+    private String gImage; 
    
 }
