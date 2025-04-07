@@ -180,16 +180,7 @@ public class SellerService {
     }
 
     
-    public SellerStatsDTO getSellerStats() {
-        // 각 상태별 판매자 수를 계산
-        long totalSellers = sellerRepository.count();  // 전체 판매자 수
-        long waitingApproval = sellerRepository.countByRegistrationStatus("등록 대기");
-        long approved = sellerRepository.countByRegistrationStatus("등록 완료");
-        long rejected = sellerRepository.countByRegistrationStatus("등록 거절");
-
-        // DTO에 값 설정하여 반환
-        return new SellerStatsDTO(totalSellers, waitingApproval, approved, rejected);
-    }
+    
     
     
     

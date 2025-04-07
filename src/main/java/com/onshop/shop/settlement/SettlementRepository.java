@@ -60,11 +60,4 @@ public interface SettlementRepository extends JpaRepository<Settlement, Long> {
         @Param("settlementId") Long settlementId,  
         @Param("username") String username
     );
-    
-    List<Settlement> findByStatus(SettlementStatus status);
-    List<Settlement> findByStatusAndSeller_SellerId(String status, Long sellerId);
-    
-    long countByStatus(SettlementStatus status);
-
-
 }

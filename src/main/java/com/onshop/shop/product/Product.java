@@ -92,7 +92,6 @@ public class Product {
     @Column(name = "overall_sales")
     private Long overallSales = 0L;
 
-
     
     // ✅ 쉼표(,)로 구분된 gImages를 리스트로 변환하여 반환
     public List<String> getImageList() {

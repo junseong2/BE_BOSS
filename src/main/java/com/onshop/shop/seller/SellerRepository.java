@@ -12,9 +12,5 @@ public interface SellerRepository extends JpaRepository<Seller, Long> {
     Optional<Seller>  findByUserId(Long userId);
     void deleteByUserId(Long userId);
 
-    
-    long countByRegistrationStatus(String registrationStatus);
 
-    // 전체 판매자 수
-    long count();
 }
