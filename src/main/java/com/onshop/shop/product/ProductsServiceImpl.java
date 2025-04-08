@@ -392,7 +392,7 @@ public class ProductsServiceImpl implements ProductsService {
                 .build();
     }
     
-    // 상품 저장(단일) -> TODO: 병합 시 이 친구를 살려야 합니다.   
+    // 상품 저장(단일) 
 	@Override
 	public Product registerProduct(SellerProductsRequestDTO product, Long userId) {
 		
@@ -416,12 +416,16 @@ public class ProductsServiceImpl implements ProductsService {
                 .expiryDate(null)
                 .description(product.getDescription())
                 .price(product.getPrice())
+                .originPrice(product.getOriginPrice())
+                .discountRate(DiscountRate.fromRate(product.getDiscountRate()))
+                .isDiscount(product.getDiscountRate() >0 ? true : false) // 할인율이 0보다 크면 할인 적용
                 .seller(seller)
                 .build();
         
-        
+        unsavedProduct.applyDiscount(); // 할인율을 적용한 price 를 컬럼에 반영
     
         // 상품 정보 저장
+        log.info("저장되기 전의 수정된 product:{}", unsavedProduct);
         Product savedProduct = productRepository.save(unsavedProduct);
         
         // 초기 재고 저장
