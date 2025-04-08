@@ -223,6 +223,8 @@ public class ProductsController {
         ObjectMapper objectMapper = new ObjectMapper();
         SellerProductsRequestDTO productDTO = objectMapper.readValue(productJSON, SellerProductsRequestDTO.class);
         
+        log.info("productDTO:{}", productDTO);
+        
         Product savedProduct = productsService.registerProduct(productDTO, userId);
         
         productsService.registerProductImages(images, savedProduct);

@@ -14,6 +14,8 @@ import com.onshop.shop.seller.Seller;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -23,13 +25,13 @@ import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
+import lombok.Data;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 @Entity
 @Table(name = "product")
-@Getter
-@Setter
+@Data
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
@@ -91,6 +93,17 @@ public class Product {
     @Builder.Default
     @Column(name = "overall_sales")
     private Long overallSales = 0L;
+    
+    @Column(name = "origin_price")
+    private Integer originPrice; // 원본 가격
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "discount_rate")
+    private DiscountRate discountRate; // 할인율
+
+    @Builder.Default
+    @Column(name = "is_discount")
+    private Boolean isDiscount = false; // 할인 유무
 
 
     
@@ -133,6 +146,16 @@ public class Product {
         this.overallSales += quantity;
         
         
+    }
+    
+    // 기존 price 를 할인율을 적용한 가격으로 자동 변환 후 저장하는 메서드(isDiscount가 true인 경우에만 실행)
+    public void applyDiscount() {
+        if (Boolean.TRUE.equals(isDiscount) && discountRate != null && originPrice != null) {
+            int rate = discountRate.getRate(); // 예: 20 (이 친구가 열거체 형태의 문자열 값을 정수형으로 변환해줌)
+            this.price = originPrice - (originPrice * rate / 100); // 기존 price에 할인율을 적용한 가격으로 계산 후 변환
+        } else if (originPrice != null) {
+            this.price = originPrice; // 할인 없을 경우 원가 그대로
+        }
     }
   
 }
