@@ -56,7 +56,8 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
     // 판매자(점주)의 상품 조회 (Native Query)
     @Query(value = """
         SELECT p.product_id AS productId, p.name AS name, p.price AS price, 
-               c.category_name AS categoryName, p.description AS description, i.stock AS stock
+               c.category_name AS categoryName, p.description AS description, i.stock AS stock,
+               i.min_stock AS minStock, p.expiry_date AS expiryDate, p.discount_rate AS discountRate, p.origin_price AS originPrice
         FROM product p
         LEFT JOIN category c ON c.category_id = p.category_id
         LEFT JOIN inventory i ON i.product_id = p.product_id

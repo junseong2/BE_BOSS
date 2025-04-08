@@ -67,7 +67,7 @@ public class Product {
     @Column(name="price")
     private Integer price;
     
-    @Column(name="gImage")
+    @Column(name = "gImage", length = 10000)
     private String gImage;
 
     @Column(name="expiry_date")

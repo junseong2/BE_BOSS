@@ -30,7 +30,7 @@ public interface ProductsService {
 	SellerProductsResponseDTO getAllDashboardProducts(int page, int size, String search, Long userId); // 모든 상품 조회
 	void registerProducts(List<SellerProductsRequestDTO> products, Long userId); // 상품 추가(다중)
     void removeProducts(SellerProductIdsDTO productsIds, Long userId); 	// 상품 삭제
-    void updateProducts(Long productId, SellerProductsRequestDTO product, Long userId); // 상품 정보 수정
+    Product updateProducts(Long productId, SellerProductsRequestDTO product, Long userId); // 상품 정보 수정
     Product registerProduct(SellerProductsRequestDTO product, Long userId); // 상품 추가(단일)
 	void registerProductImages(List<MultipartFile> images, Product product);
 
