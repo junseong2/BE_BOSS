@@ -7,6 +7,8 @@ import java.util.List;
 
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
+import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.onshop.shop.category.Category;
@@ -14,6 +16,7 @@ import com.onshop.shop.seller.Seller;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EntityListeners;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
 import jakarta.persistence.FetchType;
@@ -35,6 +38,7 @@ import lombok.Setter;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
+@EntityListeners(AuditingEntityListener.class) 
 public class Product {
 
     @Id
@@ -70,6 +74,7 @@ public class Product {
     private LocalDateTime expiryDate;
 
     @Column(name="created_register")
+    @CreatedDate
     private LocalDateTime createdRegister;
     
 

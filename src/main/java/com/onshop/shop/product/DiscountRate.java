@@ -1,6 +1,9 @@
 package com.onshop.shop.product;
 
 public enum DiscountRate {
+	RATE_0(0),
+    RATE_2(2),
+    RATE_3(3),
     RATE_5(5),
     RATE_10(10),
     RATE_15(15),

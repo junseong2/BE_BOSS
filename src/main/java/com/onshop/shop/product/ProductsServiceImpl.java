@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -413,7 +414,7 @@ public class ProductsServiceImpl implements ProductsService {
         Product unsavedProduct =  Product.builder()
                 .category(category)
                 .name(product.getName())
-                .expiryDate(null)
+                .expiryDate(LocalDateTime.parse(product.getExpiryDate()))
                 .description(product.getDescription())
                 .price(product.getPrice())
                 .originPrice(product.getOriginPrice())
