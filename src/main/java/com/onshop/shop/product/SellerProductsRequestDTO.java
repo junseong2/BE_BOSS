@@ -1,5 +1,7 @@
 package com.onshop.shop.product;
 
+import java.time.LocalDateTime;
+
 import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotEmpty;
@@ -33,7 +35,7 @@ public class SellerProductsRequestDTO {
 	@Positive(message = "가격은 0보다 커야 합니다.")
 	private Integer originPrice;
 	
-	@Pattern(regexp = "^(5|10|15|20|25|30)$", message = "할인율은 5, 10, 15, 20, 25, 30 중 하나여야 합니다.")
+	@Pattern(regexp = "^(0|5|10|15|20|25|30)$", message = "할인율은 0, 5, 10, 15, 20, 25, 30 중 하나여야 합니다.")
 	private Integer discountRate;
 	
 	@Min(value = 0, message = "재고는 최소 0 이상이어야 합니다.")
@@ -43,6 +45,8 @@ public class SellerProductsRequestDTO {
 	@Min(value = 0, message = "재고는 최소 0 이상이어야 합니다.")
 	@Max(value= 1000, message ="재고는 최대 1000이하이어야 합니다.")
 	private Long minStock; // 재고
+	
+	private String expiryDate; // 유통기한
 	
 	
 	
