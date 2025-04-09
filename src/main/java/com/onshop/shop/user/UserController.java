@@ -109,7 +109,8 @@ public class UserController {
 				"userPassword" , user.getPassword(),
 				"userPhone1", Optional.ofNullable(user.getPhone1()).orElse(""),
 			    "userPhone2", Optional.ofNullable(user.getPhone2()).orElse(""),
-			    "userPhone3", Optional.ofNullable(user.getPhone3()).orElse("")
+			    "userPhone3", Optional.ofNullable(user.getPhone3()).orElse(""),
+			    "userRole", user.getRole().name()
 				));
 	}
 
