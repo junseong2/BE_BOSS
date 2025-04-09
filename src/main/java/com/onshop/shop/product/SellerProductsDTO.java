@@ -2,6 +2,7 @@ package com.onshop.shop.product;
 
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
+import java.util.List;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -22,9 +23,10 @@ public class SellerProductsDTO {
     private Object expiryDate;
     private Integer discountRate;
     private Integer originPrice;
+    private List<String> gImages;
     
 	public SellerProductsDTO(Long productId, String name, Integer price, String categoryName, String description,
-			Long stock,Long minStock, Timestamp expiryDate, String discountRate, Integer originPrice) {
+			Long stock,Long minStock, Timestamp expiryDate, String discountRate, Integer originPrice, String gImage) {
 
 		this.productId = productId;
 		this.name = name;
@@ -36,6 +38,8 @@ public class SellerProductsDTO {
 		this.expiryDate = expiryDate != null ? expiryDate.toLocalDateTime() : null;
 		this.discountRate = discountRate != null ? DiscountRate.valueOf(discountRate).getRate(): null;
 		this.originPrice = originPrice;
+		this.gImages = gImage !=null ? List.of(gImage.split(",")): null; 
+		
 	}
     
     
