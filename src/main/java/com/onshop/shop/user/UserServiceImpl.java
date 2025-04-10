@@ -310,4 +310,27 @@ public class UserServiceImpl implements UserService {
 	    }
 	}
 
+	@Override
+	public void sendAuthCode(String email) throws MessagingException {
+	    // 1. 인증 코드 생성
+	    String authCode = emailUtils.createAuthCode(5); // 5자리 인증 코드 생성
+
+	    // 2. 인증 코드 Redis에 저장 (5분간 유효)
+	    redisTemplate.opsForValue().set(email, authCode, 300, TimeUnit.SECONDS); // 5분 간 유효
+
+	    // 3. 이메일 발송
+	    MimeMessage message = createMail(email, authCode);
+	    javaMailSender.send(message);
+
+	    // 로그 추가
+	    log.info("인증 코드 전송 완료: {}", email);
+	}
+
+	
+	
+	
+	
+	
+	
+
 }

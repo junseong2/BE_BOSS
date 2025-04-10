@@ -284,6 +284,8 @@ public class UserController {
 				user.setAddresses(new ArrayList<>()); // ✅ addresses가 null이면 초기화
 			}
 			
+			user.setRole(UserRole.CUSTOMER);
+			
 			 BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
 		        String encodedPassword = passwordEncoder.encode(user.getPassword());
 		        user.setPassword(encodedPassword); // 암호화된 비밀번호 저장
@@ -544,6 +546,18 @@ public class UserController {
 
 		return ResponseEntity.ok(null);
 	}
+	
+	@PostMapping("/email/password/send-code")
+	public ResponseEntity<?> sendAuthCode(@Valid @RequestBody EmailAuthRequestDTO emailRequestDTO) {
+	    log.info("email:{}", emailRequestDTO);
+	    try {
+	        userService.sendAuthCode(emailRequestDTO.getEmail());
+	        return ResponseEntity.ok("인증 코드 전송 성공");
+	    } catch (MessagingException ex) {
+	        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+	                             .body("이메일 전송 중 오류 발생");
+	    }
+	}
 
 	// 인증번호 검증
 	@PostMapping("/email/code-verify")
@@ -671,6 +685,23 @@ public class UserController {
 
 	    return ResponseEntity.ok(Map.of("message", "비밀번호가 성공적으로 변경되었습니다."));
 	}
+	
+	@PostMapping("/reset-password")
+	public ResponseEntity<String> resetPassword(@RequestBody Map<String, String> request) {
+	    String email = request.get("email");
+	    String password = request.get("password");
+
+	    Optional<User> userOpt = userRepository.findByEmail(email);
+	    if (userOpt.isEmpty()) return ResponseEntity.status(404).body("유저 없음");
+
+	    User user = userOpt.get();
+	    BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
+	    user.setPassword(encoder.encode(password));
+	    userRepository.save(user);
+
+	    return ResponseEntity.ok("비밀번호 재설정 완료");
+	}
+
 
 
 

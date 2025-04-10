@@ -20,6 +20,7 @@ public interface UserService {
     MimeMessage createMail(String email, String authCode) throws MessagingException;
     boolean emailVerification(EmailVerificationRequestDTO verificationRequestDTO);
     void sendVerificationCode(String toMail) throws MessagingException;
+    void sendAuthCode(String email) throws MessagingException;
     boolean validateMx(String domain);
     
     /** 아이디 찾기*/
