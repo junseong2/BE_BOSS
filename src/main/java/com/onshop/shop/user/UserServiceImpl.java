@@ -33,8 +33,6 @@ import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeMessage;
 import lombok.extern.slf4j.Slf4j;
 
-
-
 @Service
 @Slf4j
 public class UserServiceImpl implements UserService {
@@ -74,6 +72,7 @@ public class UserServiceImpl implements UserService {
         User savedUser = userRepository.save(user);
 
         List<Address> addresses = user.getAddresses() != null ? user.getAddresses() : List.of();
+        log.info("주소 목록:{}",addresses);
         if (!addresses.isEmpty()) {
             List<Address> addressEntities = addresses.stream()
                 .map(address -> {

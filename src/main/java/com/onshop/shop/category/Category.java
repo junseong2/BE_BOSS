@@ -40,13 +40,13 @@ public class Category {
     @Column(name = "category_name", nullable = false)
     private String name;
 
-    @ManyToOne(fetch = FetchType.EAGER)
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "parent_category_id")
     @JsonBackReference  // 순환 참조 방지
     private Category parentCategory;
     
     
-    @OneToMany(mappedBy = "parentCategory", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+    @OneToMany(mappedBy = "parentCategory", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     @JsonManagedReference  // 자식 카테고리는 직렬화 가능
     private List<Category> subCategories = new ArrayList<>();
 

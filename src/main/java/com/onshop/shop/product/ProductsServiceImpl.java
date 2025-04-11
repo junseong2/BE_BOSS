@@ -54,6 +54,7 @@ public class ProductsServiceImpl implements ProductsService {
                 .collect(Collectors.toList());
     }
 
+    // 상품 상세 조회
     @Override
     public ProductsDTO getProductById(Long productId) {
         Product product = productRepository.findById(productId)
