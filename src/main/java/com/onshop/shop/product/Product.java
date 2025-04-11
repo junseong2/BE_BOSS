@@ -110,7 +110,7 @@ public class Product {
     @Column(name = "is_discount")
     private Boolean isDiscount = false; // 할인 유무
 
-
+    
     
     // ✅ 쉼표(,)로 구분된 gImages를 리스트로 변환하여 반환
     public List<String> getImageList() {
