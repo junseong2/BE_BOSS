@@ -71,10 +71,16 @@ public class UserServiceImpl implements UserService {
     @Override
     @Transactional(propagation = Propagation.REQUIRED) // ✅ 트랜잭션 적용
     public void registerUser(User user) {
+        // 로그: User 저장 전 상태
+        System.out.println("registerUser 호출됨 - user: " + user.getUsername());
         User savedUser = userRepository.save(user);
+        System.out.println("User 저장 완료: " + savedUser.getUserId());
 
         List<Address> addresses = user.getAddresses() != null ? user.getAddresses() : List.of();
         if (!addresses.isEmpty()) {
+            // 로그: 주소 저장 전 상태
+            System.out.println("주소 목록 저장 전: " + addresses);
+
             List<Address> addressEntities = addresses.stream()
                 .map(address -> {
                     Address addressEntity = new Address();
@@ -85,10 +91,13 @@ public class UserServiceImpl implements UserService {
                     addressEntity.setIsDefault(address.getIsDefault());
                     return addressEntity;
                 }).collect(Collectors.toList());
-            addressRepository.saveAll(addressEntities);
 
+            // 로그: 주소 저장 후 상태
+            System.out.println("저장할 주소 목록: " + addressEntities);
+//            addressRepository.saveAll(addressEntities);
         }
     }
+
 
     @Override
     @Transactional(readOnly = true) // ✅ 읽기 전용 트랜잭션 (Lazy Loading 문제 방지)
