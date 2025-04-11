@@ -289,37 +289,53 @@ public class SellerController {
 	}
 
 	private final String uploadDir = "C:/uploads/";
+	   @PostMapping("/upload")
+	   public ResponseEntity<Map<String, String>> uploadImage(
+	           @RequestParam("file") MultipartFile file,
+	           @RequestParam("sellerId") String sellerId,
+	           @RequestParam(value = "type", required = false) String type,
+	           @RequestParam(value = "elementId", required = false) String elementId) {
 
-	@PostMapping("/upload")
-	public ResponseEntity<Map<String, String>> uploadImage(@RequestParam("file") MultipartFile file,
-			@RequestParam("sellerId") String sellerId, @RequestParam("type") String type) { // ✅ 파일 타입 추가
+	       // 로그 확인용
+	       System.out.println("📦 업로드 요청 - type: " + type + ", elementId: " + elementId);
 
-		if (file.isEmpty() || sellerId.isEmpty() || type.isEmpty()) {
-			return ResponseEntity.badRequest().body(Map.of("error", "파일, 판매자 ID 또는 타입이 없습니다."));
-		}
+	       if (file.isEmpty() || sellerId == null || sellerId.isEmpty()) {
+	           return ResponseEntity.badRequest().body(Map.of("error", "파일 또는 판매자 ID가 없습니다."));
+	       }
 
-		try {
-			// ✅ 파일명을 sellerId 기반으로 저장 (header 또는 banner 구분)
-			String fileName;
-			if ("header".equals(type)) {
-				fileName = sellerId + "_headerlogo.png";
-			} else if ("banner".equals(type)) {
-				fileName = sellerId + "_banner.png";
-			} else {
-				return ResponseEntity.badRequest().body(Map.of("error", "잘못된 타입입니다."));
-			}
+	       String fileName;
 
-			Path filePath = Paths.get("C:/uploads/" + fileName);
-			Files.write(filePath, file.getBytes());
+	       if ("header3".equals(type)) {
+	           fileName = sellerId + "_headerlogo.png";
+	       } else if ("banner3".equals(type)) {
+	           fileName = sellerId + "_banner.png";
+	       } else if (elementId != null) {
+	           // type이 header/banner가 아니고 elementId가 있을 때
+	           String extension = Optional.ofNullable(file.getOriginalFilename())
+	                   .filter(f -> f.contains("."))
+	                   .map(f -> f.substring(f.lastIndexOf('.') + 1))
+	                   .orElse("png");
 
-			String fileUrl = "/uploads/" + fileName; // ✅ 저장된 파일 URL 반환
-			return ResponseEntity.ok(Map.of("url", fileUrl, "fileName", fileName));
+	           fileName = sellerId + "_" + elementId + "." + extension;
+	       } else {
+	           // 이외의 경우는 모두 오류 처리
+	           return ResponseEntity.badRequest().body(Map.of("error", "잘못된 타입입니다."));
+	       }
 
-		} catch (IOException e) {
-			return ResponseEntity.status(500).body(Map.of("error", "파일 저장 실패: " + e.getMessage()));
-		}
-	}
+	       // 실제 저장
+	       try {
+	           Path filePath = Paths.get(uploadDir + fileName);
+	           Files.write(filePath, file.getBytes());
 
+	           return ResponseEntity.ok(Map.of(
+	                   "url", "/uploads/" + fileName,
+	                   "fileName", fileName
+	           ));
+	       } catch (IOException e) {
+	           e.printStackTrace();
+	           return ResponseEntity.status(500).body(Map.of("error", "파일 저장 실패: " + e.getMessage()));
+	       }
+	   }
 	@GetMapping("/seller-info-byuserid/{userId}")
 	public ResponseEntity<Map<String, Object>> getSellerInfoByUserId(@PathVariable Long userId) {
 		try {
@@ -496,13 +512,13 @@ public class SellerController {
         SellerStatsDTO stats = sellerService.getSellerStats();
         return ResponseEntity.ok(stats); // 통계 데이터를 반환
     }
-    
-	@GetMapping("/stores")
-	public ResponseEntity<List<SellerStoresDTO>> getAllStores(
-			@RequestParam int page,
-			@RequestParam int size
-			) {
-		List<SellerStoresDTO> sellers = sellerService.getAllStores(page, size);
-		return ResponseEntity.ok(sellers);
-	}
+
+    @GetMapping("/stores")
+    public ResponseEntity<List<SellerStoresDTO>> getAllStores(
+          @RequestParam int page,
+          @RequestParam int size
+          ) {
+       List<SellerStoresDTO> sellers = sellerService.getAllStores(page, size);
+       return ResponseEntity.ok(sellers);
+    }
 }

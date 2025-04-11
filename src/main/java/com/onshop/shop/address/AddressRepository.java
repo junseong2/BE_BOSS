@@ -38,4 +38,5 @@ public interface AddressRepository extends JpaRepository<Address, Long> {
     // ✅ 특정 주소를 가져오기 (중복인데 기본 주소로 설정하려고 할 때 사용)
     Address findByUserAndAddress1AndPost(User user, String address1, String post);
     
+    
 }

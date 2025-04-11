@@ -10,10 +10,11 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 public class SellerStoresDTO {
-	
-	private String storeName;
-	private String description;
-	private String logoUrl;
-	
+   
+   private String storeName;
+   private String description;
+   private String logoUrl;
+   
 
 }
+
