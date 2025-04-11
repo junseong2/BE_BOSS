@@ -21,6 +21,7 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
+import jakarta.persistence.Lob;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
@@ -57,15 +58,17 @@ public class Product {
     @Column(name="name", nullable = false)
     private String name;
     
-    @Column(name="description")
+    @Lob
+    @Column(name = "description", columnDefinition = "TEXT")
     private String description;
 
     @Column(name="price")
     private Integer price;
     
-    @Column(name="gImage")
+    @Lob
+    @Column(name = "gImage", columnDefinition = "TEXT")
     private String gImage;
-
+    
     @Column(name="expiry_date")
     private LocalDateTime expiryDate;
 
