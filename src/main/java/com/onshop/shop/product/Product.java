@@ -69,7 +69,7 @@ public class Product {
     @Column(name="price")
     private Integer price;
     
-
+    
     @Lob
     @Column(name = "gImage", columnDefinition = "TEXT")
 
