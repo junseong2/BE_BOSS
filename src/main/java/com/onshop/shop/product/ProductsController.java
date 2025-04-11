@@ -1,6 +1,7 @@
 package com.onshop.shop.product;
 
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
@@ -208,7 +209,7 @@ public class ProductsController {
 	@PostMapping("/seller/products")
 	public ResponseEntity<?> registerProduct(
 			@Valid @RequestParam("product") String productJSON,
-			@RequestParam("images") List<MultipartFile> images,
+			@RequestParam(value ="images", required = false) List<MultipartFile> images,
 			@CookieValue(value = "jwt", required = false) String token) 
 			throws JsonMappingException, JsonProcessingException{
 		
@@ -227,7 +228,11 @@ public class ProductsController {
         
         Product savedProduct = productsService.registerProduct(productDTO, userId);
         
-        productsService.registerProductImages(images, savedProduct);
+        if(images != null) {
+    		productsService.registerProductImages(images, savedProduct);
+   		}
+   		
+        
 		
 		return ResponseEntity.created(null).body(null);
 	}
@@ -235,11 +240,12 @@ public class ProductsController {
 	
 	
 	// 상품 수정
-	@PatchMapping("/seller/products/{productId}")
+	@PatchMapping( value ="/seller/products/{productId}",   consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
 	public ResponseEntity<?> updateProduct(
 			@PathVariable Long productId,
-			@Valid @RequestBody SellerProductsRequestDTO productDTO,
-			@CookieValue(value = "jwt", required = false) String token) {
+			@Valid @RequestParam("product") String productJSON,
+			@RequestParam(value = "images", required = false) List<MultipartFile> images,
+			@CookieValue(value = "jwt", required = false) String token) throws JsonMappingException, JsonProcessingException {
 		
 		if (token == null) {
 				       throw new NotAuthException("요청 권한이 없습니다.");
@@ -250,7 +256,16 @@ public class ProductsController {
 			throw new NullPointerException("상품ID는 필수입니다.");
 		}
 		
-		productsService.updateProducts(productId, productDTO, userId);
+        ObjectMapper objectMapper = new ObjectMapper();
+        SellerProductsRequestDTO productDTO = objectMapper.readValue(productJSON, SellerProductsRequestDTO.class);
+        
+        log.info("productDTO:{}", productDTO);
+		
+		Product updatedProduct = productsService.updateProducts(productId, productDTO, userId);
+		
+		if(images != null) {
+		 productsService.registerProductImages(images, updatedProduct);
+		}
 		
 
 		SuccessMessageResponse response = new SuccessMessageResponse(

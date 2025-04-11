@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -154,7 +155,6 @@ public class ProductsServiceImpl implements ProductsService {
         		.products(products)
         		.totalCount(productCount)
         		.build();
-
     }
     
 
@@ -413,7 +413,7 @@ public class ProductsServiceImpl implements ProductsService {
         Product unsavedProduct =  Product.builder()
                 .category(category)
                 .name(product.getName())
-                .expiryDate(null)
+                .expiryDate(LocalDateTime.parse(product.getExpiryDate()))
                 .description(product.getDescription())
                 .price(product.getPrice())
                 .originPrice(product.getOriginPrice())
@@ -446,18 +446,18 @@ public class ProductsServiceImpl implements ProductsService {
     // 상품 수정
     @Override
     @Transactional
-    public void updateProducts(Long productId, SellerProductsRequestDTO productDTO, Long userId) {
-	    Seller seller = sellerRepository.findByUserId(userId)
+    public Product updateProducts(Long productId, SellerProductsRequestDTO productDTO, Long userId) {
+	   Seller seller = sellerRepository.findByUserId(userId)
                 .orElseThrow(() -> new NotAuthException("판매자만 이용 가능합니다."));
 
-	    Long sellerId = seller.getSellerId();
+	   Long sellerId = seller.getSellerId();
 	    
        Product oldProduct = productRepository.findBySeller_SellerIdAndProductId(sellerId, productId);
         if (oldProduct == null) {
             throw new ResourceNotFoundException("상품ID:" + productId + " 로 등록된 상품을 찾을 수 없습니다.");
         }
         
-        Category category = categoryRepository.findByCategoryName(productDTO.getCategoryName());
+       Category category = categoryRepository.findByCategoryName(productDTO.getCategoryName());
         		
   		if(category == null) {
    			throw new ResourceNotFoundException(productDTO.getCategoryName() + "로 등록된 카테고리를 찾을 수 없습니다.");	
@@ -466,15 +466,39 @@ public class ProductsServiceImpl implements ProductsService {
         
         oldProduct.setName(productDTO.getName());
         oldProduct.setCategory(category);
+        oldProduct.setExpiryDate(LocalDateTime.parse(productDTO.getExpiryDate()));
+        oldProduct.setDiscountRate(DiscountRate.fromRate(productDTO.getDiscountRate()));
+        oldProduct.setIsDiscount(productDTO.getDiscountRate() > 0 ? true : false);
+        oldProduct.setOriginPrice(productDTO.getOriginPrice());
         oldProduct.setDescription(productDTO.getDescription());
         oldProduct.setPrice(productDTO.getPrice());
         
-        productRepository.save(oldProduct);
+        oldProduct.applyDiscount(); // 할인 가격 적용
+        
+        Product product = productRepository.save(oldProduct);
         
         // 재고 저장
         Inventory inventory = inventoryRepository.findByProduct(oldProduct);
-        inventory.setStock(productDTO.getStock());
+        
+        
+        // 인벤토리가 없으면 해당 상품에 대한 인벤토리를 만들어줌
+        if(inventory == null) {
+        inventory = Inventory.builder()
+        	.minStock(productDTO.getMinStock())
+        	.stock(productDTO.getStock())
+        	.product(product)
+        	.seller(seller)
+        	.build();
+        
+        // 존재하면 
+        } else {
+        	inventory.setStock(productDTO.getStock());
+        	inventory.setMinStock(productDTO.getMinStock());
+        }
+        
         inventoryRepository.save(inventory);
+        
+        return product;
     }
     
     // 상품 삭제
@@ -507,10 +531,12 @@ public class ProductsServiceImpl implements ProductsService {
         for (MultipartFile image : images) {
             String name = UUID.randomUUID() + "_" + image.getOriginalFilename(); // 랜덤 파일명 생성
             String imageUrl = uploadDir + name;
-
+            
+                    
             // 파일을 서버에 저장하는 로직
             File fileDir = new File(imageUrl);
             try {
+            	
                 Files.createDirectories(Paths.get(uploadDir)); // 디렉토리 자동 생성
                 image.transferTo(fileDir); // 이미지 저장
             } catch (IOException e) {
