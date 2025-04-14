@@ -71,10 +71,16 @@ public class UserServiceImpl implements UserService {
     @Override
     @Transactional(propagation = Propagation.REQUIRED) // ✅ 트랜잭션 적용
     public void registerUser(User user) {
+        // 로그: User 저장 전 상태
+        System.out.println("registerUser 호출됨 - user: " + user.getUsername());
         User savedUser = userRepository.save(user);
+        System.out.println("User 저장 완료: " + savedUser.getUserId());
 
         List<Address> addresses = user.getAddresses() != null ? user.getAddresses() : List.of();
         if (!addresses.isEmpty()) {
+            // 로그: 주소 저장 전 상태
+            System.out.println("주소 목록 저장 전: " + addresses);
+
             List<Address> addressEntities = addresses.stream()
                 .map(address -> {
                     Address addressEntity = new Address();
@@ -86,8 +92,12 @@ public class UserServiceImpl implements UserService {
                     return addressEntity;
                 }).collect(Collectors.toList());
 
+            // 로그: 주소 저장 후 상태
+            System.out.println("저장할 주소 목록: " + addressEntities);
+//            addressRepository.saveAll(addressEntities);
         }
     }
+
 
     @Override
     @Transactional(readOnly = true) // ✅ 읽기 전용 트랜잭션 (Lazy Loading 문제 방지)
@@ -308,5 +318,28 @@ public class UserServiceImpl implements UserService {
 	        log.warn("❌ 판매자 거절 메일 전송 실패: {}", e.getMessage());
 	    }
 	}
+
+	@Override
+	public void sendAuthCode(String email) throws MessagingException {
+	    // 1. 인증 코드 생성
+	    String authCode = emailUtils.createAuthCode(5); // 5자리 인증 코드 생성
+
+	    // 2. 인증 코드 Redis에 저장 (5분간 유효)
+	    redisTemplate.opsForValue().set(email, authCode, 300, TimeUnit.SECONDS); // 5분 간 유효
+
+	    // 3. 이메일 발송
+	    MimeMessage message = createMail(email, authCode);
+	    javaMailSender.send(message);
+
+	    // 로그 추가
+	    log.info("인증 코드 전송 완료: {}", email);
+	}
+
+	
+	
+	
+	
+	
+	
 
 }

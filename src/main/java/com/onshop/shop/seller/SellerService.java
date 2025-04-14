@@ -4,16 +4,20 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.onshop.shop.exception.ResourceNotFoundException;
 
-
+import lombok.extern.slf4j.Slf4j;
 
 @Service
+@Slf4j
 public class SellerService {
 
     private final SellerRepository sellerRepository;
@@ -190,6 +194,31 @@ public class SellerService {
         // DTO에 값 설정하여 반환
         return new SellerStatsDTO(totalSellers, waitingApproval, approved, rejected);
     }
+    
+    /** 홈페이지*/
+    
+    public List<SellerStoresDTO> getAllStores(int page, int size) {
+       Pageable pageable = PageRequest.of(page, size);
+       List<Seller> storeEntries = sellerRepository.findAll(pageable).toList();
+       
+       
+       if(storeEntries.isEmpty()) {
+          throw new ResourceNotFoundException("조회할 판매자가 없습니다.");
+       }
+       
+       return storeEntries.stream().map((sellerEntity)->{
+          log.info("sellerEntity{}",sellerEntity);
+          return SellerStoresDTO.builder()
+                .storeName(sellerEntity.getStorename())
+                .description(sellerEntity.getDescription())
+                .logoUrl(sellerEntity.getSettings())
+                .build();
+       }).toList();
+             
+    
+       
+    }
+    
     
     
     

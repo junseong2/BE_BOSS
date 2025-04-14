@@ -34,6 +34,9 @@ public class SettlementServiceImpl implements SettlementService {
 		Settlement unsaved = Settlement.builder()
 				.seller(seller)
 				.requestedAmount(requestDTO.getAmount())
+				.bankName(requestDTO.getBank())
+				.accountNumber(requestDTO.getAccount())
+				.accountHolder(requestDTO.getName())
 				.status(SettlementStatus.PENDING)
 				.build();
 		
@@ -46,8 +49,8 @@ public class SettlementServiceImpl implements SettlementService {
 		return SettlementsDTO.builder()
 				.settlementId(settlement.getSettlementId())
 				.status(settlement.getStatus())
-				.accountNum((long) 1122070398)
-				.bank("부산")
+				.accountNum(requestDTO.getAccount())
+				.bank(requestDTO.getBank())
 				.name(user.getUsername())
 				.totalAmount(settlement.getRequestedAmount())
 				.requestDate(settlement.getCreatedDate())

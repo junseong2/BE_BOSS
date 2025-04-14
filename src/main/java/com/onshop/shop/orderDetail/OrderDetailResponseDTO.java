@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import com.onshop.shop.payment.PaymentMethod;
+import com.onshop.shop.product.Product;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -38,7 +39,7 @@ public class OrderDetailResponseDTO {
     	    this.username = username;
     	    this.phoneNumber = phoneNumber;
     	    this.address = address;
-    	    this.products = new ArrayList<>();
+    	    this.products = new ArrayList<ProductItemDTO>();
     	}
 
 }
