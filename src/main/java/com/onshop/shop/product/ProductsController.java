@@ -299,4 +299,13 @@ public class ProductsController {
 		
 	}
 	
+	@GetMapping("/products/detail/{productId}")
+	public ResponseEntity<ProductDetailResponseDTO> getProductDetail(@PathVariable Long productId
+			) {
+		
+	    ProductDetailResponseDTO dto = productsService.getProductDetail(productId);
+	    return ResponseEntity.ok(dto);
+	}
+
+	
 }

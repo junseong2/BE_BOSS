@@ -59,5 +59,7 @@ public interface ProductsService {
     List<Product> getPopularProductsBySellerWeekly(Long sellerId);
     List<Product> getPopularProductsBySellerMonthly(Long sellerId);
     List<SellerProductsListDTO> getAllSellerProducts(Long sellerId, int page, int size, String search, String sort, Long categoryId);
+    
+    ProductDetailResponseDTO getProductDetail(Long productId);
 
 }
