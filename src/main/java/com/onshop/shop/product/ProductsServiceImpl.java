@@ -2,6 +2,7 @@ package com.onshop.shop.product;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.time.LocalDateTime;
@@ -28,6 +29,8 @@ import com.onshop.shop.inventory.Inventory;
 import com.onshop.shop.inventory.InventoryRepository;
 import com.onshop.shop.seller.Seller;
 import com.onshop.shop.seller.SellerRepository;
+import com.opencsv.CSVReader;
+import com.opencsv.exceptions.CsvValidationException;
 
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
@@ -635,5 +638,27 @@ public class ProductsServiceImpl implements ProductsService {
     public List<Product> getPopularProductsBySellerMonthly(Long sellerId) {
     	return productRepository.findBySeller_SellerIdOrderByMonthlySalesDesc(sellerId);
     }
+
+    /** 판매자 상품 CSV 업로드
+     * @throws IOException 
+     * @throws CsvValidationException */
+	@Override
+	public void uploadProductsCsv(MultipartFile file, Long userId) throws IOException, CsvValidationException {
+		
+        try (CSVReader csvReader = new CSVReader(new InputStreamReader(file.getInputStream()))) {
+            String[] nextLine;
+            List<Product> products = new ArrayList<>();
+
+ 
+            csvReader.readNext(); // 헤더는 건너감
+
+            while ((nextLine = csvReader.readNext()) != null) {
+            	
+            	
+            	
+            	
+            }
+        }		
+	}
 
 }

@@ -39,8 +39,6 @@ public class ReviewController {
 			@PathVariable Long productId,
 			@CookieValue(value = "jwt", required = false) String token) {
 		
-	
-
 		Long userId =null;
         if (token != null) {
         	userId= jwtUtil.extractUserId(token); // ✅ JWT에서 userId 추출
