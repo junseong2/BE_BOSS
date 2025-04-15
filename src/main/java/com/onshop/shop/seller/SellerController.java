@@ -351,6 +351,7 @@ public class SellerController {
 				Map<String, Object> response = new HashMap<>();
 				response.put("sellerId", seller.getSellerId());
 				response.put("storename", seller.getStorename());
+				response.put("representativeName", seller.getRepresentativeName());
 				// ✅ settings 값 추가 (JSON 문자열이면 그대로 반환)
 				String settings = seller.getSettings();
 				if (settings == null || settings.trim().isEmpty()) {
