@@ -212,23 +212,27 @@ public class SellerController {
 
 			// 받은 순서대로 처리
 			for (Map<String, Object> setting : mobilesettingsList) {
-			    String type = (String) setting.get("type");
-			    logger.info("처리 타입: " + type);
+				String type = (String) setting.get("type");
+				logger.info("처리 타입: " + type); // banner → grid → header 순 출력
 
-			    // 각 type에 따른 처리
-			    if ("header".equals(type) || "mobileheader".equals(type)) {
-			        logger.info("헤더 처리: " + setting);
-			    } else if ("banner".equals(type) || "mobilebanner".equals(type)) {
-			        logger.info("배너 처리: " + setting);
-			    } else if ("grid".equals(type) || "mobilegrid".equals(type)) {
-			        logger.info("그리드 처리: " + setting);
-			    } else if ("mobileBottomNavigationBar".equals(type)) {
-			        logger.info("바텀 네비게이션 바 처리: " + setting);
-			    } else {
-			        logger.warn("알 수 없는 타입: " + type);
-			    }
+				// 각 type에 따른 처리
+				if ("header".equals(type)) {
+					// 헤더 처리
+					logger.info("헤더 처리: " + setting);
+					// 헤더 관련 로직 추가
+				} else if ("banner".equals(type)) {
+					// 배너 처리
+					logger.info("배너 처리: " + setting);
+					// 배너 관련 로직 추가
+				} else if ("grid".equals(type)) {
+					// 그리드 처리
+					logger.info("그리드 처리: " + setting);
+					// 그리드 관련 로직 추가
+				} else {
+					// 알 수 없는 type 처리
+					logger.warn("알 수 없는 타입: " + type);
+				}
 			}
-
 
 			// settings를 DB에 저장
 			Seller updatedSeller = sellerService.updateSellerMobilesettings(sellerId, mobilesettings);

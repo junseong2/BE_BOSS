@@ -212,7 +212,6 @@ public class SellerService {
                 .storeName(sellerEntity.getStorename())
                 .description(sellerEntity.getDescription())
                 .logoUrl(sellerEntity.getSettings())
-                .sellerId(sellerEntity.getSellerId().intValue())
                 .build();
        }).toList();
              
