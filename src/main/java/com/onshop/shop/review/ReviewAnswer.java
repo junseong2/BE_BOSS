@@ -34,7 +34,6 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class ReviewAnswer {
 	
-
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long answerId;

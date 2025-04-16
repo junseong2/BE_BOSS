@@ -6,6 +6,8 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
+import io.jsonwebtoken.ExpiredJwtException;
+
 
 
 /**
@@ -60,6 +62,13 @@ public class GlobalException {
     public ResponseEntity<ErrorMessageResponse> handleResourceNotFound(ResourceNotFoundException ex) {
         ErrorMessageResponse response = new ErrorMessageResponse(HttpStatus.NOT_FOUND, ex.getMessage());
         return new ResponseEntity<ErrorMessageResponse>(response, HttpStatus.NOT_FOUND);
+    }
+    
+    // 토큰 만료 예외   
+    @ExceptionHandler(ExpiredJwtException.class)
+    public ResponseEntity<ErrorMessageResponse> handleJwtExpiredException(ExpiredJwtException ex) {
+        ErrorMessageResponse response = new ErrorMessageResponse(HttpStatus.NOT_FOUND, ex.getMessage());
+        return new ResponseEntity<ErrorMessageResponse>(response, HttpStatus.UNAUTHORIZED);
     }
     
     
