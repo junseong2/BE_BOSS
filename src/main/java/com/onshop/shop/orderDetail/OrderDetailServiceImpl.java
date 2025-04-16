@@ -10,17 +10,18 @@ import com.onshop.shop.exception.ResourceNotFoundException;
 import com.onshop.shop.order.Order;
 import com.onshop.shop.order.OrderDTO;
 import com.onshop.shop.order.OrderRepository;
+import com.onshop.shop.seller.Seller;
+import com.onshop.shop.seller.SellerRepository;
 
 import lombok.RequiredArgsConstructor;
 
 @Service
 @RequiredArgsConstructor
 public class OrderDetailServiceImpl implements OrderDetailService {
-	
-	
 	private final OrderDetailRepository orderDetailRepository;
 	private final OrderRepository orderRepository;
 	private final CartRepository cartRepository;
+	private final SellerRepository sellerRepository;
 	
 	
 	// 주문 상세 저장
@@ -70,16 +71,15 @@ public class OrderDetailServiceImpl implements OrderDetailService {
 	
 	// 주문 번호, 판매자 별 주문 상세 내역 조회
 	@Override
-	public SellerOrderDetailResponseDTO getOrderDetailByOrderId(Long orderId) {
-		// TODO: 실제 판매자 id 를 조회해야 함.
-		Long sellerId = 999L;
+	public SellerOrderDetailResponseDTO getOrderDetailByOrderId(Long orderId, Long userId) {
+
+		Seller seller = sellerRepository.findByUserId(userId).orElseThrow(()-> new ResourceNotFoundException("판매자만 가능합니다."));
+		Long sellerId = seller.getSellerId();
+		
 		SellerOrderDetailResponseDTO orderDetail = orderDetailRepository.findOrderDetailsByOrderId(orderId, sellerId);
 		if(orderDetail == null) {
 			throw new ResourceNotFoundException("주문번호:"+orderId+"에 해당하는 주문상세 내역을 찾을 수 없습니다.");
 		}
 		return orderDetail;
 	}
-
-
-
 }

@@ -7,6 +7,7 @@ import org.springframework.data.jpa.repository.Query;
 
 import com.onshop.shop.user.User;
 
+import io.lettuce.core.dynamic.annotation.Param;
 import io.micrometer.common.lang.Nullable;
 public interface ReviewRepsitory extends JpaRepository<Review, Long>  {
 	
@@ -43,20 +44,37 @@ public interface ReviewRepsitory extends JpaRepository<Review, Long>  {
 	
 	
 	/** 판매자*/
-	@Query("SELECT new com.onshop.shop.review.SellerReviewsDTO(" +
-		       "re.reviewId, re.rating, re.product.name, re.reviewText, re.user.username, " +
-		       "re.isAnswered, re.createdAt, re.lastModifiedAt, " +  // 리뷰 정보
-		       "ra.answerId, ra.answerText, ra.seller.storename, ra.createdAt, ra.lastModifiedAt) " +  // ReviewAnswer 정보
-		       "FROM Review re LEFT JOIN ReviewAnswer ra ON re.reviewId = ra.review.reviewId " +  
-		       "WHERE re.product.seller.sellerId = :sellerId " +
-		       "AND (:rating IS NULL OR re.rating = :rating) " +
-		       "AND (:isAnswered IS NULL OR re.isAnswered = :isAnswered)")
+	@Query(value = "SELECT " +
+            "re.review_id AS reviewId, " +
+            "re.rating AS rating, " +
+            "p.name AS productName, " +
+            "re.review_text AS reviewText, " +
+            "u.username AS username, " +
+            "re.is_answered AS isAnswered, " +
+            "re.created_at AS createdAt, " +
+            "re.last_modified_at AS lastModifiedAt, " +
+            "ra.answer_id AS answerId, " +
+            "ra.answer_text AS answerText, " +
+            "s.storename AS storeName, " +
+            "ra.created_at AS answerCreatedAt, " +
+            "ra.last_modified_at AS answerModifiedAt " +
+            "FROM review re " +
+            "LEFT JOIN review_answer ra ON ra.review_id = re.review_id " +
+            "JOIN product p ON re.product_id = p.product_id " +
+            "JOIN users u ON re.user_id = u.user_id " +
+            "JOIN seller s ON p.seller_id = s.seller_id " +
+            "WHERE p.seller_id = :sellerId " +
+            "AND (:rating IS NULL OR re.rating = :rating) " +
+            "AND (:isAnswered IS NULL OR re.is_answered = :isAnswered)", 
+    countQuery = "SELECT COUNT(re) FROM Review re WHERE re.product.seller.sellerId = :sellerId", 
+		    nativeQuery = true)
 		Page<SellerReviewsDTO> findAllBySellerId(
-		    Long sellerId,
-		    @Nullable Integer rating, 
-		    @Nullable Boolean isAnswered,
-		    Pageable pageable
+		 @Param("sellerId") Long sellerId,
+		 @Nullable @Param("rating") Integer rating, 
+		 @Nullable @Param("isAnswered") Boolean isAnswered,
+		 Pageable pageable
 		);
+
 	// 판매자 리뷰 개수 통계
 	@Query("SELECT COUNT(re) FROM Review re "+
 		       "WHERE re.product.seller.sellerId = :sellerId " +
