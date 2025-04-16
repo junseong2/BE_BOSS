@@ -1,5 +1,6 @@
 package com.onshop.shop.product;
 
+import java.io.IOException;
 import java.util.List;
 
 import org.springframework.data.domain.Page;
@@ -7,6 +8,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.onshop.shop.category.CategoryDTO;
+import com.opencsv.exceptions.CsvValidationException;
 
 
 public interface ProductsService {
@@ -60,6 +62,11 @@ public interface ProductsService {
     List<Product> getPopularProductsBySellerMonthly(Long sellerId);
     List<SellerProductsListDTO> getAllSellerProducts(Long sellerId, int page, int size, String search, String sort, Long categoryId);
     
+
     ProductDetailResponseDTO getProductDetail(Long productId);
 
+
+    
+    /** 판매자 상품 CSV 업로드*/
+    public void uploadProductsCsv(MultipartFile file, Long userId)  throws IOException, CsvValidationException;
 }

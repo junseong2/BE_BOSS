@@ -509,6 +509,7 @@ public class SellerController {
         SellerStatsDTO stats = sellerService.getSellerStats();
         return ResponseEntity.ok(stats); // 통계 데이터를 반환
     }
+
     @GetMapping("/stores")
     public ResponseEntity<List<SellerStoresDTO>> getAllStores(
           @RequestParam int page,

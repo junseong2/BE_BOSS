@@ -33,8 +33,6 @@ import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeMessage;
 import lombok.extern.slf4j.Slf4j;
 
-
-
 @Service
 @Slf4j
 public class UserServiceImpl implements UserService {
@@ -77,6 +75,7 @@ public class UserServiceImpl implements UserService {
         System.out.println("User 저장 완료: " + savedUser.getUserId());
 
         List<Address> addresses = user.getAddresses() != null ? user.getAddresses() : List.of();
+        log.info("주소 목록:{}",addresses);
         if (!addresses.isEmpty()) {
             // 로그: 주소 저장 전 상태
             System.out.println("주소 목록 저장 전: " + addresses);

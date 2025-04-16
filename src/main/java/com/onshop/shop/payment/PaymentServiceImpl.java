@@ -10,6 +10,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
+import com.onshop.shop.exception.NotAuthException;
 import com.onshop.shop.exception.ResourceNotFoundException;
 import com.onshop.shop.order.Order;
 import org.springframework.beans.factory.annotation.Value;
@@ -23,6 +24,8 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.client.RestTemplate;
 
 import com.onshop.shop.order.OrderRepository;
+import com.onshop.shop.seller.Seller;
+import com.onshop.shop.seller.SellerRepository;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -35,6 +38,7 @@ public class PaymentServiceImpl implements PaymentService {
     private final PaymentRepository paymentRepository;
     private final OrderRepository orderRepository;
     private final RestTemplate restTemplate;
+    private final SellerRepository sellerRepository;
 
     @Value("${portone.api-key}")
     private String apiKey;
@@ -101,9 +105,13 @@ public class PaymentServiceImpl implements PaymentService {
     /** 판매자*/
 	// 판매자 매출 통계
 	@Override
-	public SellerPaymentStatisticsDTO getSellerPaymentStatistics(LocalDateTime startDate, LocalDateTime endDate) {
+	public SellerPaymentStatisticsDTO getSellerPaymentStatistics(LocalDateTime startDate, LocalDateTime endDate, Long userId) {
 			
-		Long sellerId = 999L;
+    	Seller seller = sellerRepository.findByUserId(userId).orElseThrow(()->
+		new NotAuthException("판매자만 이용 가능합니다.")
+		);
+	    Long sellerId = seller.getSellerId();
+	    
 		SellerPaymentStatisticsDTO paymentStatisticsDTO   = paymentRepository.findOrderStatsBySellerId(sellerId, startDate, endDate);
 
 		if(paymentStatisticsDTO == null) {
@@ -116,8 +124,12 @@ public class PaymentServiceImpl implements PaymentService {
 	
 	// 판매자 월별 매출 
 	@Override
-	public Map<String, Long> getSellerPaymentsByMonth(LocalDateTime startDate, LocalDateTime endDate) {
-		Long sellerId = 999L;
+	public Map<String, Long> getSellerPaymentsByMonth(LocalDateTime startDate, LocalDateTime endDate, Long userId) {
+    	Seller seller = sellerRepository.findByUserId(userId).orElseThrow(()->
+		new NotAuthException("판매자만 이용 가능합니다.")
+		);
+	    Long sellerId = seller.getSellerId();
+	    
 		List<SellerPaymentsDTO> monthlySales = paymentRepository.getMonthlySalesBySellerOnlyPaid(sellerId, startDate, endDate);
 		
 		if(monthlySales.isEmpty()) {
@@ -145,9 +157,13 @@ public class PaymentServiceImpl implements PaymentService {
 
 	// 판매자 월별 카테고리별 매출 통계 비율
 	@Override
-	public List<SellerCategorySalesDTO> getSellerPaymentSalesByCategory(LocalDateTime startDate,LocalDateTime endDate) {
+	public List<SellerCategorySalesDTO> getSellerPaymentSalesByCategory(LocalDateTime startDate,LocalDateTime endDate, Long userId) {
 		
-		Long sellerId = 999L;
+    	Seller seller = sellerRepository.findByUserId(userId).orElseThrow(()->
+		new NotAuthException("판매자만 이용 가능합니다.")
+		);
+	    Long sellerId = seller.getSellerId();
+	    
 		List<SellerCategorySalesDTO> categorySalesDTOs = paymentRepository.getCategorySalesBySeller(sellerId, startDate, endDate);
 		
 		if(categorySalesDTOs.isEmpty()) {

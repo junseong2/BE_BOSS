@@ -51,6 +51,8 @@ public class ReviewServiceImpl implements ReviewService  {
 		
 		Pageable pageable = (Pageable) PageRequest.of(page, size);
 		
+		log.info("productId:{}, userId:{}, page:{}, size:{}", productId, userId, page, size);
+		
 		
 		List<ReviewsDTO> reviews = reviewRepsitory.findByProductId(productId,userId, pageable).toList();
 		Long totalCount = reviewRepsitory.countByProductProductId(productId);
@@ -58,6 +60,7 @@ public class ReviewServiceImpl implements ReviewService  {
 		if(reviews.isEmpty()) {
 			throw new ResourceNotFoundException("해당 상품의 리뷰를 조회할 수 없습니다.");
 		}
+		
 		
 		return ReviewResponseDTO.builder()
 				.reviews(reviews)
@@ -92,6 +95,7 @@ public class ReviewServiceImpl implements ReviewService  {
 				 .product(product)
 				 .rating(reviewDTO.getRatings())
 				 .reviewText(reviewDTO.getReviewText())
+				 .isAnswered(false)
 				 .user(user)
 				 .build());
 		
@@ -186,6 +190,9 @@ public class ReviewServiceImpl implements ReviewService  {
 		
 		Seller seller = sellerRepository.findByUserId(userId).orElseThrow(()-> new NotAuthException("판매자만 이용 가능합니다."));
 		
+		
+
+		
 		Pageable pageable = PageRequest.of(page, size);
 		
 		
@@ -201,9 +208,11 @@ public class ReviewServiceImpl implements ReviewService  {
 				condition.getRating(),
 				condition.getIsAnswered(),
 				pageable).toList();
+		
+		log.info("seller: {}, totalCount:{}, reviews:{}", seller, totalCount, reviews);
 		 
 		if(reviews.isEmpty()) {
-			throw new ResourceNotFoundException("조회할 리뷰가 없어요!");
+			reviews = null;
 		}
 		
 		return SellerReviewResponseDTO.builder()
@@ -239,6 +248,8 @@ public class ReviewServiceImpl implements ReviewService  {
 
 		ReviewAnswer oldReviewAnswer = reviewAnswerRepository.findById(reviewId).orElseThrow(()-> new ResourceNotFoundException("해당 리뷰는 존재하지 않습니다."));
 		oldReviewAnswer.setAnswerText(answerDTO.getAnswerText());
+		
+		reviewAnswerRepository.save(oldReviewAnswer);
 	}
 
 
@@ -246,6 +257,12 @@ public class ReviewServiceImpl implements ReviewService  {
 	@Override
 	public void deleteSellerReview(Long answerId, Long userId, Long reviewId) {
 		Seller seller = sellerRepository.findByUserId(userId).orElseThrow(()-> new NotAuthException("판매자만 이용 가능합니다."));
+		
+		boolean hasReview = reviewRepsitory.existsById(reviewId);
+		
+		if(!hasReview) {
+			throw new ResourceNotFoundException("해당 리뷰는 존재하지 않습니다."+ "reviewId:"+reviewId);
+		}
 		
 		Boolean isAnswer = reviewAnswerRepository.existsByAnswerIdAndSeller(answerId, seller);
 		if(!isAnswer) {

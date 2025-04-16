@@ -299,6 +299,26 @@ public class ProductsController {
 		
 	}
 	
+
+	// 상품 업로드 (CSV)
+	@PostMapping("/seller/products/csv")
+	public ResponseEntity<?> uploadCsv(
+			@RequestParam("file") MultipartFile file,			
+			@CookieValue(value = "jwt", required = false) String token) {
+		
+//		if (token == null) {
+//			throw new NotAuthException("요청 권한이 없습니다.");
+//		}
+
+		  try {
+	            productsService.uploadProductsCsv(file, null); // CSV 업로드 처리
+	            return ResponseEntity.ok("CSV 파일 업로드 완료");
+	        } catch (Exception e) {
+	            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
+	        }
+		
+	}
+
 	@GetMapping("/products/detail/{productId}")
 	public ResponseEntity<ProductDetailResponseDTO> getProductDetail(@PathVariable Long productId
 			) {

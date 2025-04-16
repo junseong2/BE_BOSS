@@ -16,8 +16,6 @@ import lombok.RequiredArgsConstructor;
 @Service
 @RequiredArgsConstructor
 public class OrderDetailServiceImpl implements OrderDetailService {
-	
-	
 	private final OrderDetailRepository orderDetailRepository;
 	private final OrderRepository orderRepository;
 	private final CartRepository cartRepository;
@@ -79,7 +77,4 @@ public class OrderDetailServiceImpl implements OrderDetailService {
 		}
 		return orderDetail;
 	}
-
-
-
 }

@@ -237,7 +237,7 @@
 		<dependency>
 		    <groupId>io.github.cdimascio</groupId>
 		    <artifactId>java-dotenv</artifactId>
-		    <version>5.1.1</version>
+		    <version>5.2.2</version>
 		</dependency>
 
 		<!--크롤러 용으로 추가한 의존성-->
@@ -246,6 +246,11 @@
   			<artifactId>selenium-java</artifactId>
   			<version>4.18.0</version>
 		</dependency>
+		<dependency>
+		    <groupId>com.opencsv</groupId>
+		    <artifactId>opencsv</artifactId>
+		    <version>5.7.1</version>
+    	</dependency>
 
 	</dependencies>
 <repositories>
