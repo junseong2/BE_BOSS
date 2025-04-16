@@ -63,6 +63,9 @@ public interface ProductsService {
     List<SellerProductsListDTO> getAllSellerProducts(Long sellerId, int page, int size, String search, String sort, Long categoryId);
     
 
+    ProductDetailResponseDTO getProductDetail(Long productId);
+
+
     
     /** 판매자 상품 CSV 업로드*/
     public void uploadProductsCsv(MultipartFile file, Long userId)  throws IOException, CsvValidationException;

@@ -1,3 +1,4 @@
+
 package com.onshop.shop.seller;
 
 import lombok.AllArgsConstructor;
@@ -14,7 +15,8 @@ public class SellerStoresDTO {
    private String storeName;
    private String description;
    private String logoUrl;
+   private int sellerId;
+
    
 
 }
-

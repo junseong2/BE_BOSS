@@ -299,6 +299,7 @@ public class ProductsController {
 		
 	}
 	
+
 	// 상품 업로드 (CSV)
 	@PostMapping("/seller/products/csv")
 	public ResponseEntity<?> uploadCsv(
@@ -317,5 +318,14 @@ public class ProductsController {
 	        }
 		
 	}
+
+	@GetMapping("/products/detail/{productId}")
+	public ResponseEntity<ProductDetailResponseDTO> getProductDetail(@PathVariable Long productId
+			) {
+		
+	    ProductDetailResponseDTO dto = productsService.getProductDetail(productId);
+	    return ResponseEntity.ok(dto);
+	}
+
 	
 }

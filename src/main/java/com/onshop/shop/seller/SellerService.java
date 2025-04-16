@@ -199,23 +199,26 @@ public class SellerService {
     /** 홈페이지*/
     
     public List<SellerStoresDTO> getAllStores(int page, int size) {
-    	Pageable pageable = PageRequest.of(page, size);
-    	List<Seller> storeEntries = sellerRepository.findAll(pageable).toList();
-    	
-    	
-    	if(storeEntries.isEmpty()) {
-    		throw new ResourceNotFoundException("조회할 판매자가 없습니다.");
-    	}
-    	
-    	return storeEntries.stream().map((sellerEntity)->{
-    		log.info("sellerEntity{}",sellerEntity);
-    		return SellerStoresDTO.builder()
-    				.storeName(sellerEntity.getStorename())
-    				.description(sellerEntity.getDescription())
-    				.logoUrl(sellerEntity.getSettings())
-    				.build();
-    	}).toList();
-    			
+
+       Pageable pageable = PageRequest.of(page, size);
+       List<Seller> storeEntries = sellerRepository.findAll(pageable).toList();
+       
+       
+       if(storeEntries.isEmpty()) {
+          throw new ResourceNotFoundException("조회할 판매자가 없습니다.");
+       }
+       
+       return storeEntries.stream().map((sellerEntity)->{
+          log.info("sellerEntity{}",sellerEntity);
+          return SellerStoresDTO.builder()
+                .storeName(sellerEntity.getStorename())
+                .description(sellerEntity.getDescription())
+                .logoUrl(sellerEntity.getSettings())
+                .sellerId(sellerEntity.getSellerId().intValue())
+                .build();
+       }).toList();
+             
+
     
     	
     }

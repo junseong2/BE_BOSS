@@ -1,10 +1,12 @@
 package com.onshop.shop.product;
 
 import java.util.List;
+import java.util.Optional;
 
 import org.apache.ibatis.annotations.Param;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
@@ -408,6 +410,11 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
         Page<SellerProductsListDTO> findSellerProductsBySearch(@Param("sellerId") Long sellerId,
                                                                 @Param("search") String search,
                                                                 Pageable pageable);
+    
+    @EntityGraph(attributePaths = {"seller"})
+    @Query("SELECT p FROM Product p WHERE p.productId = :productId")
+    Optional<Product> findDetailWithSellerById(@Param("productId") Long productId);
+
 }
 
 

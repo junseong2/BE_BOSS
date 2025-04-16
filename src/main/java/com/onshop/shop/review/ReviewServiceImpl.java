@@ -248,6 +248,8 @@ public class ReviewServiceImpl implements ReviewService  {
 
 		ReviewAnswer oldReviewAnswer = reviewAnswerRepository.findById(reviewId).orElseThrow(()-> new ResourceNotFoundException("해당 리뷰는 존재하지 않습니다."));
 		oldReviewAnswer.setAnswerText(answerDTO.getAnswerText());
+		
+		reviewAnswerRepository.save(oldReviewAnswer);
 	}
 
 
@@ -255,6 +257,12 @@ public class ReviewServiceImpl implements ReviewService  {
 	@Override
 	public void deleteSellerReview(Long answerId, Long userId, Long reviewId) {
 		Seller seller = sellerRepository.findByUserId(userId).orElseThrow(()-> new NotAuthException("판매자만 이용 가능합니다."));
+		
+		boolean hasReview = reviewRepsitory.existsById(reviewId);
+		
+		if(!hasReview) {
+			throw new ResourceNotFoundException("해당 리뷰는 존재하지 않습니다."+ "reviewId:"+reviewId);
+		}
 		
 		Boolean isAnswer = reviewAnswerRepository.existsByAnswerIdAndSeller(answerId, seller);
 		if(!isAnswer) {

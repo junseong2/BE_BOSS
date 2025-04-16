@@ -188,7 +188,7 @@ public class ReviewController {
         
         Long userId = jwtUtil.extractUserId(token);
         
-        reviewService.updateSellerReview(sellerAnswerRequestDTO, userId, reviewId);
+        reviewService.updateSellerReview(sellerAnswerRequestDTO, userId, answerId);
         
         
         return ResponseEntity.noContent().build();

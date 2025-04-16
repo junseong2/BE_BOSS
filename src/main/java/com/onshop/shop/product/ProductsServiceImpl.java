@@ -12,6 +12,7 @@ import java.util.Map;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
+import org.openqa.selenium.NotFoundException;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -637,6 +638,13 @@ public class ProductsServiceImpl implements ProductsService {
     @Override
     public List<Product> getPopularProductsBySellerMonthly(Long sellerId) {
     	return productRepository.findBySeller_SellerIdOrderByMonthlySalesDesc(sellerId);
+    }
+    
+    @Override
+    public ProductDetailResponseDTO getProductDetail(Long productId) {
+        Product product = productRepository.findDetailWithSellerById(productId)
+                .orElseThrow(() -> new NotFoundException("상품을 찾을 수 없습니다."));
+        return ProductDetailResponseDTO.fromEntity(product);
     }
 
     /** 판매자 상품 CSV 업로드
