@@ -50,10 +50,12 @@ public class ProductsServiceImpl implements ProductsService {
     @Value("${file.upload-dir}")  // application.properties에서 경로 정보를 읽어옴
     private String uploadDir;
     
-
+    
+    
     @Override
-    public List<ProductsDTO> getAllProducts() {
-        return productRepository.findAll().stream()
+    public List<ProductsDTO> getAllProducts(int page, int size) {
+    	Pageable pageable = PageRequest.of(page, size);
+        return productRepository.findAll(pageable).stream()
                 .map(ProductsDTO::fromEntity)
                 .collect(Collectors.toList());
     }
@@ -82,7 +84,11 @@ public class ProductsServiceImpl implements ProductsService {
     
     
     @Override
-    public List<ProductsDTO> getProductsByCategory(Long categoryId) {
+    public List<ProductsDTO> getProductsByCategory(Long categoryId, int page, int size) {
+    	
+    	
+    	Pageable pageable = PageRequest.of(page, size);
+    	
         // ✅ 1. 해당 카테고리의 하위 카테고리 ID 가져오기
         List<Category> subcategories = categoryRepository.findByParentCategoryId(categoryId);
         List<Long> categoryIds = subcategories.stream()
@@ -93,7 +99,7 @@ public class ProductsServiceImpl implements ProductsService {
         categoryIds.add(categoryId);
 
         // ✅ 3. 해당 카테고리 + 하위 카테고리에 속한 상품 조회
-        List<Product> products = productRepository.findByCategoryIdIn(categoryIds);
+        List<Product> products = productRepository.findByCategoryIdIn(categoryIds, pageable);
         return products.stream()
                 .map(ProductsDTO::fromEntity)
                 .collect(Collectors.toList());

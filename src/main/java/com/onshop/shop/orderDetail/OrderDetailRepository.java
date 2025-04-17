@@ -49,7 +49,7 @@ public interface OrderDetailRepository extends JpaRepository<OrderDetail, Long> 
 			        o.orderId, 
 			        o.createdDate, 
 			        COALESCE(SUM(od.quantity), 0),
-			        p.totalAmount - (p.totalAmount * 0.1) + 3000,
+			        p.totalAmount,
 			        p.paidDate, 
 			        p.paymentMethod, 
 			        u.username, 

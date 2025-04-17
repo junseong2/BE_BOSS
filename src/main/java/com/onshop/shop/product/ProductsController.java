@@ -43,8 +43,11 @@ public class ProductsController {
     /** 구매자*/
     // 모든 상품 조회
     @GetMapping("/products")
-    public List<ProductsDTO> getAllProducts() {
-        return productsService.getAllProducts();
+    public List<ProductsDTO> getAllProducts(
+    		@RequestParam int page,
+    		@RequestParam int size
+    		) {
+        return productsService.getAllProducts(page, size);
     }
     
     @GetMapping("/seller/products/popular")
@@ -111,8 +114,13 @@ public class ProductsController {
     
     // ✅ 특정 카테고리의 상품 조회 API 추가
     @GetMapping("/products/category/{categoryId}")
-    public List<ProductsDTO> getProductsByCategory(@PathVariable Long categoryId) {
-        return productsService.getProductsByCategory(categoryId);
+    public List<ProductsDTO> getProductsByCategory(
+    		@PathVariable Long categoryId,
+    		@RequestParam int page,
+    		@RequestParam int size
+    		
+    		) {
+        return productsService.getProductsByCategory(categoryId, page, size);
     }
     @GetMapping("/seller/used-categories")
     public ResponseEntity<List<CategoryDTO>> getUsedCategories(@RequestParam Long sellerId) {
