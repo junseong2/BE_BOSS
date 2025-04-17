@@ -23,7 +23,7 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
     List<Product> findByCategoryId(Long categoryId);
     Product findBySeller_SellerIdAndProductId(Long sellerId, Long productId);
     
-    List<Product> findByCategoryIdIn(List<Long> categoryIds);
+    List<Product> findByCategoryIdIn(List<Long> categoryIds, Pageable pageable);
 
     //sellerId를 엔티티 기준으로 수정 (seller.sellerId → seller.id)
     @Query("SELECT p FROM Product p WHERE p.seller.sellerId = :sellerId")
@@ -65,6 +65,7 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
         LEFT JOIN category c ON c.category_id = p.category_id
         LEFT JOIN inventory i ON i.product_id = p.product_id
         WHERE p.seller_id = :sellerId AND p.name LIKE CONCAT('%', :search, '%')
+        ORDER BY p.product_id DESC
     """, nativeQuery = true)
     Page<SellerProductsDTO> findBySellerSellerIdAndSearch(@Param("sellerId") Long sellerId, @Param("search") String search, Pageable pageable);
 

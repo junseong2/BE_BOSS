@@ -12,9 +12,10 @@ import com.opencsv.exceptions.CsvValidationException;
 
 
 public interface ProductsService {
-    List<ProductsDTO> getAllProducts();
+    List<ProductsDTO> getAllProducts(int page, int size); // 상품 조회 
+    
     ProductsDTO getProductById(Long productId);
-    List<ProductsDTO> getProductsByCategory(Long categoryId);
+    List<ProductsDTO> getProductsByCategory(Long categoryId, int page, int size);
     List<ProductsDTO> searchProducts(String query);
     List<Product> getProductsBySellerId(Long sellerId);
 

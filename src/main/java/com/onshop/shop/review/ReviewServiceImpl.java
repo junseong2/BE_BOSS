@@ -190,7 +190,6 @@ public class ReviewServiceImpl implements ReviewService  {
 		
 		Seller seller = sellerRepository.findByUserId(userId).orElseThrow(()-> new NotAuthException("판매자만 이용 가능합니다."));
 	
-		
 		Pageable pageable = PageRequest.of(page, size);
 		
 		
