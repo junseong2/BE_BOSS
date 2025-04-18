@@ -1,20 +1,27 @@
 package com.onshop.shop.seller;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
-
-
+import com.onshop.shop.exception.ResourceNotFoundException;
+import lombok.extern.slf4j.Slf4j;
 
 @Service
+@Slf4j
 public class SellerService {
 
     private final SellerRepository sellerRepository;
+    
 
     public SellerService(SellerRepository sellerRepository) {
         this.sellerRepository = sellerRepository;
@@ -118,21 +125,103 @@ public class SellerService {
     
     
     // 판매자 ID로 판매자 조회
-    public Seller findBysellerId(Long id) {
-        return sellerRepository.findBySellerId(id);
+    public Seller findBysellerId(Long sellerId) {
+        return sellerRepository.findBySellerId(sellerId);
     }
 
     // 판매자 정보 저장
     public Seller save(Seller seller) {
         return sellerRepository.save(seller);
     }
+    
+    // 판매업 등록
+    public Seller registerSeller(Long userId, String storename, String description,  String RepresentativeName, String businessRegistrationNumber, String onlineSalesNumber) {
+        Seller newSeller = new Seller();
+        newSeller.setUserId(userId);
+        newSeller.setStorename(storename);
+        newSeller.setDescription(description);
+        newSeller.setRepresentativeName(RepresentativeName);
+        newSeller.setBusinessRegistrationNumber(businessRegistrationNumber);
+        newSeller.setOnlineSalesNumber(onlineSalesNumber);
+        newSeller.setRegistrationStatus("등록 대기");  // 초기 상태는 '등록 대기'
+        newSeller.setApplicationDate(LocalDateTime.now());  // 신청 날짜 설정
+        return sellerRepository.save(newSeller);  // 저장
+    }
+    
+    // 이미 `userId`로 등록된 판매자가 있는지 확인
+    public boolean isUserAlreadySeller(Long userId) {
+        return sellerRepository.findByUserId(userId).isPresent();
+    }
+    
+    // 관리자 판매업 등록 승인 및 거절
+    public void approveSeller(Long sellerId) {
+        Seller seller = sellerRepository.findById(sellerId)
+            .orElseThrow(() -> new RuntimeException("판매자 정보를 찾을 수 없습니다."));
+
+        seller.setRegistrationStatus("등록 완료");
+        sellerRepository.save(seller);
+
+//        userService.promoteToSellerAndNotify(seller.getUserId(), seller.getStorename());
+    }
+    
+    public void rejectSeller(Long sellerId) {
+        Seller seller = sellerRepository.findById(sellerId)
+            .orElseThrow(() -> new RuntimeException("판매자 정보를 찾을 수 없습니다."));
+
+        seller.setRegistrationStatus("등록 거절");
+        sellerRepository.save(seller);
+
+//        userService.promoteToSellerAndNotify(seller.getUserId(), seller.getStorename());
+    }
+    
+    public List<Seller> getAllSellers(){
+    	return sellerRepository.findAll();
+    }
+    
+    // seller중복가입 방지
+    public boolean isUserSeller(Long userId) {
+        return sellerRepository.findByUserId(userId).isPresent();
+    }
 
     
+    public SellerStatsDTO getSellerStats() {
+        // 각 상태별 판매자 수를 계산
+        long totalSellers = sellerRepository.count();  // 전체 판매자 수
+        long waitingApproval = sellerRepository.countByRegistrationStatus("등록 대기");
+        long approved = sellerRepository.countByRegistrationStatus("등록 완료");
+        long rejected = sellerRepository.countByRegistrationStatus("등록 거절");
+
+        // DTO에 값 설정하여 반환
+        return new SellerStatsDTO(totalSellers, waitingApproval, approved, rejected);
+    }
     
     
+    /** 홈페이지*/
     
+    public List<SellerStoresDTO> getAllStores(int page, int size) {
+
+       Pageable pageable = PageRequest.of(page, size);
+       List<Seller> storeEntries = sellerRepository.findAll(pageable).toList();
+       
+       
+       if(storeEntries.isEmpty()) {
+          throw new ResourceNotFoundException("조회할 판매자가 없습니다.");
+       }
+       
+       return storeEntries.stream().map((sellerEntity)->{
+          log.info("sellerEntity{}",sellerEntity);
+          return SellerStoresDTO.builder()
+                .storeName(sellerEntity.getStorename())
+                .description(sellerEntity.getDescription())
+                .logoUrl(sellerEntity.getSettings())
+                .sellerId(sellerEntity.getSellerId().intValue())
+                .build();
+       }).toList();
+             
+
     
-    
+    	
+    }
     
     
     

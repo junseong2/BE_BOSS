@@ -3,8 +3,12 @@ package com.onshop.shop.payment;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
+
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.onshop.shop.order.Order;
+import com.onshop.shop.settlement.Settlement;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -52,4 +56,10 @@ public class Payment {
     private LocalDateTime paidDate;
 
     private String impUid;  // PortOne 결제 UID
+    
+    
+    @ManyToOne // 결제 내역이 다수일 때 정산에서는 한 번에 처리
+    @JoinColumn(name = "settlement_id")
+    @OnDelete(action = OnDeleteAction.SET_NULL) // 결제 내역이 지워지면, 정산내역 집계에서 제외만 되도록
+    private Settlement settlement;
 }

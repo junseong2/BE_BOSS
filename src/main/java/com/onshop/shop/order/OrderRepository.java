@@ -8,8 +8,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 
-
-
+import com.onshop.shop.user.User;
 
 import java.util.List;
 
@@ -35,5 +34,10 @@ public interface OrderRepository extends JpaRepository<Order, Long> {
 		""")
 		Long countOrdersBySeller(@Param("sellerId") Long sellerId);
 
-
+	
+	void deleteByUser(User user);
+	
+	List<Order> findByUser(User user); 
 }
+
+

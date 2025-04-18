@@ -4,28 +4,31 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import com.onshop.shop.exception.NotAuthException;
 import com.onshop.shop.order.Order;
 import com.onshop.shop.order.OrderDTO;
 import com.onshop.shop.order.OrderService;
+import com.onshop.shop.security.JwtUtil;
+
+import lombok.RequiredArgsConstructor;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
 @RestController
-@RequestMapping()
+@RequiredArgsConstructor
 public class PaymentController {
 
     private final PaymentService paymentService;
     private final OrderService orderService;
     private final PaymentConfig paymentConfig;
+    private final JwtUtil jwtUtil;
 
-    public PaymentController(PaymentService paymentService,OrderService orderService, PaymentConfig paymentConfig) {
-        this.paymentService = paymentService;
-        this.orderService = orderService;
-        this.paymentConfig = paymentConfig;
-    }
-    
+
     // ✅ 프론트에서 사용할 채널 키 반환 API 추가
     @GetMapping("/payment/channel-key/{paymentMethod}")
     public Map<String, String> getChannelKey(@PathVariable String paymentMethod) {
@@ -65,18 +68,56 @@ public class PaymentController {
     }
    
     
-    /** 판매자 결제 내역 조회*/
-    @GetMapping("/seller/payments")
-    public ResponseEntity<SellerPaymentResponseDTO> getSellerPayments(
-    		@RequestParam int page,
-    		@RequestParam int size,
-    		@RequestParam String search,
-    		@RequestParam String status
-    		
-    		){
+    /** 판매자 매출관리 통계 */
+    @GetMapping("/seller/payments/summary-statistics")
+    public ResponseEntity<?> getSellerPaymentstatistics(
+    		@RequestParam LocalDate startDate,
+    		@RequestParam LocalDate endDate,
+    		@CookieValue(value = "jwt", required = false) String token) {
+
+        if (token == null) {
+            throw new NotAuthException("요청 권한이 없습니다.");
+        }
+
+        Long userId = jwtUtil.extractUserId(token);
     	
-    	 SellerPaymentResponseDTO payment = paymentService.getSellerPayments(page, size, search, status);
+    	LocalDateTime startDateTime= startDate.atStartOfDay();
+    	LocalDateTime endDateTime =  endDate.atTime(23, 59, 59);
+    	SellerPaymentStatisticsDTO paymentStatisticsDTO= paymentService.getSellerPaymentStatistics(startDateTime, endDateTime, userId);
     	
-    	return ResponseEntity.ok(payment);
+    	return ResponseEntity.ok(paymentStatisticsDTO);
+    	
+    }
+    
+    /** 판매자 월별 매출 통계*/
+    @GetMapping("/seller/payments/monthly-statistics")
+    public ResponseEntity<?> getSellerPaymentsByMonth(
+    		@RequestParam LocalDate startDate,
+    		@RequestParam LocalDate endDate,
+    		@CookieValue(value = "jwt", required = false) String token) {
+
+        if (token == null) {
+            throw new NotAuthException("요청 권한이 없습니다.");
+        }
+
+        Long userId = jwtUtil.extractUserId(token);
+    	Map<String,Long> payments = paymentService.getSellerPaymentsByMonth(startDate.atStartOfDay(), endDate.atTime(23,59,59), userId);
+    	return ResponseEntity.ok(payments);
+    }
+    
+    /** 판매자 카테고리별 매출 비율 통계*/
+    @GetMapping("/seller/payments/category-statistics")
+    public ResponseEntity<?> getSellerPaymentSalesByCategory(
+    		@RequestParam LocalDate startDate,
+    		@RequestParam LocalDate endDate,
+    		@CookieValue(value = "jwt", required = false) String token) {
+
+        if (token == null) {
+            throw new NotAuthException("요청 권한이 없습니다.");
+        }
+
+        Long userId = jwtUtil.extractUserId(token);
+    	List<SellerCategorySalesDTO> categorySalesDTOs = paymentService.getSellerPaymentSalesByCategory(startDate.atStartOfDay(), endDate.atTime(23, 59, 59), userId);
+    	return ResponseEntity.ok(categorySalesDTOs);
     }
 }

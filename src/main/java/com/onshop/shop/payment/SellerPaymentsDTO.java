@@ -11,12 +11,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 public class SellerPaymentsDTO {
-	
-	private String impUid;
-	private String username;
-	private Object paidDate;
-	private Object paymentMethod;
-	private Object totalAmount;
-	private Object paymentStatus;
+	private String date; 
+	private Long totalAmount;
 
 }

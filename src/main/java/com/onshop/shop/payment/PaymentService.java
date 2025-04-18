@@ -1,6 +1,11 @@
 package com.onshop.shop.payment;
 
 import java.util.Optional;
+
+import org.springframework.web.bind.annotation.RequestParam;
+
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
 
@@ -13,7 +18,13 @@ public interface PaymentService {
     
     
     /** 판매자 */
-    // 판매자 결제 내역 조회
-    SellerPaymentResponseDTO getSellerPayments(int page, int size, String search, String status);
+    // 판매자 매출 통계
+    SellerPaymentStatisticsDTO getSellerPaymentStatistics(LocalDateTime startDate, LocalDateTime endDate, Long userId);
     
+    // 판매자 월별 매출 합계
+    Map<String, Long> getSellerPaymentsByMonth(LocalDateTime startDate, LocalDateTime endDate, Long userId);
+    
+    // 판매자별 카테고리별 매출 비율 통계
+    List<SellerCategorySalesDTO> getSellerPaymentSalesByCategory(LocalDateTime startDate,LocalDateTime endDate, Long userId);
+
 }

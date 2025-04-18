@@ -26,6 +26,7 @@ import com.onshop.shop.category.Category;
 	    private List<String> gImage;
 	    private LocalDateTime expiryDate;
 	    private LocalDateTime createdRegister;
+	    private String storename;
 	
 	 // ProductsDTO.java
 	    public static ProductsDTO fromEntity(Product product) {
@@ -40,6 +41,9 @@ import com.onshop.shop.category.Category;
 	                .description(product.getDescription())
 	                .price(product.getPrice())
 	                .gImage(imageUrls)
+//	                .storename(product.getSeller() != null ? 
+//	                        (product.getSeller().getStorename() != null ? product.getSeller().getStorename() : "판매자 없음") 
+//	                        : "판매자 없음")
 	                .expiryDate(product.getExpiryDate())
 	                .createdRegister(product.getCreatedRegister())
 	                .build();
