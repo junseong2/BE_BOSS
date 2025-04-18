@@ -261,74 +261,69 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
 	Page<SellerProductsDTO> findBySellerAndCategoryOrderByOverallSalesDesc(@Param("sellerId") Long sellerId,
 			@Param("categoryId") Long categoryId, @Param("search") String search, Pageable pageable);
 
-	@Query(value = """
-			    SELECT p.product_id AS productId, p.name AS name, p.price AS price,
-			           c.category_name AS categoryName, p.description AS description, i.stock AS stock
-			    FROM product p
-			    LEFT JOIN category c ON c.category_id = p.category_id
-			    LEFT JOIN inventory i ON i.product_id = p.product_id
-			    WHERE p.seller_id = :sellerId
-			      AND p.category_id = :categoryId
-			      AND p.name LIKE CONCAT('%', :search, '%')
-			""", nativeQuery = true)
-	Page<SellerProductsDTO> findBySellerAndCategory(@Param("sellerId") Long sellerId,
-			@Param("categoryId") Long categoryId, @Param("search") String search, Pageable pageable);
-
-    @Query("SELECT p.productId FROM Product p")
-    Page<Long> findRandomProductIds(Pageable pageable);
+	
 
     
     
+    
+    
+    
     @Query(value = """
-    	    SELECT p.product_id AS productId, p.name AS name, p.price AS price,
-    	           c.category_name AS categoryName, p.description AS description, i.stock AS stock, p.g_image AS gImage
-    	    FROM product p
-    	    LEFT JOIN category c ON c.category_id = p.category_id
-    	    LEFT JOIN inventory i ON i.product_id = p.product_id
-    	    WHERE p.seller_id = :sellerId AND p.name LIKE CONCAT('%', :search, '%')
-    	    ORDER BY p.price ASC
-    	""", nativeQuery = true)
-    	Page<SellerProductsListDTO> findSellerProductsByPriceAsc(@Param("sellerId") Long sellerId,
-    	        @Param("search") String search, Pageable pageable);
+        SELECT p.product_id AS productId, p.name AS name, p.price AS price, p.origin_price AS originPrice,
+               c.category_name AS categoryName, p.description AS description, p.expiry_date AS expiryDate,
+               p.is_discount AS isDiscount, p.discount_rate AS discountRate, i.stock AS stock, p.g_image AS gImage
+        FROM product p
+        LEFT JOIN category c ON c.category_id = p.category_id
+        LEFT JOIN inventory i ON i.product_id = p.product_id
+        WHERE p.seller_id = :sellerId AND p.name LIKE CONCAT('%', :search, '%')
+        ORDER BY p.price ASC
+    """, nativeQuery = true)
+    Page<SellerProductsListDTO> findSellerProductsByPriceAsc(@Param("sellerId") Long sellerId,
+            @Param("search") String search, Pageable pageable);
 
     @Query(value = """
-    	    SELECT p.product_id AS productId, p.name AS name, p.price AS price,
-    	           c.category_name AS categoryName, p.description AS description, i.stock AS stock, p.g_image AS gImage
-    	    FROM product p
-    	    LEFT JOIN category c ON c.category_id = p.category_id
-    	    LEFT JOIN inventory i ON i.product_id = p.product_id
-    	    WHERE p.seller_id = :sellerId AND p.name LIKE CONCAT('%', :search, '%')
-    	    ORDER BY p.price DESC
-    	""", nativeQuery = true)
-    	Page<SellerProductsListDTO> findSellerProductsByPriceDesc(@Param("sellerId") Long sellerId,
-    	        @Param("search") String search, Pageable pageable);
-    @Query(value = """
-    	    SELECT p.product_id AS productId, p.name AS name, p.price AS price,
-    	           c.category_name AS categoryName, p.description AS description, i.stock AS stock, p.g_image AS gImage
-    	    FROM product p
-    	    LEFT JOIN category c ON c.category_id = p.category_id
-    	    LEFT JOIN inventory i ON i.product_id = p.product_id
-    	    WHERE p.seller_id = :sellerId AND p.name LIKE CONCAT('%', :search, '%')
-    	    ORDER BY p.created_register DESC
-    	""", nativeQuery = true)
-    	Page<SellerProductsListDTO> findSellerProductsByCreatedDateDesc(@Param("sellerId") Long sellerId,
-    	        @Param("search") String search, Pageable pageable);
-    @Query(value = """
-    	    SELECT p.product_id AS productId, p.name AS name, p.price AS price,
-    	           c.category_name AS categoryName, p.description AS description, i.stock AS stock, p.g_image AS gImage
-    	    FROM product p
-    	    LEFT JOIN category c ON c.category_id = p.category_id
-    	    LEFT JOIN inventory i ON i.product_id = p.product_id
-    	    WHERE p.seller_id = :sellerId AND p.name LIKE CONCAT('%', :search, '%')
-    	    ORDER BY p.overall_sales DESC
-    	""", nativeQuery = true)
-    	Page<SellerProductsListDTO> findSellerProductsBySalesDesc(@Param("sellerId") Long sellerId,
-    	        @Param("search") String search, Pageable pageable);
+        SELECT p.product_id AS productId, p.name AS name, p.price AS price, p.origin_price AS originPrice,
+               c.category_name AS categoryName, p.description AS description, p.expiry_date AS expiryDate,
+               p.is_discount AS isDiscount, p.discount_rate AS discountRate, i.stock AS stock, p.g_image AS gImage
+        FROM product p
+        LEFT JOIN category c ON c.category_id = p.category_id
+        LEFT JOIN inventory i ON i.product_id = p.product_id
+        WHERE p.seller_id = :sellerId AND p.name LIKE CONCAT('%', :search, '%')
+        ORDER BY p.price DESC
+    """, nativeQuery = true)
+    Page<SellerProductsListDTO> findSellerProductsByPriceDesc(@Param("sellerId") Long sellerId,
+            @Param("search") String search, Pageable pageable);
 
-    // 가격 내림차순 정렬 (Category 포함)
     @Query(value = """
-        SELECT p.product_id AS productId, p.name AS name, p.price AS price,
-               c.category_name AS categoryName, p.description AS description, i.stock AS stock, p.g_image AS gImage
+        SELECT p.product_id AS productId, p.name AS name, p.price AS price, p.origin_price AS originPrice,
+               c.category_name AS categoryName, p.description AS description, p.expiry_date AS expiryDate,
+               p.is_discount AS isDiscount, p.discount_rate AS discountRate, i.stock AS stock, p.g_image AS gImage
+        FROM product p
+        LEFT JOIN category c ON c.category_id = p.category_id
+        LEFT JOIN inventory i ON i.product_id = p.product_id
+        WHERE p.seller_id = :sellerId AND p.name LIKE CONCAT('%', :search, '%')
+        ORDER BY p.created_register DESC
+    """, nativeQuery = true)
+    Page<SellerProductsListDTO> findSellerProductsByCreatedDateDesc(@Param("sellerId") Long sellerId,
+            @Param("search") String search, Pageable pageable);
+
+    @Query(value = """
+        SELECT p.product_id AS productId, p.name AS name, p.price AS price, p.origin_price AS originPrice,
+               c.category_name AS categoryName, p.description AS description, p.expiry_date AS expiryDate,
+               p.is_discount AS isDiscount, p.discount_rate AS discountRate, i.stock AS stock, p.g_image AS gImage
+        FROM product p
+        LEFT JOIN category c ON c.category_id = p.category_id
+        LEFT JOIN inventory i ON i.product_id = p.product_id
+        WHERE p.seller_id = :sellerId AND p.name LIKE CONCAT('%', :search, '%')
+        ORDER BY p.overall_sales DESC
+    """, nativeQuery = true)
+    Page<SellerProductsListDTO> findSellerProductsBySalesDesc(@Param("sellerId") Long sellerId,
+            @Param("search") String search, Pageable pageable);
+
+    @Query(value = """
+        SELECT p.product_id AS productId, p.name AS name, p.price AS price, p.origin_price AS originPrice,
+               c.category_name AS categoryName, p.description AS description, p.expiry_date AS expiryDate,
+               p.is_discount AS isDiscount, p.discount_rate AS discountRate, i.stock AS stock, p.g_image AS gImage
         FROM product p
         LEFT JOIN category c ON c.category_id = p.category_id
         LEFT JOIN inventory i ON i.product_id = p.product_id
@@ -336,14 +331,12 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
         ORDER BY p.price DESC
     """, nativeQuery = true)
     Page<SellerProductsListDTO> findSellerProductsByCategoryAndPriceDesc(@Param("sellerId") Long sellerId,
-                                                                          @Param("categoryId") Long categoryId,
-                                                                          @Param("search") String search,
-                                                                          Pageable pageable);
+            @Param("categoryId") Long categoryId, @Param("search") String search, Pageable pageable);
 
-    // 가격 오름차순 정렬 (Category 포함)
     @Query(value = """
-        SELECT p.product_id AS productId, p.name AS name, p.price AS price,
-               c.category_name AS categoryName, p.description AS description, i.stock AS stock, p.g_image AS gImage
+        SELECT p.product_id AS productId, p.name AS name, p.price AS price, p.origin_price AS originPrice,
+               c.category_name AS categoryName, p.description AS description, p.expiry_date AS expiryDate,
+               p.is_discount AS isDiscount, p.discount_rate AS discountRate, i.stock AS stock, p.g_image AS gImage
         FROM product p
         LEFT JOIN category c ON c.category_id = p.category_id
         LEFT JOIN inventory i ON i.product_id = p.product_id
@@ -351,14 +344,12 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
         ORDER BY p.price ASC
     """, nativeQuery = true)
     Page<SellerProductsListDTO> findSellerProductsByCategoryAndPriceAsc(@Param("sellerId") Long sellerId,
-                                                                          @Param("categoryId") Long categoryId,
-                                                                          @Param("search") String search,
-                                                                          Pageable pageable);
+            @Param("categoryId") Long categoryId, @Param("search") String search, Pageable pageable);
 
-    // 최신 등록일 순 정렬 (Category 포함)
     @Query(value = """
-        SELECT p.product_id AS productId, p.name AS name, p.price AS price,
-               c.category_name AS categoryName, p.description AS description, i.stock AS stock, p.g_image AS gImage
+        SELECT p.product_id AS productId, p.name AS name, p.price AS price, p.origin_price AS originPrice,
+               c.category_name AS categoryName, p.description AS description, p.expiry_date AS expiryDate,
+               p.is_discount AS isDiscount, p.discount_rate AS discountRate, i.stock AS stock, p.g_image AS gImage
         FROM product p
         LEFT JOIN category c ON c.category_id = p.category_id
         LEFT JOIN inventory i ON i.product_id = p.product_id
@@ -366,14 +357,12 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
         ORDER BY p.created_register DESC
     """, nativeQuery = true)
     Page<SellerProductsListDTO> findSellerProductsByCategoryAndCreatedDateDesc(@Param("sellerId") Long sellerId,
-                                                                                @Param("categoryId") Long categoryId,
-                                                                                @Param("search") String search,
-                                                                                Pageable pageable);
+            @Param("categoryId") Long categoryId, @Param("search") String search, Pageable pageable);
 
-    // 판매량 높은 순 정렬 (Category 포함)
     @Query(value = """
-        SELECT p.product_id AS productId, p.name AS name, p.price AS price,
-               c.category_name AS categoryName, p.description AS description, i.stock AS stock, p.g_image AS gImage
+        SELECT p.product_id AS productId, p.name AS name, p.price AS price, p.origin_price AS originPrice,
+               c.category_name AS categoryName, p.description AS description, p.expiry_date AS expiryDate,
+               p.is_discount AS isDiscount, p.discount_rate AS discountRate, i.stock AS stock, p.g_image AS gImage
         FROM product p
         LEFT JOIN category c ON c.category_id = p.category_id
         LEFT JOIN inventory i ON i.product_id = p.product_id
@@ -381,38 +370,43 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
         ORDER BY p.overall_sales DESC
     """, nativeQuery = true)
     Page<SellerProductsListDTO> findSellerProductsByCategoryAndSalesDesc(@Param("sellerId") Long sellerId,
-                                                                          @Param("categoryId") Long categoryId,
-                                                                          @Param("search") String search,
-                                                                          Pageable pageable);
+            @Param("categoryId") Long categoryId, @Param("search") String search, Pageable pageable);
 
-    
-    // 카테고리와 검색어를 기준으로 상품 조회
     @Query(value = """
-        SELECT p.product_id AS productId, p.name AS name, p.price AS price,
-               c.category_name AS categoryName, p.description AS description, i.stock AS stock, p.g_image AS gImage
+        SELECT p.product_id AS productId, p.name AS name, p.price AS price, p.origin_price AS originPrice,
+               c.category_name AS categoryName, p.description AS description, p.expiry_date AS expiryDate,
+               p.is_discount AS isDiscount, p.discount_rate AS discountRate, i.stock AS stock, p.g_image AS gImage
         FROM product p
         LEFT JOIN category c ON c.category_id = p.category_id
         LEFT JOIN inventory i ON i.product_id = p.product_id
         WHERE p.seller_id = :sellerId AND p.category_id = :categoryId AND p.name LIKE CONCAT('%', :search, '%')
     """, nativeQuery = true)
     Page<SellerProductsListDTO> findSellerProductsByCategory(@Param("sellerId") Long sellerId,
-                                                              @Param("categoryId") Long categoryId,
-                                                              @Param("search") String search,
-                                                              Pageable pageable);    
+            @Param("categoryId") Long categoryId, @Param("search") String search, Pageable pageable);
+
     @Query(value = """
-            SELECT p.product_id AS productId, p.name AS name, p.price AS price,
-                   c.category_name AS categoryName, p.description AS description, i.stock AS stock, p.g_image AS gImage
-            FROM product p
-            LEFT JOIN category c ON c.category_id = p.category_id
-            LEFT JOIN inventory i ON i.product_id = p.product_id
-            WHERE p.seller_id = :sellerId AND p.name LIKE CONCAT('%', :search, '%')
-        """, nativeQuery = true)
-        Page<SellerProductsListDTO> findSellerProductsBySearch(@Param("sellerId") Long sellerId,
-                                                                @Param("search") String search,
-                                                                Pageable pageable);
+        SELECT p.product_id AS productId, p.name AS name, p.price AS price, p.origin_price AS originPrice,
+               c.category_name AS categoryName, p.description AS description, p.expiry_date AS expiryDate,
+               p.is_discount AS isDiscount, p.discount_rate AS discountRate, i.stock AS stock, p.g_image AS gImage
+        FROM product p
+        LEFT JOIN category c ON c.category_id = p.category_id
+        LEFT JOIN inventory i ON i.product_id = p.product_id
+        WHERE p.seller_id = :sellerId AND p.name LIKE CONCAT('%', :search, '%')
+    """, nativeQuery = true)
+    Page<SellerProductsListDTO> findSellerProductsBySearch(@Param("sellerId") Long sellerId,
+            @Param("search") String search, Pageable pageable);
+
+    @Query("SELECT p.productId FROM Product p")
+    Page<Long> findRandomProductIds(Pageable pageable);
     
-    @EntityGraph(attributePaths = {"seller"})
-    @Query("SELECT p FROM Product p WHERE p.productId = :productId")
+    @Query("SELECT p FROM Product p WHERE p.seller.sellerId = :sellerId AND p.category.categoryId = :categoryId AND p.productName LIKE %:search%")
+    Page<Product> findBySellerAndCategory(
+        @Param("sellerId") Long sellerId,
+        @Param("categoryId") Long categoryId,
+        @Param("search") String search,
+        Pageable pageable
+    );
+    @Query("SELECT p FROM Product p JOIN FETCH p.seller WHERE p.productId = :productId")
     Optional<Product> findDetailWithSellerById(@Param("productId") Long productId);
 
 }
