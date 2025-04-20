@@ -279,13 +279,13 @@ public class ProductsController {
 		SuccessMessageResponse response = new SuccessMessageResponse(
 				HttpStatus.OK, 
 				"선택 상품의 정보가 수정되었습니다.", 		
-				SellerProductsDTO.builder()
-					.productId(productId)
-					.categoryName(productDTO.getCategoryName())
-					.name(productDTO.getName())
-					.price(productDTO.getPrice())
-					.stock(productDTO.getStock())
-					.build());
+				new SellerProductsDTO(
+					    productId,
+					    productDTO.getName(),
+					    productDTO.getPrice(),
+					    productDTO.getCategoryName(),
+					    productDTO.getStock()
+					));
 		return ResponseEntity.ok(response);
 	}
 	

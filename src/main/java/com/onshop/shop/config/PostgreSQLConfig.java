@@ -2,6 +2,7 @@ package com.onshop.shop.config;
 
 import jakarta.persistence.EntityManagerFactory;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.orm.jpa.EntityManagerFactoryBuilder;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -24,14 +25,23 @@ import java.util.Map;
     transactionManagerRef = "pgTransactionManager"
 )
 public class PostgreSQLConfig {
+	
+    @Value("${POSTGRES_URL}")
+    private String url;
+
+    @Value("${POSTGRES_USERNAME}")
+    private String username;
+
+    @Value("${POSTGRES_PASSWORD}")
+    private String password;
 
     @Bean(name = "pgDataSource")
     public DataSource pgDataSource() {
         DriverManagerDataSource dataSource = new DriverManagerDataSource();
         dataSource.setDriverClassName("org.postgresql.Driver");
-        dataSource.setUrl("jdbc:postgresql://localhost:5432/final");
-        dataSource.setUsername("postgres");
-        dataSource.setPassword("1234");
+        dataSource.setUrl(url);
+        dataSource.setUsername(username);
+        dataSource.setPassword(password);
         return dataSource;
     }
 
