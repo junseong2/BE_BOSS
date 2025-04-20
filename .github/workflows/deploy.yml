@@ -33,6 +33,10 @@ jobs:
 
       - name: Build with Maven Wrapper
         run: ./mvnw clean package -DskipTests
+      
+      
+      - name: List built jar
+        run: ls -alh target
 
       - name: Deploy to Elastic Beanstalk
         uses: einaregilsson/beanstalk-deploy@v21
@@ -43,4 +47,4 @@ jobs:
           environment_name: ${{ secrets.ENV_NAME }}
           region: ${{ secrets.AWS_REGION }}
           version_label: ${{ github.sha }}
-          deployment_package: target/boss-0.0.1-SNAPSHOT.jar
+          deployment_package: target/shop-0.0.1-SNAPSHOT.jar
