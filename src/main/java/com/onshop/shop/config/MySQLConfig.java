@@ -2,6 +2,7 @@ package com.onshop.shop.config;
 
 import jakarta.persistence.EntityManagerFactory;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.orm.jpa.EntityManagerFactoryBuilder;
 import org.springframework.boot.jdbc.DataSourceBuilder;
 import org.springframework.context.annotation.*;
@@ -47,14 +48,24 @@ import java.util.*;
 	    transactionManagerRef = "mysqlTransactionManager"
 	)
 public class MySQLConfig {
+	
+	 	@Value("${DB_URL}")
+	    private String url;
+
+	    @Value("${DB_USERNAME}")
+	    private String username;
+
+	    @Value("${DB_PASSWORD}")
+	    private String password;
+
 
     @Bean(name = "mysqlDataSource")
     @Primary
     public DataSource mysqlDataSource() {
         return DataSourceBuilder.create()
-                .url("jdbc:mysql://localhost:3306/final")
-                .username("root")
-                .password("1234")
+                .url(url)
+                .username(username)
+                .password(password)
                 .driverClassName("com.mysql.cj.jdbc.Driver")
                 .build();
     }

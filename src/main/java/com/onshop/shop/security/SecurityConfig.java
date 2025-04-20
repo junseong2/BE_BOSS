@@ -29,12 +29,12 @@ public class SecurityConfig {
             .cors(cors -> cors.configurationSource(corsConfigurationSource()))
             .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
             .authorizeHttpRequests(auth -> auth
-                .requestMatchers("/api/**","/auth/**", "/category",
+                .requestMatchers("/api/**","/auth/**", "/category","/",
 
 
                        "/product/**",    "/product",     "/payment/**",    "/orders/**", "/products/**",    "/products", "/category/**", "/products/**","/cart", "/cart/**", "/favicon.ico","/uploads/**"
                         ,"/store/**","/seller/**","/seller","/seller/info/**","articles", "/vector/**","/seller/orders/**", "/business/**"
-                        ,"/address/**" , "/orderdetail/**", "/settlements/**","/crawl/**","/crawl-image/**"
+                        ,"/address/**" , "/orderdetail/**", "/settlements/**","/crawl/**","/crawl-image/**","/business/health"
                 		)
 
                 .permitAll()
@@ -67,7 +67,11 @@ public class SecurityConfig {
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
-        configuration.setAllowedOrigins(List.of("http://localhost:5173"));
+        configuration.setAllowedOrigins(List.of("http://localhost:5173",
+        		"http://boss-shop.com","https://www.boss-shop.com",
+        		"https://boss-shop.com",
+        		"http://boss-shop3.ap-northeast-3.elasticbeanstalk.com",
+        	    "https://boss-shop3.ap-northeast-3.elasticbeanstalk.com"));
         configuration.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE","PATCH", "OPTIONS"));
         configuration.setAllowedHeaders(List.of("Authorization", "Content-Type"));
         configuration.setAllowCredentials(true);

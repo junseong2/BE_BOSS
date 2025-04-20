@@ -9,7 +9,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 @Data
-@Builder
+//@Builder
 @NoArgsConstructor
 public class SellerProductsDTO {
     
@@ -20,7 +20,7 @@ public class SellerProductsDTO {
     private String description;
     private Long stock;
     private Long minStock;
-    private Object expiryDate;
+    private LocalDateTime expiryDate;
     private Integer discountRate;
     private Integer originPrice;
     private List<String> gImages;
@@ -42,6 +42,13 @@ public class SellerProductsDTO {
 		
 	}
     
+	public SellerProductsDTO(Long productId, String name, Integer price, String categoryName, Long stock) {
+	    this.productId = productId;
+	    this.name = name;
+	    this.price = price;
+	    this.categoryName = categoryName;
+	    this.stock = stock;
+	}
     
    
 }
