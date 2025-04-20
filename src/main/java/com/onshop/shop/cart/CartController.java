@@ -110,7 +110,7 @@ System.out.println("업데이트양");
         }
 
         // 갱신된 장바구니 정보 가져오기
-        List<CartDTO> updatedCart = cartService.getCartByUserId(userId);
+        List<CartDTO> updatedCart = cartServiceImpl.getCartByUserId(userId);
 
         Map<String, Object> response = new HashMap<>();
         response.put("cartItems", updatedCart);
@@ -167,6 +167,16 @@ System.out.println("업데이트양");
         Map<String, Object> response = new HashMap<>();
         response.put("success", true);
         response.put("message", "장바구니가 비워졌습니다.");
+        return ResponseEntity.ok(response);
+    }
+    
+    // 유저 장바구니 아이템 개수
+    @GetMapping("/count")
+    public ResponseEntity<CartTotalCountResponseDTO> totalCountByUserId(@CookieValue(name = "jwt", required = false) String jwtToken) {
+        Long userId = jwtUtil.extractUserId(jwtToken);
+        
+        CartTotalCountResponseDTO response = cartService.totalCountByUserId(userId);
+        
         return ResponseEntity.ok(response);
     }
 }

@@ -38,7 +38,8 @@ import java.util.*;
 	            "com.onshop.shop.util",
 	            "com.onshop.shop.settlement",
 	            "com.onshop.shop.review",
-	            "com.onshop.shop.follow"
+	            "com.onshop.shop.follow",
+	            "com.onshop.shop.fileupload"
 
 	        // ❌ "com.onshop.shop.vector" 제외
 
