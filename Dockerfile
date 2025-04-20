@@ -8,7 +8,7 @@ WORKDIR /app
 COPY target/shop-0.0.1-SNAPSHOT.jar /shop.jar
 
 # 4. Spring Boot 애플리케이션 실행
-ENTRYPOINT ["java", "-jar", "/shop.jar"]
+ENTRYPOINT ["java", "-jar", "/shop.jar", "--server.port=5000", "--server.address=0.0.0.0"]
 
 # 5. 외부에 노출할 포트 설정 (Spring Boot 포트 5000)
 EXPOSE 5000
