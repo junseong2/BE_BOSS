@@ -26,6 +26,7 @@ import com.onshop.shop.category.CategoryDTO;
 import com.onshop.shop.category.CategoryRepository;
 import com.onshop.shop.exception.NotAuthException;
 import com.onshop.shop.exception.ResourceNotFoundException;
+import com.onshop.shop.fileupload.FileUploadService;
 import com.onshop.shop.inventory.Inventory;
 import com.onshop.shop.inventory.InventoryRepository;
 import com.onshop.shop.seller.Seller;
@@ -46,6 +47,7 @@ public class ProductsServiceImpl implements ProductsService {
     private final CategoryRepository categoryRepository; 
     private final InventoryRepository inventoryRepository;
     private final SellerRepository sellerRepository;
+    private final FileUploadService fileUploadService;
     
     @Value("${file.upload-dir}")  // application.properties에서 경로 정보를 읽어옴
     private String uploadDir;
@@ -537,25 +539,27 @@ public class ProductsServiceImpl implements ProductsService {
     @Override
     public void registerProductImages(List<MultipartFile> images, Product product) {
         // 이미지 파일 처리
-        List<String> imageNames = new ArrayList<>(); // g_image 저장용 리스트
+        List<String> imageNames = images.stream().map(fileUploadService::upload).toList();
+        
 
-        for (MultipartFile image : images) {
-            String name = UUID.randomUUID() + "_" + image.getOriginalFilename(); // 랜덤 파일명 생성
-            String imageUrl = uploadDir + name;
-            
-                    
-            // 파일을 서버에 저장하는 로직
-            File fileDir = new File(imageUrl);
-            try {
-            	
-                Files.createDirectories(Paths.get(uploadDir)); // 디렉토리 자동 생성
-                image.transferTo(fileDir); // 이미지 저장
-            } catch (IOException e) {
-                log.error(e.getMessage());
-            }
-
-            imageNames.add(name); // g_image 저장을 위해 파일명 추가
-        }
+//        for (MultipartFile image : images) {
+//            String name = UUID.randomUUID() + "_" + image.getOriginalFilename(); // 랜덤 파일명 생성
+//            String imageUrl = uploadDir + name;
+//            
+//                    
+//            // 파일을 서버에 저장하는 로직
+//            File fileDir = new File(imageUrl);
+//            try {
+//            	
+//                Files.createDirectories(Paths.get(uploadDir)); // 디렉토리 자동 생성
+//                image.transferTo(fileDir); // 이미지 저장
+//            } catch (IOException e) {
+//                log.error(e.getMessage());
+//            }
+//
+//            imageNames.add(name); // g_image 저장을 위해 파일명 추가
+//        }
+        
 
         // g_image 업데이트 (파일명 리스트를 ,로 구분된 문자열로 변환하여 저장)
         String gImageString = String.join(",", imageNames);
