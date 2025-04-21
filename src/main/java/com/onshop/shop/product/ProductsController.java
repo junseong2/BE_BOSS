@@ -22,6 +22,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.onshop.shop.category.CategoryDTO;
 import com.onshop.shop.exception.NotAuthException;
 import com.onshop.shop.exception.SuccessMessageResponse;
+import com.onshop.shop.fileupload.FileUploadService;
 import com.onshop.shop.security.JwtUtil;
 
 import jakarta.validation.Valid;
@@ -38,6 +39,7 @@ import org.springframework.web.bind.annotation.DeleteMapping;
 public class ProductsController {
 
     private final ProductsService productsService;
+    private final FileUploadService fileUploadService;
     private final JwtUtil jwtUtil;
 
     /** 구매자*/
