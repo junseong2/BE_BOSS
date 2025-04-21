@@ -110,7 +110,7 @@ System.out.println("업데이트양");
         }
 
         // 갱신된 장바구니 정보 가져오기
-        List<CartDTO> updatedCart = cartServiceImpl.getCartByUserId(userId);
+        List<CartDTO> updatedCart = cartService.getCartByUserId(userId);
 
         Map<String, Object> response = new HashMap<>();
         response.put("cartItems", updatedCart);

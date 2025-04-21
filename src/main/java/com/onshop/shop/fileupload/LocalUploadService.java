@@ -16,7 +16,7 @@ import lombok.extern.slf4j.Slf4j;
 
 @Service
 @RequiredArgsConstructor
-@Profile("dev") // 개발 환경에서만 사용
+@Profile("dev2") // 개발 환경에서만 사용(잠시 닫음)
 @Slf4j
 public class LocalUploadService implements FileUploadService{
 	
