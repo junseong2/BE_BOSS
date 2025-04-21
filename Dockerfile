@@ -12,3 +12,4 @@ ENTRYPOINT ["java", "-jar", "/shop.jar", "--server.port=5000", "--server.address
 
 # 5. 외부에 노출할 포트 설정 (Spring Boot 포트 5000)
 EXPOSE 5000
+ 
