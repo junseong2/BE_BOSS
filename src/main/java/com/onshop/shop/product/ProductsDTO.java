@@ -15,8 +15,6 @@ import com.onshop.shop.category.Category;
 	@Builder
 	public class ProductsDTO {
 		
-	
-	
 	    private Long productId;
 	    private Long categoryId;
 	    private Long sellerId;
@@ -27,11 +25,12 @@ import com.onshop.shop.category.Category;
 	    private LocalDateTime expiryDate;
 	    private LocalDateTime createdRegister;
 	    private String storename;
-	
+	   
 	 // ProductsDTO.java
 	    public static ProductsDTO fromEntity(Product product) {
 	    	List<String> imageUrls = product.getImageList().stream()
-	                .map(imageName -> "http://localhost:5000/uploads/" + imageName) // URL 변환
+//	                .map(imageName -> "http://localhost:5000/uploads/" + imageName) // URL 변환
+	                .map(imageName ->  "https://bossassets.s3.amazonaws.com/"  + imageName) // URL 변환
 	                .collect(Collectors.toList());
 	
 	        return ProductsDTO.builder()
@@ -41,9 +40,6 @@ import com.onshop.shop.category.Category;
 	                .description(product.getDescription())
 	                .price(product.getPrice())
 	                .gImage(imageUrls)
-//	                .storename(product.getSeller() != null ? 
-//	                        (product.getSeller().getStorename() != null ? product.getSeller().getStorename() : "판매자 없음") 
-//	                        : "판매자 없음")
 	                .expiryDate(product.getExpiryDate())
 	                .createdRegister(product.getCreatedRegister())
 	                .build();

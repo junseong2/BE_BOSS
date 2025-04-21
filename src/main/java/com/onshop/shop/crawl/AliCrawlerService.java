@@ -4,6 +4,7 @@ import org.openqa.selenium.*;
 import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.chrome.ChromeOptions;
 import org.openqa.selenium.support.ui.*;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.io.*;
@@ -13,9 +14,16 @@ import java.util.*;
 
 @Service
 public class AliCrawlerService {
+	
+	
+	@Value("${ali.crawl.driver-path}")
+	private String driver;
+	
+	@Value("${ali.crawl.base-path}")
+	private String tempImgPath;
 
     public CrawledProductDto crawl(String url) {
-        System.setProperty("webdriver.chrome.driver", "C:\\Driver\\chromedriver.exe");
+        System.setProperty("webdriver.chrome.driver", driver);
 
         ChromeOptions options = new ChromeOptions();
         options.addArguments("--disable-blink-features=AutomationControlled");
@@ -27,7 +35,7 @@ public class AliCrawlerService {
         WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(5));
 
         String uuid = UUID.randomUUID().toString();
-        Path basePath = Paths.get("C:/Crawl/" + uuid);
+        Path basePath = Paths.get(tempImgPath +"/" + uuid);
         Path imagePath = basePath.resolve("image");
         Path descPath = basePath.resolve("desc");
         Path dataFile = basePath.resolve("data.txt");

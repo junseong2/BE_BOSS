@@ -40,7 +40,7 @@ public class S3UploadService implements FileUploadService {
 
             s3Client.putObject(request, RequestBody.fromInputStream(file.getInputStream(), file.getSize()));
 
-            return "https://" + bucket + ".s3.amazonaws.com/" + key; // 버켓 주소 반환(이걸 데이터베이스에 저장하면 됨)
+            return  key; // 버켓 주소 반환(이걸 데이터베이스에 저장하면 됨)
         } catch (IOException e) {
             throw new RuntimeException("S3 upload failed", e);
         }
