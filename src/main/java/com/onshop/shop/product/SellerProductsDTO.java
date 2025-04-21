@@ -9,7 +9,6 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 @Data
-//@Builder
 @NoArgsConstructor
 public class SellerProductsDTO {
     
@@ -42,6 +41,7 @@ public class SellerProductsDTO {
 		
 	}
     
+
 	public SellerProductsDTO(Long productId, String name, Integer price, String categoryName, Long stock) {
 	    this.productId = productId;
 	    this.name = name;
@@ -49,6 +49,5 @@ public class SellerProductsDTO {
 	    this.categoryName = categoryName;
 	    this.stock = stock;
 	}
-    
-   
+
 }
