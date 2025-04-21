@@ -7,6 +7,7 @@ import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.PageRequest;
@@ -40,23 +41,25 @@ public class ReviewServiceImpl implements ReviewService  {
 	private final SellerRepository sellerRepository;
 	private final ProductRepository productRepository;
 	
-    @Value("${file.upload-dir}")  // application.properties에서 경로 정보를 읽어옴
+    @Value("${file.upload.url}")  // application-[''].properties에서 경로 정보를 읽어옴
     private String uploadDir;
     
 
 	
 	// 리뷰 조회
 	@Override
-	public ReviewResponseDTO getReviews(Long productId,Long userId, int page, int size) {
+	public ReviewResponseDTO getReviews(Long productId, int page, int size) {
 		
-		Pageable pageable = (Pageable) PageRequest.of(page, size);
+		Pageable pageable = PageRequest.of(page, size);
 		
-		log.info("productId:{}, userId:{}, page:{}, size:{}", productId, userId, page, size);
-		
-		
-		List<ReviewsDTO> reviews = reviewRepsitory.findByProductId(productId,userId, pageable).toList();
+		List<ReviewsDTO> reviews = reviewRepsitory.findByProductId(productId, pageable).toList();
 		Long totalCount = reviewRepsitory.countByProductProductId(productId);
+		
+		log.info("reviews:{}", reviews);
+		log.info("count:{}", totalCount);
 		AvgRatingResponseDTO avgRatingDTO = reviewRepsitory.findAvgRatingByProductId(productId);
+		
+		
 		if(reviews.isEmpty()) {
 			throw new ResourceNotFoundException("해당 상품의 리뷰를 조회할 수 없습니다.");
 		}
@@ -76,6 +79,7 @@ public class ReviewServiceImpl implements ReviewService  {
 		
 		Long userId = reviewDTO.getUserId();
 		Long productId = reviewDTO.getProductId();
+		String images = reviewDTO.getImages().stream().collect(Collectors.joining(","));
 		
 		User user =userRepository.findById(userId).orElseThrow(()->{
 			 throw new NotAuthException("인증된 유저가 아닙니다.");
@@ -95,6 +99,7 @@ public class ReviewServiceImpl implements ReviewService  {
 				 .product(product)
 				 .rating(reviewDTO.getRatings())
 				 .reviewText(reviewDTO.getReviewText())
+				 .gImages(images)
 				 .isAnswered(false)
 				 .user(user)
 				 .build());

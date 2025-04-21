@@ -20,14 +20,23 @@ public interface ReviewRepsitory extends JpaRepository<Review, Long>  {
 	AvgRatingResponseDTO findAvgRatingByProductId(Long productId);
 	
 	
-	// 리뷰 조회
-	@Query("SELECT new com.onshop.shop.review.ReviewsDTO(" +
-		       "re.reviewId, re.user.username, re.rating, re.reviewText, re.gImages, " +
-		       "CASE WHEN re.user.userId = :userId THEN true ELSE false END" +
-		       ") " +
-		       "FROM Review re " +
-		       "WHERE re.product.productId = :productId")
-	Page<ReviewsDTO> findByProductId(Long productId, Long userId, Pageable pageable);
+	// 리뷰 조회 -> 판매자 답변까지 추가된 것
+	@Query(value = "SELECT " +
+            "r.review_id AS reviewId, " +
+            "u.username AS username, " +
+            "r.rating AS rating, " +
+            "r.review_text AS reviewText, " +
+            "r.g_images AS gImages, " +  
+            "s.storename AS storeName, " +
+            "ra.answer_text AS answerText, " +
+            "r.created_at AS createdAt "+
+		     "FROM review r " +
+		     "LEFT JOIN review_answer ra ON r.review_id = ra.review_id " +
+		     "LEFT JOIN users u ON r.user_id = u.user_id " +
+		     "LEFT JOIN seller s ON ra.seller_id = s.seller_id " +
+		     "WHERE r.product_id = :productId",
+		    countQuery = "SELECT COUNT(*) FROM review WHERE product_id = :productId",  nativeQuery = true)
+	Page<ReviewsDTO> findByProductId(Long productId, Pageable pageable);
 
 	
 	// 리뷰 상세 조회

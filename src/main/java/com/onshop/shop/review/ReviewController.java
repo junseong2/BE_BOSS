@@ -1,5 +1,7 @@
 package com.onshop.shop.review;
 
+import java.util.List;
+
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CookieValue;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -11,9 +13,11 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
 
 import com.onshop.shop.exception.BadRequestException;
 import com.onshop.shop.exception.NotAuthException;
+import com.onshop.shop.fileupload.FileUploadService;
 import com.onshop.shop.security.JwtUtil;
 
 import jakarta.validation.Valid;
@@ -26,6 +30,7 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class ReviewController {
 	
+	private final FileUploadService fileUploadService;
 	private final ReviewService reviewService;
 	private final JwtUtil jwtUtil;
 	
@@ -36,17 +41,11 @@ public class ReviewController {
 			@RequestParam int page,
 			@RequestParam int size,
 			@RequestParam String sortby,
-			@PathVariable Long productId,
-			@CookieValue(value = "jwt", required = false) String token) {
+			@PathVariable Long productId
+		) {
 		
-		Long userId =null;
-        if (token != null) {
-        	userId= jwtUtil.extractUserId(token); // ✅ JWT에서 userId 추출
-   
-        }
-		
-		ReviewResponseDTO reviews = reviewService.getReviews(productId,userId, page, size);
-		
+
+		ReviewResponseDTO reviews = reviewService.getReviews(productId, page, size);
 		
 		return ResponseEntity.ok(reviews);
 		
@@ -57,22 +56,41 @@ public class ReviewController {
 	@PostMapping("/products/{productId}/reviews")
 	public ResponseEntity<ReviewResponseDTO> createReview(
 			@PathVariable Long productId,
-			@Valid @RequestBody ReviewRequestDTO reviewDTO,
+		    @RequestParam(value = "ratings", required = false) Long ratings,
+		    @RequestParam(value = "reviewText", required = false) String reviewText,
+			@RequestParam(value = "images", required = false) List<MultipartFile> images,
 			@CookieValue(value = "jwt", required = false) String token) {
 		
 	
-		log.info("등록 요청 리뷰:{}", reviewDTO);
 		
         if (token == null) {
             throw new NotAuthException("요청권한이 없습니다.");
         }
 
-        Long userId = jwtUtil.extractUserId(token); // ✅ JWT에서 userId 추출
-		
-        reviewDTO.setProductId(productId);
-        reviewDTO.setUserId(userId);
-		
-		reviewService.createReview(reviewDTO);
+        Long userId = jwtUtil.extractUserId(token); // JWT에서 userId 추출
+        log.info("ratings:{}", ratings);
+        log.info("images:{}", images);
+        log.info("reviewText:{}", reviewText);
+        
+        if(ratings <=0L) {
+        	throw new BadRequestException("평점은 필수입니다.");
+        }
+        
+        if(reviewText.isEmpty()) {
+        	throw new BadRequestException("리뷰 내용은 필수입니다.");
+        }
+        
+        
+        List<String> uploadImages = images.stream().map(fileUploadService::upload).toList();
+        
+		reviewService.createReview(		
+				ReviewRequestDTO.builder()
+				.productId(productId)
+				.reviewText(reviewText)
+				.ratings(ratings.intValue())
+				.images(uploadImages)
+				.userId(userId)
+				.build());
 		
 		return ResponseEntity.created(null).build();
 		

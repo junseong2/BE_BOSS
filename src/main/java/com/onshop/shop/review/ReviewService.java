@@ -6,7 +6,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 public interface ReviewService {
 	
-	ReviewResponseDTO getReviews(Long productId, Long userId, int page, int size);
+	ReviewResponseDTO getReviews(Long productId, int page, int size);
     void createReview(ReviewRequestDTO reviewDto);
     void updateReview(ReviewRequestDTO reviewDto);
     void deleteReview(Long reviewId, Long userId);
