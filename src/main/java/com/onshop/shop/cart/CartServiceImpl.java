@@ -33,8 +33,9 @@ public class CartServiceImpl implements CartService {
 		return carts.stream().map(cart -> {
 			Product product = cart.getProduct();
 			return new CartDTO(cart.getCartId(),cart.getQuantity(),cart.getUserId(), cart.getProduct().getProductId(),  
-					product.getName(), // ✅ productName 추가
-					product.getPrice() // ✅ productPrice 추가
+					product.getName(), // productName 추가
+					product.getPrice(), // productPrice 추가
+					product.getImageList().get(0) // product 썸네일 추가
 			);
 		}).collect(Collectors.toList());
 	}

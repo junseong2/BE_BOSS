@@ -39,7 +39,6 @@ import org.springframework.web.bind.annotation.DeleteMapping;
 public class ProductsController {
 
     private final ProductsService productsService;
-    private final FileUploadService fileUploadService;
     private final JwtUtil jwtUtil;
 
     /** 구매자*/
@@ -80,14 +79,18 @@ public class ProductsController {
 
     
     @GetMapping("/products/popular")
-    public ResponseEntity<List<Product>> getPopularProducts(@RequestParam String sortBy) {
+    public ResponseEntity<List<Product>> getPopularProducts(
+    		@RequestParam String sortBy,
+    		@RequestParam int page,
+    		@RequestParam int size
+    		) {
         log.info("인기 상품 조회 요청: sortBy={}", sortBy);
         
         List<Product> products;
         
         switch (sortBy.toLowerCase()) {
             case "daily":
-                products = productsService.getPopularProductsDaily();
+                products = productsService.getPopularProductsDaily(page, size);
                 break;
             case "weekly":
                 products = productsService.getPopularProductsWeekly();

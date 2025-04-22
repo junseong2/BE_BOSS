@@ -104,10 +104,9 @@ public class UserController {
       }
 
       return ResponseEntity.ok(Map.of("userId", user.getUserId().toString(), 
-            "userName", user.getUsername(),
-              "userEmail", Optional.ofNullable(user.getEmail()).orElse(""),
-            "userPassword" , user.getPassword(),
-            "userPhone1", Optional.ofNullable(user.getPhone1()).orElse(""),
+             "userName", user.getUsername(),
+             "userEmail", Optional.ofNullable(user.getEmail()).orElse(""),
+             "userPhone1", Optional.ofNullable(user.getPhone1()).orElse(""),
              "userPhone2", Optional.ofNullable(user.getPhone2()).orElse(""),
              "userPhone3", Optional.ofNullable(user.getPhone3()).orElse(""),
              "userRole", user.getRole()

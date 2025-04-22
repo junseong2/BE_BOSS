@@ -48,7 +48,7 @@ public interface ProductsService {
 
     
     // 일간 인기 상품 조회
-    public List<Product> getPopularProductsDaily();
+    public List<Product> getPopularProductsDaily(int page, int size);
 
     // 주간 인기 상품 조회
     public List<Product> getPopularProductsWeekly();
