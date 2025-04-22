@@ -607,8 +607,9 @@ public class ProductsServiceImpl implements ProductsService {
 //	}   
     
     @Override
-    public List<Product> getPopularProductsDaily() {
-        return productRepository.findAllByOrderByDailySalesDesc();  // List<Product>로 반환
+    public List<Product> getPopularProductsDaily(int page, int size) {
+    	Pageable pageable = PageRequest.of(page, size);
+        return productRepository.findAllByOrderByDailySalesDesc(pageable);  // List<Product>로 반환
     }
 
     @Override

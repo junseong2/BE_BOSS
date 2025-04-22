@@ -39,7 +39,7 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
     @Query("SELECT p FROM Product p JOIN p.category c WHERE p.name LIKE %:query% OR c.name LIKE %:query%")
     List<Product> searchByNameOrCategory(@Param("query") String query);
     
-	List<Product> findAllByOrderByDailySalesDesc(); // dailySales 기준으로 모든 상품 정렬
+	List<Product> findAllByOrderByDailySalesDesc(Pageable pageable); // dailySales 기준으로 모든 상품 정렬
 
 	List<Product> findAllByOrderByWeeklySalesDesc(); // weeklySales 기준으로 모든 상품 정렬
 

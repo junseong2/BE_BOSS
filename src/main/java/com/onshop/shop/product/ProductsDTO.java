@@ -30,7 +30,7 @@ import com.onshop.shop.category.Category;
 	    public static ProductsDTO fromEntity(Product product) {
 	    	List<String> imageUrls = product.getImageList().stream()
 //	                .map(imageName -> "http://localhost:5000/uploads/" + imageName) // URL 변환
-	                .map(imageName ->  "https://bossassets.s3.amazonaws.com/"  + imageName) // URL 변환
+//	                .map(imageName ->  "https://bossassets.s3.amazonaws.com/"  + imageName) // URL 변환
 	                .collect(Collectors.toList());
 	
 	        return ProductsDTO.builder()

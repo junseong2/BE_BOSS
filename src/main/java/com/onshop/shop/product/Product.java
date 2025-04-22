@@ -4,6 +4,7 @@ package com.onshop.shop.product;
 import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
@@ -121,8 +122,13 @@ public class Product {
     
     // ✅ 쉼표(,)로 구분된 gImages를 리스트로 변환하여 반환
     public List<String> getImageList() {
+        String s3BaseUrl = "https://bossassets.s3.amazonaws.com/";
+
         return (this.gImage != null && !this.gImage.isEmpty())
-                ? Arrays.asList(this.gImage.split(","))
+                ? Arrays.stream(this.gImage.split(","))
+                        .map(String::trim)
+                        .map(fileName -> s3BaseUrl + fileName)
+                        .collect(Collectors.toList())
                 : List.of();
     }
     
