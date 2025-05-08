@@ -2,6 +2,8 @@ package com.onshop.shop.domain.product.service;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
+
+// TODO: 쓰는거 아니라면 제거(YoungWan Kim)
 @Service
 public class ResetService {
 

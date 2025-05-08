@@ -39,6 +39,8 @@ import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
+
+//TODO: 정렬의 경우 중복되는 로직이 너무 많은데 줄일 수 있으면 최대한 줄이는게 좋아 보임. 클래스가 너무 무거움( Youngwan kim).
 @Service
 @RequiredArgsConstructor
 @Slf4j
@@ -133,6 +135,7 @@ public class ProductsSellerServiceImpl implements ProductsSellerService {
         inventoryRepository.saveAll(unsavedInventories);
     }
     
+    /** @deprecated 향후 안 쓰이는거면 조만간 삭제 */
     @Override
     public SellerProductsResponseDTO getAllProducts(int page, int size, String search, String sort) {
         Long sellerId = 999L; // TODO: 추후 로그인 정보에서 받아오도록 수정
@@ -472,6 +475,7 @@ public class ProductsSellerServiceImpl implements ProductsSellerService {
 
 
     /** 판매자 상품 CSV 업로드
+     * @deprecated 이거 구현안 할 거면 조만간 제거
      * @throws IOException 
      * @throws CsvValidationException */
 	@Override

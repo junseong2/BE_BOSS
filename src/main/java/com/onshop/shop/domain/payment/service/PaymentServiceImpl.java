@@ -59,13 +59,13 @@ public class PaymentServiceImpl implements PaymentService {
      * 
      * @param paymentDTO 결제 정보 DTO
      * @return 생성된 결제 엔티티
-     * @throws IllegalArgumentException 주문이 존재하지 않을 경우
+     * @throws ResourceNotFoundException 주문이 존재하지 않을 경우
      */
     @Override
     @Transactional
     public Payment createPayment(PaymentDTO paymentDTO) {
         Order order = orderRepository.findById(paymentDTO.getOrderId())
-            .orElseThrow(() -> new IllegalArgumentException("주문을 찾을 수 없습니다. orderId: " + paymentDTO.getOrderId()));
+            .orElseThrow(() -> new ResourceNotFoundException("주문을 찾을 수 없습니다. orderId: " + paymentDTO.getOrderId()));
 
         Payment payment = new Payment();
         payment.setUserId(paymentDTO.getUserId());
