@@ -1,8 +1,6 @@
 
 package com.onshop.shop.domain.address.entity;
 
-import org.hibernate.annotations.OnDelete;
-import org.hibernate.annotations.OnDeleteAction;
 
 import com.onshop.shop.domain.user.entity.User;
 
@@ -31,7 +29,6 @@ public class Address {
 
     @ManyToOne(fetch = FetchType.LAZY) // User와 다대일 관계
     @JoinColumn(name = "user_id", nullable = false)
-    @OnDelete(action = OnDeleteAction.CASCADE) // User 삭제 시, 관련된 Address도 삭제됨
     private User user;
 
     private String address1;

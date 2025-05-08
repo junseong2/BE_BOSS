@@ -26,13 +26,7 @@ import lombok.Setter;
 
 
 
-/*
-@JsonIdentityInfo(
-	    generator = ObjectIdGenerators.PropertyGenerator.class,
-	    property = "userId"
-	)
-	
-	*/
+
 @Getter
 @Setter
 @Entity
@@ -63,7 +57,7 @@ public class User {
     private Timestamp createdSignup;
 
   
-    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER)
+    @OneToMany(mappedBy = "user", cascade = CascadeType.REMOVE, orphanRemoval = true, fetch = FetchType.EAGER)
     private List<Address> addresses = new ArrayList<>();
     
     

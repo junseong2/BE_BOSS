@@ -1,10 +1,11 @@
 package com.onshop.shop.domain.auth.service;
 
 import com.onshop.shop.domain.auth.dto.LoginRequestDTO;
+import com.onshop.shop.domain.auth.dto.SignupRequestDTO;
 import com.onshop.shop.domain.user.dto.EmailVerificationRequestDTO;
 import com.onshop.shop.domain.user.dto.ForgetReqeustDTO;
 import com.onshop.shop.domain.user.dto.ForgetResponseDTO;
-import com.onshop.shop.domain.user.entity.User;
+
 
 import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeMessage;
@@ -13,7 +14,7 @@ import jakarta.servlet.http.Cookie;
 public interface AuthService {
 
 	
-    void registerUser(User user);
+    void registerUser(SignupRequestDTO request);
     
     Cookie login(LoginRequestDTO loginRequestDTO);
     

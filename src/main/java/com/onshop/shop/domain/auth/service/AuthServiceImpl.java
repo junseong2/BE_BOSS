@@ -1,9 +1,9 @@
 package com.onshop.shop.domain.auth.service;
 
+import java.util.ArrayList;
 import java.util.Hashtable;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
-import java.util.stream.Collectors;
 
 import javax.naming.NamingException;
 import javax.naming.directory.Attribute;
@@ -22,14 +22,13 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Propagation;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.client.RestTemplate;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.onshop.shop.domain.address.entity.Address;
 import com.onshop.shop.domain.auth.dto.LoginRequestDTO;
+import com.onshop.shop.domain.auth.dto.SignupRequestDTO;
 import com.onshop.shop.domain.user.dto.EmailVerificationRequestDTO;
 import com.onshop.shop.domain.user.dto.ForgetReqeustDTO;
 import com.onshop.shop.domain.user.dto.ForgetResponseDTO;
@@ -48,6 +47,22 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 
+/**
+ * 인증 관련 서비스 구현체로, 회원가입, 일반 로그인, 소셜 로그인(Naver, Kakao), 이메일 인증 등을 담당합니다.
+ * <p>
+ * 이 클래스는 다음 기능들을 제공합니다:
+ * <ul>
+ *     <li>일반 회원가입 및 로그인 처리</li>
+ *     <li>네이버/카카오 소셜 로그인 및 사용자 정보 저장</li>
+ *     <li>이메일 인증 코드 발송 및 검증</li>
+ *     <li>도메인의 MX 레코드 유효성 검증</li>
+ * </ul>
+ * 
+ * JWT 토큰을 생성하고 이를 HTTP 쿠키에 저장하여 사용자 인증 상태를 유지합니다.
+ * 이메일 인증은 Redis를 통해 인증 코드를 일정 시간 동안 저장하고 비교합니다.
+ *
+ * @author 
+ */
 @Service
 @RequiredArgsConstructor
 @Slf4j
@@ -80,37 +95,37 @@ public class AuthServiceImpl implements AuthService {
 	   
 	   
 
-	   // 회원가입
-	   @Override
-	   @Transactional(propagation = Propagation.REQUIRED)
-	   public void registerUser(User user) {
+	    /**
+	     * 사용자 회원가입을 처리하는 메서드
+	     * 
+	     * @param signupRequestDTO 회원가입 요청 DTO
+	     */
+   public void registerUser(SignupRequestDTO signupRequestDTO) {
+        // User 객체 생성
+        User user = new User();
+        user.setEmail(signupRequestDTO.getEmail());
+        user.setUsername(signupRequestDTO.getName());  // 이름을 username으로 설정
+        user.setPassword(signupRequestDTO.getPassword());
+        user.setRole(UserRole.CUSTOMER);  // 기본 역할을 CUSTOMER로 설정
 
-		   User savedUser = userService.registerUser(user); // 유저 등록
+	    // 전화번호 설정
+	    user.setPhones(signupRequestDTO.getPhones());  // 주소가 없으면 전화번호만 추가
+	    
+	    user.setRole(UserRole.CUSTOMER); // 유저 권한 설정
 
-	       List<Address> addresses = user.getAddresses() != null ? user.getAddresses() : List.of();
-	       log.info("주소 목록:{}",addresses);
-
-	       if (!addresses.isEmpty()) {
-	            // 로그: 주소 저장 전 상태
-	    	   log.info("주소 목록 저장 전:{} ", addresses);
-
-	            List<Address> addressEntities = addresses.stream()
-	                .map(address -> {
-	                    Address addressEntity = new Address();
-	                    addressEntity.setUser(savedUser);
-	                    addressEntity.setAddress1(address.getAddress1());
-	                    addressEntity.setAddress2(address.getAddress2());
-	                    addressEntity.setPost(address.getPost());
-	                    addressEntity.setIsDefault(address.getIsDefault());
-	                    return addressEntity;
-	                }).collect(Collectors.toList());
-
-	            // 로그: 주소 저장 후 상태
-	            log.info("주소 목록 저장 후:{} ", addressEntities);
-//	            addressRepository.saveAll(addressEntities);
-	        }
+	    // 주소 추가
+	    List<Address> addresses = signupRequestDTO.getAddresses();
+	    for (Address address : addresses) {
+	         address.setUser(user); // Address와 User를 연관시킴
 	    }
 
+	    // 주소 저장
+	    user.setAddresses(addresses); // User 엔티티에 주소 리스트 설정
+
+	    // 사용자 저장
+	    userService.registerUser(user);
+	    }
+	    
 	// 로그인 
 	@Override
 	public Cookie login(LoginRequestDTO loginRequestDTO) {
