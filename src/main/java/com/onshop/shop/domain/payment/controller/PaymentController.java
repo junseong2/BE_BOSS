@@ -15,7 +15,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.onshop.shop.domain.order.service.OrderService;
+import com.onshop.shop.domain.order.service.OrderSellerService;
 import com.onshop.shop.domain.payment.config.PaymentConfig;
 import com.onshop.shop.domain.payment.dto.PaymentDTO;
 import com.onshop.shop.domain.payment.dto.SellerCategorySalesDTO;
@@ -33,7 +33,7 @@ import lombok.RequiredArgsConstructor;
 public class PaymentController {
 
     private final PaymentService paymentService;
-    private final OrderService orderService;
+    private final OrderSellerService orderService;
     private final PaymentConfig paymentConfig;
     private final JwtUtil jwtUtil;
 
