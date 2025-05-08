@@ -48,7 +48,7 @@ public class InventoryController {
             throw new NotAuthException("요청 권한이 없습니다.");
         }
 
-        Long userId = jwtUtil.extractUserId(token); // ✅ JWT에서 userId 추출
+        Long userId = jwtUtil.extractUserId(token); // JWT에서 userId 추출
 
 		SellerInventoryResponseDTO inventory = inventoryService.getAllInventory(page, size, search,state, userId);
 		return ResponseEntity.ok(inventory);
