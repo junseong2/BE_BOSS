@@ -33,7 +33,6 @@ import lombok.RequiredArgsConstructor;
 public class PaymentController {
 
     private final PaymentService paymentService;
-    private final OrderSellerService orderService;
     private final PaymentConfig paymentConfig;
     private final JwtUtil jwtUtil;
 
