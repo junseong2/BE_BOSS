@@ -25,9 +25,9 @@ public interface SettlementRepository extends JpaRepository<Settlement, Long> {
             + " st.createdDate, "
             + " st.updatedDate, "
             + " st.status, "
-            + " st.bankName, " // TODO: 하드코딩된 은행 이름(향후 사용자가 등록한 입출금 은행명으로 변경)
-            + " u.username, " // TODO: User 엔티티에서 username 가져옴(향후 사용자가 지정한 예금주명으로 변경)
-            + " st.accountNumber, " // TODO: 하드코딩된 계좌번호(향후 사용자가 등록한 입출금 계좌로 변경)
+            + " st.bankName, " 
+            + " u.username, "
+            + " st.accountNumber, "
             + " st.requestedAmount) "
             + "FROM Settlement st "
             + "JOIN Seller s ON st.seller.sellerId = s.sellerId "

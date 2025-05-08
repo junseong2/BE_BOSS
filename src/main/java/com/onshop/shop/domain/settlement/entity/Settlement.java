@@ -4,6 +4,8 @@ import java.time.LocalDateTime;
 
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
+import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import com.onshop.shop.domain.seller.entity.Seller;
@@ -50,18 +52,9 @@ public class Settlement {
     private String accountNumber;    // 계좌 번호
     private String accountHolder;    // 예금주 이름
 
+    @CreatedDate
     private LocalDateTime createdDate;  // 생성일
+    @LastModifiedDate
     private LocalDateTime updatedDate;  // 수정일
-
-    @PrePersist
-    protected void onCreate() {
-        this.createdDate = LocalDateTime.now();
-        this.updatedDate = LocalDateTime.now();
-    }
-
-    @PreUpdate
-    protected void onUpdate() {
-        this.updatedDate = LocalDateTime.now();
-    }
 
 }
