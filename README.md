@@ -1,6 +1,8 @@
 # 📌 판매자 스토어 커스텀 쇼핑몰 웹 사이트
 ## 📝 개요
 누구나 손쉽게 나만의 스토어를 만들고, 자신의 상품을 판매할 수 있는 셀러 중심의 커머스 플랫폼
+![제목을 입력해주세요_-001](https://github.com/user-attachments/assets/456b99e4-6e1e-45f8-bdce-02eef2fb66c4)
+
 <br><br>
 ## 📆 개발 기간
 - **개발 시작일**: 2025년 2월 28일
@@ -9,18 +11,15 @@
 ![image](https://github.com/user-attachments/assets/c1b0dad0-fcca-49f2-b418-ac1a5df93e42)
 <br><br>
 ## 📟 개발환경
-
 - **운영 체제**: Windows
 - **IDE**: Visual Studio Code, Spring Tools Suite 4
-- **버전 관리**: Git, GitHub
-- **배포 환경**: AWS EC2, S3, RDS
-- **데이터베이스**: MySQL, PostgreSQL
-- **CI/CD**: GitHub Actions
 <br><br>
 ## 🧱 시스템 아키텍처
 ![image](https://github.com/user-attachments/assets/efb835ba-48be-4f87-8f3f-b74140f7b9dd)
 <br><br>
 ## 🛠️ 기술 스택
+![image](https://github.com/user-attachments/assets/7eb576ad-e2ff-45c2-aab8-a2e489597573)
+![image](https://github.com/user-attachments/assets/40dad05d-d2bf-4e54-896c-755b3848a85e)
 
 | 구분              | 기술                                             |
 | ----------------- | --------------------------------------           |
@@ -30,10 +29,12 @@
 | **인프라**        | AWS EC2, S3, RDS, CloudFront                     |
 | **배포 및 CI/CD** | GitHub Actions                                  |
 | **버전 관리**     | Git, GitHub                                      |
-| **테스트**        | PostMan, Selenium                                |
+| **테스트**        | PostMan, Selenium  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;                                 |
 
 <br><br>
 ## 🧩 핵심 기능 요약
+![image](https://github.com/user-attachments/assets/8a479571-024c-4221-83d0-8066cc6a1513)
+
 | 기능 | 설명 | 
 |------|------|
 | **회원 관리** | 회원가입, 로그인, 정보 수정, 탈퇴 기능 | 
@@ -47,7 +48,9 @@
 | **AI 챗봇** | 사용자가 상품 추천을 받을 수 있는 챗봇 | 
 | **행동 기반 추천** | 장바구니 기록 기반 개인화 추천 |
 | **상품 데이터 크롤링** | 외부 상품 데이터를 수집해 등록 |
-| **판매자 샵 에디터** | 레이아웃/폰트/색상 커스터마이징 | 
+| **판매자 샵 에디터**| 레이아웃/폰트/색상 커스터마이징&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;| 
+
+
 
 <br><br>
 ## 팀원
